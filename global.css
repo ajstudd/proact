@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a202c;
+  width: 5px;
+  /* border-radius: 5px; */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  /* border-radius: 5px;  I do not neet rounded scrollbar for now */
+  transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
