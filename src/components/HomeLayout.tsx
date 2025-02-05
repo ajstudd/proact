@@ -19,11 +19,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <Sidebar
                     isOpen={isOpen}
                     toggleSidebar={toggleSidebar}
-                    classOverride="lg:relative lg:w-64 lg:block absolute lg:h-auto w-full h-full top-0 left-0 z-50"
                 />
                 <Box
                     as="main"
-                    className={`transition-all duration-300 flex-1 bg-gray-100 overflow-y-auto h-full ${isOpen ? "lg:ml-64" : ""}`}
+                    className={`transition-all duration-300 flex-1 bg-gray-100 overflow-y-auto h-full `}
                 >
                     {children}
                 </Box>

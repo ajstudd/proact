@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Icon, Stack, Text } from "@chakra-ui/react";
 import { FiMenu, FiChevronLeft, FiHome, FiSettings, FiUser, FiBell, FiMessageCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
 
@@ -10,15 +10,14 @@ const menuItems = [
     { label: "Settings", icon: FiSettings }
 ];
 
-const Sidebar = ({ isOpen, toggleSidebar, classOverride }: {
+const Sidebar = ({ isOpen, toggleSidebar }: {
     isOpen: boolean;
     toggleSidebar: () => void;
-    classOverride?: string;
 }) => {
     return (
         <Box
             as="aside"
-            className={classOverride ? classOverride : `h-screen bg-gray-900 text-white transition-all duration-300 shadow-lg ${isOpen ? "w-64" : "w-[64px]"}`}
+            className={`h-screen bg-gray-900 text-white transition-all duration-300 shadow-lg ${isOpen ? "w-64" : "w-[64px]"}`}
         >
             <Flex align="center" className="p-4 border-b border-gray-700">
                 <Button onClick={toggleSidebar} className="text-white bg-transparent p-2">
@@ -27,11 +26,15 @@ const Sidebar = ({ isOpen, toggleSidebar, classOverride }: {
                 {isOpen && <Text ml={4} fontSize="lg" fontWeight="bold">Dashboard</Text>}
             </Flex>
             <Box p={4} className="overflow-hidden hover:overflow-y-auto h-[calc(100vh-64px)] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
-                <Stack spacing={4} className="w-full flex justify-start items-start">
+                <div className="w-full flex justify-center items-center align-middle content-center flex-col">
                     {menuItems.map((item, index) => (
-                        <Button
+                        <button
                             key={index}
-                            className={`flex justify-start bg-transparent text-white p-2 hover:bg-gray-700 rounded-lg ${isOpen ? "pl-4 items-center" : " w-full items-start"}`}
+
+                            className={`flex items-center bg-transparent 
+                            text-white hover:bg-gray-700 rounded-lg w-full
+                            ${isOpen ? "pl-[20px] h-[40px]" : "justify-center content-center h-[40px]"}
+                           `}
                         >
                             <Icon as={item.icon} className={isOpen ? "mr-2" : ""} />
                             <motion.div
@@ -41,11 +44,11 @@ const Sidebar = ({ isOpen, toggleSidebar, classOverride }: {
                             >
                                 {isOpen && <Text>{item.label}</Text>}
                             </motion.div>
-                        </Button>
+                        </button>
                     ))}
-                </Stack>
+                </div>
             </Box>
-        </Box>
+        </Box >
     );
 };
 
