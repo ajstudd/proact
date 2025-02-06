@@ -1,6 +1,8 @@
+"use client";
+
 import { Box, Icon, Flex, Text } from "@chakra-ui/react";
 import { FiHome, FiUser, FiMessageCircle, FiBell, FiSettings } from "react-icons/fi";
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
 
 const menuItems = [
     { label: "Home", icon: FiHome, path: "/" },
@@ -12,22 +14,29 @@ const menuItems = [
 
 const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
     const router = useRouter();
+    const pathname = usePathname(); // Get current route
 
     return (
         <Box className="fixed bottom-0 left-0 w-full bg-gray-900 text-white p-2 shadow-lg">
             <Flex justify="space-around" align="center">
-                {menuItems.map((item, index) => (
-                    <Flex
-                        key={index}
-                        direction="column"
-                        align="center"
-                        className="p-2 cursor-pointer hover:bg-gray-700 rounded-lg"
-                        onClick={() => router.push(item.path)}
-                    >
-                        <Icon as={item.icon} boxSize={14} />
-                        {showLabels && <Text fontSize="xs" mt={1}>{item.label}</Text>}
-                    </Flex>
-                ))}
+                {menuItems.map((item) => {
+                    const isActive = pathname === item.path;
+
+                    return (
+                        <Flex
+                            key={item.path}
+                            direction="column"
+                            align="center"
+                            className={`p-2 cursor-pointer rounded-lg transition-all duration-200 
+                                ${isActive ? "text-blue-400 bg-gray-700" : "hover:bg-gray-700"}
+                            `}
+                            onClick={() => router.push(item.path)}
+                        >
+                            <Icon as={item.icon} boxSize={14} />
+                            {showLabels && <Text fontSize="xs" mt={1}>{item.label}</Text>}
+                        </Flex>
+                    );
+                })}
             </Flex>
         </Box>
     );

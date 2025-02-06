@@ -1,19 +1,22 @@
-import { Box, Button, Flex, HStack, Icon, Stack, Text } from "@chakra-ui/react";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
+import { Box, Button, Flex, Icon, Text } from "@chakra-ui/react";
 import { FiMenu, FiChevronLeft, FiHome, FiSettings, FiUser, FiBell, FiMessageCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
 
 const menuItems = [
-    { label: "Home", icon: FiHome },
-    { label: "Profile", icon: FiUser },
-    { label: "Messages", icon: FiMessageCircle },
-    { label: "Notifications", icon: FiBell },
-    { label: "Settings", icon: FiSettings }
+    { label: "Home", icon: FiHome, path: "/" },
+    { label: "Profile", icon: FiUser, path: "/profile" },
+    { label: "Messages", icon: FiMessageCircle, path: "/messages" },
+    { label: "Notifications", icon: FiBell, path: "/notifications" },
+    { label: "Settings", icon: FiSettings, path: "/settings" }
 ];
 
-const Sidebar = ({ isOpen, toggleSidebar }: {
-    isOpen: boolean;
-    toggleSidebar: () => void;
-}) => {
+const Sidebar = ({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) => {
+    const router = useRouter();
+    const pathname = usePathname(); // Get current path
+
     return (
         <Box
             as="aside"
@@ -25,30 +28,34 @@ const Sidebar = ({ isOpen, toggleSidebar }: {
                 </Button>
                 {isOpen && <Text ml={4} fontSize="lg" fontWeight="bold">Dashboard</Text>}
             </Flex>
-            <Box p={4} className="overflow-hidden hover:overflow-y-auto h-[calc(100vh-64px)] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
-                <div className="w-full flex justify-center items-center align-middle content-center flex-col">
-                    {menuItems.map((item, index) => (
-                        <button
-                            key={index}
 
-                            className={`flex items-center bg-transparent 
-                            text-white hover:bg-gray-700 rounded-lg w-full
-                            ${isOpen ? "pl-[20px] h-[40px]" : "justify-center content-center h-[40px]"}
-                           `}
-                        >
-                            <Icon as={item.icon} className={isOpen ? "mr-2" : ""} />
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: isOpen ? 1 : 0 }}
-                                transition={{ duration: 0.3 }}
+            <Box p={4} className="overflow-hidden hover:overflow-y-auto h-[calc(100vh-64px)] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                <div className="w-full flex justify-center items-center flex-col gap-2">
+                    {menuItems.map((item) => {
+                        const isActive = pathname === item.path;
+                        return (
+                            <button
+                                key={item.path}
+                                onClick={() => router.push(item.path)}
+                                className={`flex items-center rounded-lg w-full transition-all duration-200
+                                    ${isOpen ? "pl-[20px] h-[40px]" : "justify-center h-[40px]"} 
+                                    ${isActive ? "bg-gray-700 text-blue-400" : "bg-transparent text-white hover:bg-gray-700"}
+                                `}
                             >
-                                {isOpen && <Text>{item.label}</Text>}
-                            </motion.div>
-                        </button>
-                    ))}
+                                <Icon as={item.icon} className={`${isOpen ? "mr-2" : ""}`} />
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: isOpen ? 1 : 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    {isOpen && <Text>{item.label}</Text>}
+                                </motion.div>
+                            </button>
+                        );
+                    })}
                 </div>
             </Box>
-        </Box >
+        </Box>
     );
 };
 
