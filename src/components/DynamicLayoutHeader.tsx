@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Flex, Input, IconButton, VStack, Image, Text } from "@chakra-ui/react";
+import { Box, Flex, Input, IconButton, VStack, Image, Text, Button } from "@chakra-ui/react";
 import { FiSearch, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import useDebounce from "hooks/useDebounce"; // Import debounce hook
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import useScreenSize from "hooks/useScreenSize";
 
 interface HeaderProps {
@@ -19,6 +19,13 @@ const dummyResults = [
     { id: 3, title: "Hawa Mahal", image: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Taj_Mahal_%28Edited%29.jpeg", link: "" }, // No link case
 ];
 
+const buttonConfig: Record<string, { text: string; link: string } | null> = {
+    "/signup": { text: "Login", link: "/login" },
+    "/login": { text: "Sign Up", link: "/signup" },
+    "/home": { text: "Dashboard", link: "/dashboard" }, // Example: Button on home page
+    "/projects": { text: "My Projects", link: "/dashboard/projects" }, // Example: Button for projects
+};
+
 const Header = ({ hideSearch = false }: HeaderProps) => {
     const [searchTerm, setSearchTerm] = useState("");
     const { screenSize } = useScreenSize();
@@ -27,6 +34,7 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const router = useRouter();
 
+    const button = buttonConfig[router.pathname] || null;
     // Simulated API call (Replace with actual API)
     const fetchResults = async (query: string) => {
         if (!query.trim()) {
@@ -161,8 +169,21 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                     </div>
                 </div>
             )}
+            {button && (
+                <Button
+                    variant="outline"
+                    colorScheme="teal"
+                    className="ml-auto hover:bg-teal-500 hover:text-white transition-all"
+                    onClick={() => router.push(button.link)}
+                >
+                    {button.text}
+                </Button>
+            )}
         </Box>
     );
 };
 
 export default Header;
+
+
+

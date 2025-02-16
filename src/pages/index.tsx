@@ -1,5 +1,6 @@
 import { ChakraProvider, Box, Heading, Text, Button, Stack, Flex, Image } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 import { Roboto } from "next/font/google";
 import HeroCarousel from "components/Hero";
 
@@ -24,8 +25,10 @@ const BackgroundPattern = () => (
   </svg>
 );
 
-// 🏆 Hero Section
-function HeroSection() {
+
+const HeroSection = () => {
+  const router = useRouter();
+
   return (
     <Box as="section" className="relative bg-gray-900 text-white py-20 px-6 text-center overflow-hidden">
       <BackgroundPattern />
@@ -42,75 +45,28 @@ function HeroSection() {
           A platform to track government projects, engage with citizens, and ensure transparency in public initiatives.
         </Text>
         <Stack direction="row" spacing={4} justify="center" className="mt-6">
-          <Button colorScheme="teal" size="lg" className="shadow-lg hover:scale-105 transition-transform">
+          <Button
+            colorScheme="teal"
+            size="lg"
+            className="shadow-lg hover:scale-105 transition-transform"
+            onClick={() => router.push("/home")}
+          >
             Explore Projects
           </Button>
-          <Button variant="outline" colorScheme="teal" size="lg" className="hover:bg-teal-500 hover:text-white transition-all">
-            Learn More
+          <Button
+            variant="outline"
+            colorScheme="teal"
+            size="lg"
+            className="hover:bg-teal-500 hover:text-white transition-all"
+            onClick={() => router.push("/signup")}
+          >
+            Get Started
           </Button>
         </Stack>
       </motion.div>
     </Box>
   );
-}
-
-// ⚡ Features Section
-function FeaturesSection() {
-  return (
-    <Box bg="gray.50" py={20} px={8} textAlign="center">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
-        <Heading as="h2" size="xl" mb={6} fontWeight="semibold" color="gray.800">
-          Key Features
-        </Heading>
-        <Text fontSize="md" maxW="600px" mx="auto" mb={12} color="gray.600">
-          Explore the features that make our platform stand out and create a more transparent world.
-        </Text>
-      </motion.div>
-
-      <Flex wrap="wrap" justify="center" gap={8}>
-        <FeatureCard
-          title="Real-Time Updates"
-          description="Stay informed with live updates on government projects."
-          svgPath="/svgs/real-time.svg"
-        />
-        <FeatureCard
-          title="Public Engagement"
-          description="Empower citizens to give feedback, vote, and report issues."
-          svgPath="/svgs/engagement.svg"
-        />
-        <FeatureCard
-          title="Secure & Anonymous Reporting"
-          description="Ensure corruption reports remain confidential."
-          svgPath="/svgs/secure-reporting.svg"
-        />
-        <FeatureCard
-          title="Geotagged Projects"
-          description="View projects on an interactive OpenStreetMap."
-          svgPath="/svgs/geotagging.svg"
-        />
-      </Flex>
-    </Box>
-  );
-}
-
-// 🔥 Feature Card Component
-function FeatureCard({ title, description, svgPath }: { title: string; description: string; svgPath: string }) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      transition={{ duration: 0.3 }}
-      className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center transition-all"
-    >
-      <Image src={svgPath} width={60} height={60} alt={title} className="mb-4" />
-      <Heading as="h3" size="md" mb={3} fontWeight="semibold">
-        {title}
-      </Heading>
-      <Text fontSize="sm">{description}</Text>
-    </motion.div>
-  );
-}
-
-// ⭐ Testimonial Section
+};
 function Testimonials() {
   return (
     <Box className="bg-gray-100 py-20 px-6 text-center">
@@ -151,9 +107,61 @@ function Testimonial({ name, text, image }: { name: string; text: string; image:
     </motion.div>
   );
 }
+function FeatureCard({ title, description, svgPath }: { title: string; description: string; svgPath: string }) {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center transition-all"
+    >
+      <Image src={svgPath} width={60} height={60} alt={title} className="mb-4" />
+      <Heading as="h3" size="md" mb={3} fontWeight="semibold">
+        {title}
+      </Heading>
+      <Text fontSize="sm">{description}</Text>
+    </motion.div>
+  );
+}
+function FeaturesSection() {
+  return (
+    <Box bg="gray.50" py={20} px={8} textAlign="center">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+        <Heading as="h2" size="xl" mb={6} fontWeight="semibold" color="gray.800">
+          Key Features
+        </Heading>
+        <Text fontSize="md" maxW="600px" mx="auto" mb={12} color="gray.600">
+          Explore the features that make our platform stand out and create a more transparent world.
+        </Text>
+      </motion.div>
 
-// 📢 Call to Action Section
-function CallToAction() {
+      <Flex wrap="wrap" justify="center" gap={8}>
+        <FeatureCard
+          title="Real-Time Updates"
+          description="Stay informed with live updates on government projects."
+          svgPath="/svgs/real-time.svg"
+        />
+        <FeatureCard
+          title="Public Engagement"
+          description="Empower citizens to give feedback, vote, and report issues."
+          svgPath="/svgs/engagement.svg"
+        />
+        <FeatureCard
+          title="Secure & Anonymous Reporting"
+          description="Ensure corruption reports remain confidential."
+          svgPath="/svgs/secure-reporting.svg"
+        />
+        <FeatureCard
+          title="Geotagged Projects"
+          description="View projects on an interactive OpenStreetMap."
+          svgPath="/svgs/geotagging.svg"
+        />
+      </Flex>
+    </Box>
+  );
+}
+const CallToAction = () => {
+  const router = useRouter();
+
   return (
     <Box bg="teal.600" color="white" py={16} textAlign="center">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
@@ -163,16 +171,24 @@ function CallToAction() {
         <Text fontSize="lg" mt={4} maxW="600px" mx="auto">
           Register now to track projects, report concerns, and shape the future of governance.
         </Text>
-        <Button size="lg" mt={6} colorScheme="whiteAlpha" className="hover:scale-105 transition-transform">
-          Get Started
+        <Button
+          size="lg"
+          mt={6}
+          colorScheme="whiteAlpha"
+          className="hover:scale-105 transition-transform"
+          onClick={() => router.push("/signup")}
+        >
+          Sign Up Now
         </Button>
       </motion.div>
     </Box>
   );
-}
+};
 
 // 🏡 Home Page Component
 export default function Home() {
+  const router = useRouter();
+
   return (
     <ChakraProvider>
       <HeroCarousel />
