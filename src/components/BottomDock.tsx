@@ -5,7 +5,7 @@ import { FiHome, FiUser, FiMessageCircle, FiBell, FiSettings } from "react-icons
 import { useRouter, usePathname } from "next/navigation";
 
 const menuItems = [
-    { label: "Home", icon: FiHome, path: "/" },
+    { label: "Home", icon: FiHome, path: "/home" },
     { label: "Profile", icon: FiUser, path: "/profile" },
     { label: "Messages", icon: FiMessageCircle, path: "/messages" },
     { label: "Notifications", icon: FiBell, path: "/notifications" },

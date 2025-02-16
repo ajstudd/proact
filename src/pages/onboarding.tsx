@@ -28,7 +28,7 @@ const GovernmentInfo = () => {
                     >
                         <h3 className="text-lg font-semibold text-yellow-300">1. Submit Your Information</h3>
                         <p className="text-gray-300">
-                            Provide your official **name, designation, department, and contact details**.
+                            Provide your official name, designation, department, and contact details.
                         </p>
                     </motion.div>
 
@@ -38,7 +38,7 @@ const GovernmentInfo = () => {
                     >
                         <h3 className="text-lg font-semibold text-yellow-300">2. Verification Process</h3>
                         <p className="text-gray-300">
-                            Our team will verify your **government ID and authorization letter**.
+                            Our team will verify your government ID and authorization letter.
                         </p>
                     </motion.div>
 
@@ -48,7 +48,7 @@ const GovernmentInfo = () => {
                     >
                         <h3 className="text-lg font-semibold text-yellow-300">3. Account Activation</h3>
                         <p className="text-gray-300">
-                            Once verified, you will receive login credentials **via email**.
+                            Once verified, you will receive login credentials via email.
                         </p>
                     </motion.div>
                 </div>

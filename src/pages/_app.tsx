@@ -24,63 +24,16 @@ const roboto = Roboto({
   fallback: ["sans-serif"],
 });
 
-// export default function App({ Component, pageProps }: AppProps) {
-//   const publicPages = ["/", "/government-info"];
-//   const noAuthPages = ["/login", "/signup"];
-
-//   const auth = useAuth([...publicPages, ...noAuthPages]);
-
-//   // Prevent unauthorized users from seeing protected content
-//   if (!auth.isAuthenticated && !publicPages.includes(Component.name) && !noAuthPages.includes(Component.name)) {
-//     return null;
-//   }
-
-//   // 🛠️ **Dynamically Assign Layout**
-//   let Layout = HomeLayout; // Default public layout
-//   // Component.name.toLowerCase()
-//   // noAuthPages.includes(Component.name.toLowerCase())
-//   console.log('noAuthPages.includes(Component.name.toLowerCase())', noAuthPages.includes(Component.name.toLowerCase()))
-//   console.log('Component.name.toLowerCase()', Component.name.toLowerCase())
-//   if (noAuthPages.includes(Component.name.toLowerCase())) {
-//     Layout = AuthLayout; // Login/Register pages
-//   } else if (auth.isAuthenticated) {
-//     switch (auth.user?.role) {
-//       case "government":
-//         Layout = GovernmentLayout;
-//         break;
-//       case "contractor":
-//         Layout = ContractorLayout;
-//         break;
-//       default:
-//         Layout = HomeLayout;
-//     }
-//   }
-
-//   return (
-//     <main className={roboto.className}>
-//       <Provider store={store}>
-//         <AppContextProvider>
-//           <Layout>
-//             <ChakraProvider>
-//               <Component {...pageProps} />
-//             </ChakraProvider>
-//           </Layout>
-//         </AppContextProvider>
-//       </Provider>
-//     </main>
-//   );
-// }
-
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const publicPages = ["/"];
-  const noAuthPages = ["/login", "/signup", "/onboarding"];
+  const publicPages = ["/home"];
+  const noAuthPages = ["/login", "/signup", "/onboarding", "/"];
 
   const auth = useAuth([...publicPages, ...noAuthPages]);
 
-  // Prevent unauthorized users from seeing protected content
+  // ✅ Prevent rendering protected pages before checking auth
   if (!auth.isAuthenticated && !publicPages.includes(router.pathname) && !noAuthPages.includes(router.pathname)) {
-    return null;
+    return <p className="text-center text-gray-500 mt-20">Redirecting...</p>; // ✅ Show message instead of blank screen
   }
 
   // 🛠️ **Dynamically Assign Layout**

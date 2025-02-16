@@ -6,7 +6,7 @@ import { FiMenu, FiChevronLeft, FiHome, FiSettings, FiUser, FiBell, FiMessageCir
 import { motion } from "framer-motion";
 
 const menuItems = [
-    { label: "Home", icon: FiHome, path: "/" },
+    { label: "Home", icon: FiHome, path: "/home" },
     { label: "Profile", icon: FiUser, path: "/profile" },
     { label: "Messages", icon: FiMessageCircle, path: "/messages" },
     { label: "Notifications", icon: FiBell, path: "/notifications" },

@@ -390,6 +390,7 @@ const useAuth = (publicPages: string[] = []) => {
 
     useEffect(() => {
         const token = localStorage.getItem("jwtToken");
+        console.log('token', token)
 
         if (!token) {
             if (!publicPages.includes(pathname)) {
@@ -400,6 +401,7 @@ const useAuth = (publicPages: string[] = []) => {
 
         try {
             const decoded: DecodedToken = jwtDecode(token);
+            console.log('decoded', decoded)
 
             if (decoded.exp * 1000 < Date.now()) {
                 localStorage.removeItem("jwtToken");
@@ -410,6 +412,7 @@ const useAuth = (publicPages: string[] = []) => {
         } catch (error) {
             console.error("Invalid JWT Token", error);
             localStorage.removeItem("jwtToken");
+            console.log('router', router)
             router.replace("/login"); // ✅ Redirect if token is invalid
         }
     }, [pathname, router]); // ✅ Ensure router and pathname are dependencies
