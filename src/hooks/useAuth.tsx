@@ -369,3 +369,52 @@
 // };
 
 // export const useAuth = () => useContext(AuthContext);
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+import { usePathname } from "next/navigation";
+
+interface DecodedToken {
+    userId: string;
+    role: string;
+    exp: number; // Expiration timestamp
+}
+
+const useAuth = (publicPages: string[] = []) => {
+    const pathname = usePathname();
+    const router = useRouter();
+    const [auth, setAuth] = useState<{ isAuthenticated: boolean; user: DecodedToken | null }>({
+        isAuthenticated: false,
+        user: null,
+    });
+
+    useEffect(() => {
+        const token = localStorage.getItem("jwtToken");
+
+        if (!token) {
+            if (!publicPages.includes(pathname)) {
+                router.replace("/login"); // ✅ Redirect to login
+            }
+            return;
+        }
+
+        try {
+            const decoded: DecodedToken = jwtDecode(token);
+
+            if (decoded.exp * 1000 < Date.now()) {
+                localStorage.removeItem("jwtToken");
+                router.replace("/login"); // ✅ Redirect to login if token expired
+            } else {
+                setAuth({ isAuthenticated: true, user: decoded });
+            }
+        } catch (error) {
+            console.error("Invalid JWT Token", error);
+            localStorage.removeItem("jwtToken");
+            router.replace("/login"); // ✅ Redirect if token is invalid
+        }
+    }, [pathname, router]); // ✅ Ensure router and pathname are dependencies
+
+    return auth;
+};
+
+export default useAuth;

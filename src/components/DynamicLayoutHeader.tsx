@@ -8,6 +8,10 @@ import useDebounce from "hooks/useDebounce"; // Import debounce hook
 import { useRouter } from "next/navigation";
 import useScreenSize from "hooks/useScreenSize";
 
+interface HeaderProps {
+    hideSearch?: boolean; // New prop to hide search feature
+}
+
 // Dummy search data
 const dummyResults = [
     { id: 1, title: "Taj Mahal", image: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Taj_Mahal_%28Edited%29.jpeg", link: "https://en.wikipedia.org/wiki/Taj_Mahal" },
@@ -15,7 +19,7 @@ const dummyResults = [
     { id: 3, title: "Hawa Mahal", image: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Taj_Mahal_%28Edited%29.jpeg", link: "" }, // No link case
 ];
 
-const Header = () => {
+const Header = ({ hideSearch = false }: HeaderProps) => {
     const [searchTerm, setSearchTerm] = useState("");
     const { screenSize } = useScreenSize();
     const [results, setResults] = useState<typeof dummyResults>([]);
@@ -29,15 +33,6 @@ const Header = () => {
             setResults([]);
             return;
         }
-
-        // Uncomment below for real API call
-        /*
-        const res = await fetch(`/api/search?query=${query}`);
-        const data = await res.json();
-        setResults(data);
-        */
-
-        // Using dummy results for now
         setResults(dummyResults.filter(item => item.title.toLowerCase().includes(query.toLowerCase())));
     };
 
@@ -49,50 +44,53 @@ const Header = () => {
     return (
         <Box as="header" className="bg-gray-800 text-white px-6 shadow-md fixed w-full top-0 z-10 h-16 flex items-center">
             <Text fontSize="xl" fontWeight="bold" className="w-[33%]">Proactive India</Text>
+
             <Flex className="w-[67%] mx-auto px-1 lg:px-4 justify-end lg:justify-start">
-                {/* Logo */}
+                {/* Conditionally Render Search Bar & Button */}
+                {!hideSearch && (
+                    <>
+                        {/* Desktop Search Bar (Visible on md+) */}
+                        <div className="flex relative w-[450px] hidden lg:flex">
+                            <IconButton
+                                aria-label="Search"
+                                icon={<FiSearch />}
+                                className="absolute left-6 text-gray-500 bg-transparent"
+                            />
+                            <Input
+                                className="pl-12 pr-12 py-1 text-black w-full rounded-lg shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Search..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            {searchTerm && (
+                                <IconButton
+                                    aria-label="Clear search"
+                                    icon={<FiX />}
+                                    size="sm"
+                                    className="absolute right-6 text-gray-500 bg-transparent"
+                                    onClick={() => {
+                                        setSearchTerm("");
+                                        setResults([]);
+                                    }}
+                                />
+                            )}
+                        </div>
 
-                {/* Desktop Search Bar (Visible on md+) */}
-                <div className="flex relative w-[450px] hidden lg:flex">
-
-                    <IconButton
-                        aria-label="Search"
-                        icon={<FiSearch />}
-                        className="absolute left-6 text-gray-500 bg-transparent"
-                    />
-                    <Input
-                        className="pl-12 pr-12 py-1 text-black w-full rounded-lg shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                        <IconButton
-                            aria-label="Clear search"
-                            icon={<FiX />}
-                            size="sm"
-                            className="absolute right-6 text-gray-500 bg-transparent"
-                            onClick={() => {
-                                setSearchTerm("");
-                                setResults([]);
-                            }}
-                        />
-                    )}
-                </div>
-
-                {/* Mobile Search Icon (Hidden on md+) */}
-                {screenSize !== "large" && (
-                    <IconButton
-                        aria-label="Search"
-                        icon={<FiSearch />}
-                        className="text-white"
-                        onClick={() => setIsSearchOpen(true)}
-                    />
+                        {/* Mobile Search Icon (Hidden on md+) */}
+                        {screenSize !== "large" && (
+                            <IconButton
+                                aria-label="Search"
+                                icon={<FiSearch />}
+                                className="text-white"
+                                onClick={() => setIsSearchOpen(true)}
+                            />
+                        )}
+                    </>
                 )}
             </Flex>
 
             {/* Mobile Expanding Search Bar (Visible only when active) */}
-            {isSearchOpen && (
+            {isSearchOpen && !hideSearch && (
                 <motion.div
                     initial={{ width: "0px", opacity: 0 }}
                     animate={{ width: "100%", opacity: 1 }}
@@ -118,19 +116,20 @@ const Header = () => {
                     />
                 </motion.div>
             )}
-            {results.length > 0 && (
+
+            {/* Search Results Dropdown */}
+            {!hideSearch && results.length > 0 && (
                 <div
                     className="absolute left-1/2 transform -translate-x-1/2 
-      top-[122px] w-full 
-      sm:top-[12px] sm:max-w-[80%] sm:w-full 
-      lg:top-[64px] lg:max-w-[50%] lg:w-full 
-      bg-white shadow-lg p-3 rounded-lg z-20"
+                        top-[122px] w-full 
+                        sm:top-[12px] sm:max-w-[80%] sm:w-full 
+                        lg:top-[64px] lg:max-w-[50%] lg:w-full 
+                        bg-white shadow-lg p-3 rounded-lg z-20"
                 >
                     <div className="space-y-3">
                         {results.map((result) => (
                             <div
                                 key={result.id}
-                                // hover:scale-105 INFO:add this later for scaling effect
                                 className="flex items-center w-full p-3 hover:bg-gray-200 cursor-pointer rounded-lg transition-all duration-300 ease-in-out transform"
                                 onClick={() => result.link ? router.push(result.link) : null}
                             >
@@ -139,7 +138,6 @@ const Header = () => {
                                     alt={result.title}
                                     className="rounded-lg mr-3 w-16 h-16 object-cover"
                                 />
-
                                 <div className="flex-1">
                                     <span
                                         className="block text-black font-semibold text-sm line-clamp-2"
@@ -153,7 +151,6 @@ const Header = () => {
                                         {result.title}
                                     </span>
                                 </div>
-
                                 <FiSearch
                                     className="text-gray-500 ml-3 cursor-pointer hover:text-gray-700"
                                     size={20}
@@ -164,8 +161,6 @@ const Header = () => {
                     </div>
                 </div>
             )}
-
-
         </Box>
     );
 };
