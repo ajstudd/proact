@@ -1,5 +1,6 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
@@ -20,6 +21,9 @@ const decryptEmail = (encryptedEmail: string) => {
     }
 };
 
+
+
+
 const VerifyAccount = () => {
     const router = useRouter();
     const { email } = useParams(); // Get encrypted email from URL
@@ -33,6 +37,11 @@ const VerifyAccount = () => {
     const [requestOtp, { isLoading: requestingOtp }] = useRequestOtpMutation();
     const [verifyOtp, { isLoading: verifyingOtp }] = useVerifyOtpMutation();
 
+    useEffect(() => {
+        if (!email) {
+            notFound(); // Show Next.js 404 page
+        }
+    }, [email]);
     useEffect(() => {
         if (!decryptedEmail) {
             toast.error("Invalid email.");
