@@ -1,8 +1,9 @@
 "use client";
 
+import { GetServerSidePropsContext } from "next";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { useRequestOtpMutation, useVerifyOtpMutation } from "@services";
@@ -21,14 +22,8 @@ const decryptEmail = (encryptedEmail: string) => {
     }
 };
 
-
-
-
-const VerifyAccount = () => {
+const VerifyAccount = ({ decryptedEmail }: { decryptedEmail: string }) => {
     const router = useRouter();
-    const { email } = useParams(); // Get encrypted email from URL
-    const decryptedEmail = decryptEmail(email as string);
-
     const [step, setStep] = useState(1);
     const [method, setMethod] = useState<"email" | "phone">("email");
     const [phone, setPhone] = useState("");
@@ -38,14 +33,9 @@ const VerifyAccount = () => {
     const [verifyOtp, { isLoading: verifyingOtp }] = useVerifyOtpMutation();
 
     useEffect(() => {
-        if (!email) {
-            notFound(); // Show Next.js 404 page
-        }
-    }, [email]);
-    useEffect(() => {
         if (!decryptedEmail) {
             toast.error("Invalid email.");
-            setTimeout(() => router.push("/login"), 2000); // Delay before redirect
+            setTimeout(() => router.push("/login"), 2000);
         }
     }, [decryptedEmail, router]);
 
@@ -72,7 +62,7 @@ const VerifyAccount = () => {
         try {
             await verifyOtp({ email: decryptedEmail, otp }).unwrap();
             toast.success("Account verified successfully!");
-            setTimeout(() => router.push("/login"), 2000); // Delay before redirect
+            setTimeout(() => router.push("/login"), 2000);
         } catch (error: any) {
             toast.error(error.data?.message || "Invalid OTP");
         }
@@ -98,7 +88,7 @@ const VerifyAccount = () => {
                                 className={`w-1/2 py-2 rounded-lg ${method === "email" ? "bg-blue-600" : "bg-gray-700"}`}
                                 onClick={() => {
                                     setMethod("email");
-                                    setPhone(""); // Reset phone input
+                                    setPhone("");
                                 }}
                             >
                                 Email
@@ -164,5 +154,34 @@ const VerifyAccount = () => {
         </motion.div>
     );
 };
+
+// **Server-side function to get email from URL**
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const { email } = context.query;
+
+    if (!email || typeof email !== "string") {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
+    const decryptedEmail = decryptEmail(email);
+
+    if (!decryptedEmail) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: { decryptedEmail },
+    };
+}
 
 export default VerifyAccount;
