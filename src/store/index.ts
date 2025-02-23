@@ -5,7 +5,8 @@ import {
   mediaApi,
   userApi,
   imageApi,
-  postApi
+  postApi,
+  otpApi,
 } from '../services';
 import userSlice from './userSlice';
 import uiSlice from './uiSlice';
@@ -31,6 +32,7 @@ export const store = configureStore({
       userApi.middleware,
       postApi.middleware,
       imageApi.middleware,
+
     ),
 });
 

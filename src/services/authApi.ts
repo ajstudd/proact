@@ -9,106 +9,60 @@ import {
   RegisterUserRequestPayload,
   LoginAuthRequestPayload,
   ErrorResponse,
-  IUser,
   IUserData,
 } from '../types';
 import {
   LoginPasswordPayload,
   LoginPasswordResponsePayload,
   LoginSuccessResponsePayload,
-  Tokens,
-  UserAuthRequestPayload,
-  VerifyOtpRequestPayload,
 } from '../types/auth';
-// import { reAuthBaseQuery } from '@/utils/reAuth';
 import { transformAuthResponse } from '../utils/transformTokens';
-import { LocalStorageKeys } from '../configs';
 
 const API_URL: string | undefined = process.env.NEXT_PUBLIC_API_URL;
 
-// const baseQuery = fetchBaseQuery({
-//   baseUrl: `${API_URL}/auth`,
-// });
-
 export const authApi = createApi({
   reducerPath: 'authApi',
-  // baseQuery: reAuthBaseQuery(baseQuery),
   baseQuery: fetchBaseQuery({
     baseUrl: `${API_URL}/auth`,
-  }) as BaseQueryFn<
-    FetchArgs,
-    unknown,
-    { status: number; data: ErrorResponse }
-  >,
-  endpoints: builder => ({
+  }) as BaseQueryFn<FetchArgs, unknown, { status: number; data: ErrorResponse }>,
+  endpoints: (builder) => ({
+    /** 🔐 User Login */
     login: builder.mutation<LoginSuccessResponsePayload, LoginAuthRequestPayload>({
-      query: body => ({
+      query: (body) => ({
         url: '/login',
         method: 'POST',
         body,
       }),
-      // transformResponse: transformAuthResponse,
-      // extraOptions: {
-      //   looseCheck: true,
-      // },
     }),
-    adminLogin: builder.mutation<
-      LoginPasswordResponsePayload,
-      LoginPasswordPayload
-    >({
-      query: body => ({
-        url: '/login',
-        method: 'POST',
-        body,
-      }),
 
-      // transformResponse: transformAuthResponse,
-      // extraOptions: {
-      //   looseCheck: true,
-      // },
-    }),
-    verifyOtp: builder.mutation<
-      VerifyOtpRequestPayload,
-      VerifyOtpRequestPayload
-    >({
-      query: body => ({
-        url: '/verify',
+    /** 🔐 Admin Login */
+    adminLogin: builder.mutation<LoginPasswordResponsePayload, LoginPasswordPayload>({
+      query: (body) => ({
+        url: '/admin/login',
         method: 'POST',
         body,
       }),
-      // transformResponse: transformAuthResponse,
-      // extraOptions: {
-      //   looseCheck: true,
-      // },
     }),
-    register: builder.mutation<
-      Pick<UserAuthRequestPayload, 'name' | 'phone'>,
-      Pick<UserAuthRequestPayload, 'name' | 'phone' | 'email'>
-    >({
-      query: body => ({
+    /** 📝 Register User */
+    register: builder.mutation<void, RegisterUserRequestPayload>({
+      query: (body) => ({
         url: '/register',
         method: 'POST',
-        body: { ...body },
+        body,
       }),
-      // transformResponse: transformAuthResponse,
-      // extraOptions: {
-      //   looseCheck: true,
-      // },
     }),
+
+    /** 🔑 Forgot Password */
     forgotPassword: builder.mutation<void, string>({
-      query: email => ({
+      query: (email) => ({
         url: '/forgot-password',
         method: 'POST',
         body: { email },
       }),
     }),
-    resetPassword: builder.mutation<
-      void,
-      {
-        token: string;
-        password: string;
-      }
-    >({
+
+    /** 🔄 Reset Password */
+    resetPassword: builder.mutation<void, { token: string; password: string }>({
       query: ({ password, token }) => ({
         url: '/reset-password',
         method: 'POST',
@@ -119,8 +73,9 @@ export const authApi = createApi({
       }),
     }),
 
+    /** 🔄 Refresh Access Token */
     newAccessToken: builder.mutation<UserAuthResponsePayload, string>({
-      query: refreshToken => ({
+      query: (refreshToken) => ({
         url: '/refresh-tokens',
         method: 'POST',
         body: { refreshToken },
@@ -128,24 +83,20 @@ export const authApi = createApi({
       transformResponse: transformAuthResponse,
     }),
 
+    /** 👤 Get User Info */
     me: builder.mutation<IUserData, string>({
-      query: token => ({
+      query: (token) => ({
         url: '/me',
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
-          // Authorization: `Bearer ${
-          //   (
-          //     JSON.parse(
-          //       localStorage.getItem(LocalStorageKeys.AUTH_DATA)!
-          //     ) as UserAuthResponsePayload
-          //   ).tokens.access.token
-          // }`,
         },
       }),
     }),
+
+    /** 🚪 Logout */
     logout: builder.mutation<void, string>({
-      query: refreshToken => ({
+      query: (refreshToken) => ({
         url: '/logout',
         method: 'POST',
         body: { refreshToken },
@@ -155,13 +106,12 @@ export const authApi = createApi({
 });
 
 export const {
-  useAdminLoginMutation,
-  useForgotPasswordMutation,
   useLoginMutation,
-  useLogoutMutation,
-  useMeMutation,
-  useNewAccessTokenMutation,
+  useAdminLoginMutation,
   useRegisterMutation,
+  useForgotPasswordMutation,
   useResetPasswordMutation,
-  useVerifyOtpMutation,
+  useNewAccessTokenMutation,
+  useMeMutation,
+  useLogoutMutation,
 } = authApi;

@@ -4,6 +4,12 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { AppContextProvider } from "../contexts/AppContext";
 import { store } from "../store";
 import { Provider } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+
+
 import "../../global.css";
 import { useRouter } from "next/router";
 import useAuth from "hooks/useAuth";
@@ -27,7 +33,7 @@ const roboto = Roboto({
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const publicPages = ["/home"];
-  const noAuthPages = ["/login", "/signup", "/onboarding", "/"];
+  const noAuthPages = ["/login", "/signup", "/onboarding", "/", "/otp/[email]"];
 
   const auth = useAuth([...publicPages, ...noAuthPages]);
 
@@ -60,6 +66,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Layout>
             <ChakraProvider>
               <Component {...pageProps} />
+              <ToastContainer position="top-right" autoClose={3000} />
             </ChakraProvider>
           </Layout>
         </AppContextProvider>

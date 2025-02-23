@@ -124,7 +124,6 @@
 //   );
 // }
 
-
 "use client";
 
 import { useState } from "react";
@@ -134,17 +133,19 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiUser, FiMail, FiLock, FiBriefcase } from "react-icons/fi";
 import Link from "next/link";
+import { useRegisterMutation } from "@services";
 
 const Register = () => {
   const router = useRouter();
+  const [registerUser, { isLoading }] = useRegisterMutation(); // RTK Mutation Hook
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
-    role: "user", // Default role is user
+    role: "USER", // Default role
   });
-
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -152,14 +153,14 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
-    // Dummy API Call Simulation
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await registerUser(formData).unwrap(); // Call API
       toast.success("Registration successful! Redirecting...");
-      router.push("/login"); // Redirect to login after successful registration
-    }, 2000);
+      router.push("/login"); // Redirect to login page
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Registration failed! Please try again.");
+    }
   };
 
   return (
@@ -197,6 +198,18 @@ const Register = () => {
             />
           </div>
           <div className="flex items-center border-b border-gray-600 py-2">
+            <FiMail className="mr-2" />
+            <input
+              type="phone"
+              name="phone"
+              placeholder="Phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="bg-transparent outline-none flex-1"
+            />
+          </div>
+          <div className="flex items-center border-b border-gray-600 py-2">
             <FiLock className="mr-2" />
             <input
               type="password"
@@ -217,16 +230,16 @@ const Register = () => {
               onChange={handleChange}
               className="bg-transparent outline-none flex-1"
             >
-              <option value="user" className="text-black">User</option>
-              <option value="contractor" className="text-black">Contractor</option>
+              <option value="USER" className="text-black">User</option>
+              <option value="CONTRACTOR" className="text-black">Contractor</option>
             </select>
           </div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={isLoading}
             className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition-all"
           >
-            {loading ? "Registering..." : "Register"}
+            {isLoading ? "Registering..." : "Register"}
           </button>
         </form>
         <p className="mt-4 text-center">
