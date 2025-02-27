@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ProjectCard from "components/ProjectCard"; // Import the card component
+import CreateProjectForm from "components/CreateProject";
 
 // Dummy data for testing (Replace with API call)
 const projects = [
@@ -46,7 +47,7 @@ const HomePage = () => {
     return (
         <div className="min-h-screen bg-gray-100 p-6 max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold text-gray-900 text-center mb-6">Government Projects</h1>
-
+            <CreateProjectForm />
             {/* Animated List */}
             <motion.div
                 initial={{ opacity: 0 }}

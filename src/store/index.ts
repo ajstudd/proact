@@ -7,6 +7,7 @@ import {
   imageApi,
   postApi,
   otpApi,
+  api,
 } from '../services';
 import userSlice from './userSlice';
 import uiSlice from './uiSlice';
@@ -16,6 +17,7 @@ export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [mediaApi.reducerPath]: mediaApi.reducer,
+    [api.reducerPath]: api.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [imageApi.reducerPath]: imageApi.reducer,
     [postApi.reducerPath]: postApi.reducer,
@@ -29,6 +31,7 @@ export const store = configureStore({
     }).concat(
       authApi.middleware,
       mediaApi.middleware,
+      api.middleware,
       userApi.middleware,
       postApi.middleware,
       imageApi.middleware,
@@ -40,3 +43,5 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
+
+

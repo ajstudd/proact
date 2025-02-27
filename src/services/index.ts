@@ -4,3 +4,6 @@ export * from './userApi';
 export * from './imageApi';
 export * from './postApi';
 export * from './otpApi';
+export * from './api';
+export * from './uploadApi';
+export * from './projectApi';
