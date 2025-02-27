@@ -7,8 +7,6 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dynamic from "next/dynamic";
 import { useCreateProjectMutation, useUploadFileMutation } from "@services"; // RTK API hooks for project and file upload
-
-// Dynamic import for react-leaflet map (if needed)
 const MapPicker = dynamic(() => import("./MapPicker"), { ssr: false });
 
 export default function CreateProjectForm() {
@@ -138,7 +136,7 @@ export default function CreateProjectForm() {
                     <label className="block mb-2 font-semibold">Project Location</label>
                     {/* Replace this with your actual MapPicker component */}
                     <div className="w-full h-64 bg-gray-700 rounded-md flex items-center justify-center">
-                        <p className="text-gray-300">Map Picker (React Leaflet)</p>
+                        <MapPicker onLocationSelect={(lat, lng) => setLocation({ lat, lng })} />
                     </div>
                     {/* Example: When user clicks on map, update location */}
                     {/* setLocation({ lat: selectedLat, lng: selectedLng }); */}
