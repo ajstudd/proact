@@ -18,7 +18,8 @@ import {
 } from '../types/auth';
 import { transformAuthResponse } from '../utils/transformTokens';
 
-const API_URL: string | undefined = process.env.NEXT_PUBLIC_API_URL;
+const API_URL: string | undefined = process.env['NEXT_PUBLIC_API_URL'];
+//add env.local file in root folder and add NEXT_PUBLIC_API_URL=your api url
 
 export const authApi = createApi({
   reducerPath: 'authApi',
