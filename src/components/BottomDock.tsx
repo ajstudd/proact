@@ -17,7 +17,7 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
     const pathname = usePathname(); // Get current route
 
     return (
-        <Box className="fixed bottom-0 left-0 w-full bg-gray-900 text-white p-2 shadow-lg">
+        <Box className="z-[1000] fixed bottom-0 left-0 w-full bg-gray-900 text-white p-2 shadow-lg">
             <Flex justify="space-around" align="center">
                 {menuItems.map((item) => {
                     const isActive = pathname === item.path;
