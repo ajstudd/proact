@@ -20,12 +20,12 @@ export default function CreateProjectForm() {
     const [descriptionText, setDescriptionText] = useState("");
     const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [pdfUrl, setPdfUrl] = useState("");
-    const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [location, setLocation] = useState<{ lat: number; lng: number; place: string } | null>(null);
+    console.log('location', location);
 
     const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setBannerFile(e.target.files[0]);
-            // Optional: Preview the image immediately
             const previewUrl = URL.createObjectURL(e.target.files[0]);
             setBannerUrl(previewUrl);
         }
@@ -40,27 +40,24 @@ export default function CreateProjectForm() {
     const handleProjectSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            // Upload banner if needed
             let uploadedBannerUrl = bannerUrl;
             if (bannerFile) {
                 const bannerResponse = await uploadFile({ file: bannerFile, type: "image" }).unwrap();
                 uploadedBannerUrl = bannerResponse.url;
             }
 
-            // Upload PDF if provided
             let uploadedPdfUrl = "";
             if (pdfFile) {
                 const pdfResponse = await uploadFile({ file: pdfFile, type: "pdf" }).unwrap();
                 uploadedPdfUrl = pdfResponse.url;
             }
 
-            // Construct project payload
             const projectPayload = {
                 bannerUrl: uploadedBannerUrl,
                 associatedProfiles,
-                description: pdfFile ? "" : descriptionText, // Use text if no PDF
+                description: pdfFile ? "" : descriptionText,
                 pdfUrl: uploadedPdfUrl,
-                location,
+                location: { lat: location?.lat, lng: location?.lng, place: location?.place },
             };
 
             await createProject(projectPayload).unwrap();
@@ -73,24 +70,21 @@ export default function CreateProjectForm() {
 
     return (
         <motion.div
-            className="min-h-screen bg-gray-900 text-white p-6 flex flex-col items-center"
+            className="min-h-screen bg-gray-900 rounded-lg text-white p-6 flex flex-col items-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
         >
             <h1 className="text-3xl font-bold mb-6">Create New Project</h1>
             <form className="w-full max-w-2xl space-y-6" onSubmit={handleProjectSubmit}>
-                {/* Banner Image Upload */}
                 <div className="flex flex-col">
                     <label className="mb-2 font-semibold">Banner Image</label>
-                    <input type="file" accept="image/*" onChange={handleBannerChange} className="text-black" />
+                    <input type="file" accept="image/*" onChange={handleBannerChange} className="text-white" />
                     {bannerUrl && <img src={bannerUrl} alt="Banner Preview" className="mt-4 rounded-md shadow-md" />}
                 </div>
 
-                {/* Associated Profiles */}
                 <div>
                     <label className="block mb-2 font-semibold">Associated Profiles</label>
-                    {/* Dynamic fields for profiles - can be expanded with add/remove functionality */}
                     <input
                         type="text"
                         placeholder="Enter profile name and role (e.g., John Doe, Engineer)"
@@ -116,7 +110,6 @@ export default function CreateProjectForm() {
                     )}
                 </div>
 
-                {/* Project Description or PDF */}
                 <div>
                     <label className="block mb-2 font-semibold">Project Description</label>
                     <textarea
@@ -127,19 +120,20 @@ export default function CreateProjectForm() {
                     />
                     <div className="mt-4">
                         <label className="block mb-2 font-semibold">Or Upload a PDF</label>
-                        <input type="file" accept="application/pdf" onChange={handlePdfChange} className="text-black" />
+                        <input type="file" accept="application/pdf" onChange={handlePdfChange} className="text-white" />
                     </div>
                 </div>
 
-                {/* Location Picker using React Leaflet */}
                 <div>
                     <label className="block mb-2 font-semibold">Project Location</label>
-                    {/* Replace this with your actual MapPicker component */}
-                    <div className="w-full h-64 bg-gray-700 rounded-md flex items-center justify-center">
-                        <MapPicker onLocationSelect={(lat, lng) => setLocation({ lat, lng })} />
+                    <div className="w-full rounded-md flex flex-col items-center justify-center">
+                        <MapPicker onLocationSelect={(lat, lng, place) => setLocation({ lat, lng, place })} />
+                        {location?.place && (
+                            <div className="text-sm text-gray-400 mt-2 animate-fade-in">
+                                Selected Location: {location.place}
+                            </div>
+                        )}
                     </div>
-                    {/* Example: When user clicks on map, update location */}
-                    {/* setLocation({ lat: selectedLat, lng: selectedLng }); */}
                 </div>
 
                 <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg transition-all">

@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import { useState, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -10,34 +10,58 @@ import ReactDOMServer from "react-dom/server";
 import { toast } from "react-toastify";
 
 const customMarkerIcon = new L.DivIcon({
-    html: ReactDOMServer.renderToString(<FaMapMarkerAlt className="text-red-500 text-3xl animate-bounce" />),
+    html: ReactDOMServer.renderToString(
+        <FaMapMarkerAlt className="text-red-500 text-3xl animate-bounce" />
+    ),
     className: "custom-marker-icon",
     iconSize: [30, 30],
     iconAnchor: [15, 30],
 });
 
 interface MapPickerProps {
-    onLocationSelect: (lat: number, lng: number) => void;
+    onLocationSelect: (lat: number, lng: number, place: string) => void;
 }
 
 export default function MapPicker({ onLocationSelect }: MapPickerProps) {
     const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
     const [search, setSearch] = useState<string>("");
-
-    // Ref to hold the map instance
+    const [suggestions, setSuggestions] = useState<any[]>([]);
     const mapRef = useRef<any>(null);
 
+    async function fetchPlaceName(lat: number, lng: number) {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await res.json();
+            const displayName = data.display_name || `Unnamed Location (Lat: ${lat}, Lng: ${lng})`;
+            return displayName;
+        } catch (error) {
+            console.error("Reverse Geocoding Error:", error);
+            return `Unnamed Location (Lat: ${lat}, Lng: ${lng})`;
+        }
+    }
+
+    async function handleLocationSelect(lat: number, lng: number) {
+        const place = await fetchPlaceName(lat, lng);
+        setPosition({ lat, lng });
+        onLocationSelect(lat, lng, place); // Pass place name along with coordinates
+    }
+
     function LocationMarker() {
-        const map = useMapEvents({
+        const map = useMap(); // Get map instance from hook
+
+        mapRef.current = map; // Store map instance in ref
+
+        useMapEvents({
             click(e) {
                 setPosition(e.latlng);
-                onLocationSelect(e.latlng.lat, e.latlng.lng);
+                onLocationSelect(e.latlng.lat, e.latlng.lng, "Unnamed Location");
                 map.flyTo(e.latlng, map.getZoom());
             },
         });
 
         return position ? <Marker position={position} icon={customMarkerIcon} /> : null;
     }
+
 
     async function handleSearch() {
         if (!search) {
@@ -50,15 +74,8 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
             const data = await res.json();
 
             if (data.length > 0) {
-                const { lat, lon } = data[0];
-                const latLng = { lat: parseFloat(lat), lng: parseFloat(lon) };
-
-                setPosition(latLng);
-                onLocationSelect(latLng.lat, latLng.lng);
-
-                if (mapRef.current) {
-                    mapRef.current.flyTo(latLng, 13); // Add Zoom Level
-                }
+                console.log('data', data);
+                setSuggestions(data);
             } else {
                 toast.error("Location not found!");
             }
@@ -67,34 +84,71 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
             toast.error("Something went wrong!");
         }
     }
+
+    function selectLocation(lat: number, lng: number, name: string) {
+        const latLng = { lat, lng };
+        setPosition(latLng);
+        onLocationSelect(lat, lng, name);
+        setSuggestions([]);
+        setSearch("");
+
+        if (mapRef.current) {
+            const currentCenter = mapRef.current.getCenter();
+            if (currentCenter.lat !== lat || currentCenter.lng !== lng) {
+                mapRef.current.flyTo(latLng, 11);
+            }
+        }
+    }
+
+
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full">
-            {/* Search Input */}
-            <div className="mb-2 flex items-center">
-                <input
-                    type="text"
-                    placeholder="Search Location"
-                    className="w-full text-black px-4 py-2 border rounded-md outline-none shadow-sm focus:ring focus:ring-blue-400"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-                <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md ml-2"
-                    onClick={handleSearch}
-                >
-                    Search
-                </button>
+            <div className="mb-2 flex flex-col gap-2">
+                <div className="flex items-center flex-col gap-2 lg:flex-row lg:gap-0">
+                    <input
+                        type="text"
+                        placeholder="Search Location"
+                        className="w-full px-4 py-2 text-black border rounded-md outline-none shadow-sm focus:ring focus:ring-blue-400"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                handleSearch();
+                            }
+                        }}
+                    />
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 w-full rounded-md ml-0 lg:ml-2 lg:w-auto"
+                        type="button"
+                        onClick={handleSearch}
+                    >
+                        Search
+                    </button>
+                </div>
+
+                {suggestions.length > 0 && (
+                    <div className="bg-white shadow-lg border rounded-md max-h-48 overflow-y-auto">
+                        {suggestions.map((suggestion, index) => (
+                            <div
+                                key={index}
+                                className="p-2 cursor-pointer hover:bg-blue-800 text-black hover:text-white"
+                                onClick={() =>
+                                    selectLocation(parseFloat(suggestion.lat), parseFloat(suggestion.lon), suggestion?.display_name)
+                                }
+                            >
+                                {suggestion.display_name}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
-            {/* Map Container */}
             <div className="rounded-lg overflow-hidden">
                 <MapContainer
                     center={[25.286135350000002, 87.13042293057262]}
-                    zoom={13}
+                    zoom={11}
                     className="w-full h-[400px]"
-                    whenReady={() => {
-                        mapRef.current = mapRef.current; // Store map instance inside ref
-                    }}
                 >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     <LocationMarker />
