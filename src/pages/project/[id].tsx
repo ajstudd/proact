@@ -1,36 +1,37 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { FiArrowLeft, FiMapPin, FiThumbsUp, FiThumbsDown } from "react-icons/fi";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import ProjectStats from "components/ProjectStats";
+import Comments from "components/Comments";
+import UpdatesTimeline from "components/UpdatesTimeline";
+import PdfToSlides from "components/PdfToSlides";
+import MapModal from "components/MapModal";
+import { useGetProjectByIdQuery } from "@services"; // Import the API hook
 
 const ProjectPage = () => {
     const router = useRouter();
     const { id } = router.query; // ✅ Get project ID from URL
-    const [project, setProject] = useState<any>(null);
+    const [projectId, setProjectId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!id) return;
-
-        // Simulated API call (Replace with real API)
-        const fetchProject = async () => {
-            // Example API call: `/api/projects/${id}`
-            const projectData = {
-                id,
-                title: "New Highway Construction",
-                description:
-                    "This project aims to improve connectivity and reduce travel time for rural communities by building a modern highway.",
-                image: "https://images.unsplash.com/photo-1579547945413-0226cba2f0eb",
-                location: "Delhi, India",
-                likes: 120,
-                dislikes: 5,
-            };
-            setProject(projectData);
-        };
-
-        fetchProject();
+        if (id) {
+            setProjectId(id as string);
+        }
     }, [id]);
 
-    if (!project) return <p className="text-center text-gray-500 mt-20">Loading...</p>;
+    const { data: project, error, isLoading } = useGetProjectByIdQuery(projectId!, {
+        skip: !projectId,
+    }); // Use the API hook
+
+    const [isMapOpen, setIsMapOpen] = useState(false);
+    const [isPdfOpen, setIsPdfOpen] = useState(false);
+
+    if (isLoading) return <p className="text-center text-gray-500 mt-20">Loading...</p>;
+    if (error) return <p className="text-center text-red-500 mt-20">Error loading project data.</p>;
+    if (!project) return <p className="text-center text-gray-500 mt-20">Project not found.</p>;
+    console.log('project', project);
 
     return (
         <motion.div
@@ -46,25 +47,62 @@ const ProjectPage = () => {
                 <FiArrowLeft /> <span>Back to Projects</span>
             </button>
 
-            <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
-                <img src={project.image} alt={project.title} className="w-full h-64 object-cover rounded-lg" />
+            <div className="relative bg-white p-6 rounded-lg shadow-lg mt-4">
+                <img src={project.bannerUrl} alt={project.title} className="w-full h-64 object-cover rounded-lg" />
                 <h1 className="text-2xl font-bold text-gray-900 mt-4">{project.title}</h1>
                 <p className="text-gray-700 mt-2">{project.description}</p>
                 <div className="flex items-center justify-between mt-4 text-gray-700">
                     <div className="flex items-center">
                         <FiMapPin className="mr-1 text-red-500" />
-                        {project.location}
+                        {project.location.place}
                     </div>
                     <div className="flex items-center space-x-3">
                         <span className="flex items-center">
-                            <FiThumbsUp className="mr-1 text-green-500" /> {project.likes}
+                            <FiThumbsUp className="mr-1 text-green-500" /> {project.likes.length}
                         </span>
                         <span className="flex items-center">
-                            <FiThumbsDown className="mr-1 text-red-500" /> {project.dislikes}
+                            <FiThumbsDown className="mr-1 text-red-500" /> {project.dislikes.length}
                         </span>
                     </div>
                 </div>
+                <div className="mt-4">
+                    <button
+                        onClick={() => setIsPdfOpen(true)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                    >
+                        View Project PDF
+                    </button>
+                    <button
+                        onClick={() => setIsMapOpen(true)}
+                        className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition ml-4"
+                    >
+                        View Map Location
+                    </button>
+                </div>
             </div>
+
+            <ProjectStats
+                budget={project.budget}
+                expenditure={project.expenditure}
+                likesCount={project.likes.length}
+                dislikesCount={project.dislikes.length}
+                createdAt={project.createdAt}
+                onLike={() => { }}
+                onDislike={() => { }}
+            />
+
+            <Comments
+                projectId={project._id}
+                comments={project.comments}
+                onAddComment={() => { }}
+                onLikeComment={() => { }}
+                onDislikeComment={() => { }}
+            />
+
+            <UpdatesTimeline updates={project.updates} />
+
+            <PdfToSlides pdfUrl={project.pdfUrl} isOpen={isPdfOpen} onClose={() => setIsPdfOpen(false)} />
+            <MapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} location={project.location} />
         </motion.div>
     );
 };

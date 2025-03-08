@@ -18,6 +18,13 @@ export const projectApi = api.injectEndpoints({
 
     getProjectById: builder.query({
       query: (id) => `/${id}`,
+
+      transformResponse: (response: any) => {
+        if (response.status === "error") {
+          throw new Error(response.message);
+        }
+        return response.project;
+      },
       providesTags: ["Projects"],
     }),
 
