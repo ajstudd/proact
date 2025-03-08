@@ -14,6 +14,7 @@ export default function CreateProjectForm() {
     const [createProject] = useCreateProjectMutation();
     const [uploadFile] = useUploadFileMutation();
 
+    const [title, setTitle] = useState("");
     const [bannerFile, setBannerFile] = useState<File | null>(null);
     const [bannerUrl, setBannerUrl] = useState("");
     const [associatedProfiles, setAssociatedProfiles] = useState<Array<{ name: string; role: string }>>([]);
@@ -21,6 +22,9 @@ export default function CreateProjectForm() {
     const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [pdfUrl, setPdfUrl] = useState("");
     const [location, setLocation] = useState<{ lat: number; lng: number; place: string } | null>(null);
+    const [budget, setBudget] = useState<number>(0);
+    const [contractor, setContractor] = useState("");
+    const [government, setGovernment] = useState("");
     console.log('location', location);
 
     const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,29 +44,30 @@ export default function CreateProjectForm() {
     const handleProjectSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            let uploadedBannerUrl = bannerUrl;
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("description", pdfFile ? "" : descriptionText);
+            formData.append("budget", budget.toString());
+            formData.append("contractor", contractor);
+            formData.append("government", government);
+
+            if (location) {
+                formData.append("location[lat]", location.lat.toString());
+                formData.append("location[lng]", location.lng.toString());
+                formData.append("location[place]", location.place);
+            }
+
             if (bannerFile) {
-                const bannerResponse = await uploadFile({ file: bannerFile, type: "image" }).unwrap();
-                uploadedBannerUrl = bannerResponse.url;
+                formData.append("banner", bannerFile);
             }
 
-            let uploadedPdfUrl = "";
             if (pdfFile) {
-                const pdfResponse = await uploadFile({ file: pdfFile, type: "pdf" }).unwrap();
-                uploadedPdfUrl = pdfResponse.url;
+                formData.append("pdf", pdfFile);
             }
 
-            const projectPayload = {
-                bannerUrl: uploadedBannerUrl,
-                associatedProfiles,
-                description: pdfFile ? "" : descriptionText,
-                pdfUrl: uploadedPdfUrl,
-                location: { lat: location?.lat, lng: location?.lng, place: location?.place },
-            };
-
-            await createProject(projectPayload).unwrap();
+            await createProject(formData).unwrap();
             toast.success("Project created successfully!");
-            router.push("/projects"); // Redirect to project list page
+            router.push("/home");
         } catch (error: any) {
             toast.error(error.data?.message || "Failed to create project");
         }
@@ -78,50 +83,72 @@ export default function CreateProjectForm() {
             <h1 className="text-3xl font-bold mb-6">Create New Project</h1>
             <form className="w-full max-w-2xl space-y-6" onSubmit={handleProjectSubmit}>
                 <div className="flex flex-col">
+                    <label className="mb-2 font-semibold">Project Title</label>
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Enter project title"
+                        className="w-full p-2 text-black rounded-md"
+                        required
+                    />
+                </div>
+
+                <div className="flex flex-col">
                     <label className="mb-2 font-semibold">Banner Image</label>
                     <input type="file" accept="image/*" onChange={handleBannerChange} className="text-white" />
                     {bannerUrl && <img src={bannerUrl} alt="Banner Preview" className="mt-4 rounded-md shadow-md" />}
                 </div>
 
                 <div>
-                    <label className="block mb-2 font-semibold">Associated Profiles</label>
-                    <input
-                        type="text"
-                        placeholder="Enter profile name and role (e.g., John Doe, Engineer)"
-                        className="w-full p-2 text-black rounded-md"
-                        onBlur={(e) => {
-                            if (e.target.value) {
-                                const [name, role] = e.target.value.split(",");
-                                if (name && role) {
-                                    setAssociatedProfiles((prev) => [...prev, { name: name.trim(), role: role.trim() }]);
-                                    e.target.value = "";
-                                }
-                            }
-                        }}
-                    />
-                    {associatedProfiles.length > 0 && (
-                        <ul className="mt-2">
-                            {associatedProfiles.map((profile, index) => (
-                                <li key={index} className="text-gray-300">
-                                    {profile.name} - {profile.role}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-
-                <div>
                     <label className="block mb-2 font-semibold">Project Description</label>
                     <textarea
-                        placeholder="Enter project description (if not uploading a PDF)"
+                        placeholder="Enter project description"
                         className="w-full p-2 text-black rounded-md"
                         value={descriptionText}
                         onChange={(e) => setDescriptionText(e.target.value)}
                     />
-                    <div className="mt-4">
-                        <label className="block mb-2 font-semibold">Or Upload a PDF</label>
-                        <input type="file" accept="application/pdf" onChange={handlePdfChange} className="text-white" />
-                    </div>
+                </div>
+
+                <div>
+                    <label className="block mb-2 font-semibold">Upload PDF</label>
+                    <input type="file" accept="application/pdf" onChange={handlePdfChange} className="text-white" />
+                </div>
+
+                <div className="flex flex-col">
+                    <label className="mb-2 font-semibold">Budget</label>
+                    <input
+                        type="number"
+                        value={budget}
+                        onChange={(e) => setBudget(Number(e.target.value))}
+                        placeholder="Enter project budget"
+                        className="w-full p-2 text-black rounded-md"
+                        required
+                    />
+                </div>
+
+                <div className="flex flex-col">
+                    <label className="mb-2 font-semibold">Contractor ID</label>
+                    <input
+                        type="text"
+                        value={contractor}
+                        onChange={(e) => setContractor(e.target.value)}
+                        placeholder="Enter contractor ID"
+                        className="w-full p-2 text-black rounded-md"
+                        required
+                    />
+                </div>
+
+                <div className="flex flex-col">
+                    <label className="mb-2 font-semibold">Government ID</label>
+                    <input
+                        type="text"
+                        value={government}
+                        onChange={(e) => setGovernment(e.target.value)}
+                        placeholder="Enter government ID"
+                        className="w-full p-2 text-black rounded-md"
+                        required
+                    />
                 </div>
 
                 <div>

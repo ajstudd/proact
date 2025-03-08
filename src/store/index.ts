@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore } from "@reduxjs/toolkit";
 // import authReducer from './authSlice';
 import {
   authApi,
@@ -8,10 +8,11 @@ import {
   postApi,
   otpApi,
   api,
-} from '../services';
-import userSlice from './userSlice';
-import uiSlice from './uiSlice';
-import postsSlice from './postsSlice';
+  projectApi,
+} from "../services";
+import userSlice from "./userSlice";
+import uiSlice from "./uiSlice";
+import postsSlice from "./postsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -25,7 +26,7 @@ export const store = configureStore({
     postsSlice,
     uiSlice,
   },
-  middleware: getDefaultMiddleware =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }).concat(
@@ -34,8 +35,7 @@ export const store = configureStore({
       api.middleware,
       userApi.middleware,
       postApi.middleware,
-      imageApi.middleware,
-
+      imageApi.middleware
     ),
 });
 
@@ -43,5 +43,3 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
-
-
