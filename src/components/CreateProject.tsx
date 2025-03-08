@@ -9,7 +9,11 @@ import dynamic from "next/dynamic";
 import { useCreateProjectMutation, useUploadFileMutation } from "@services"; // RTK API hooks for project and file upload
 const MapPicker = dynamic(() => import("./MapPicker"), { ssr: false });
 
-export default function CreateProjectForm() {
+interface CreateProjectFormProps {
+    onSuccess?: () => void;
+}
+
+export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
     const router = useRouter();
     const [createProject] = useCreateProjectMutation();
     const [uploadFile] = useUploadFileMutation();
@@ -67,7 +71,27 @@ export default function CreateProjectForm() {
 
             await createProject(formData).unwrap();
             toast.success("Project created successfully!");
-            router.push("/home");
+
+            // Call the onSuccess callback if provided
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                router.push("/home");
+            }
+
+            // Reset form
+            setTitle("");
+            setBannerFile(null);
+            setBannerUrl("");
+            setAssociatedProfiles([]);
+            setDescriptionText("");
+            setPdfFile(null);
+            setPdfUrl("");
+            setLocation(null);
+            setBudget(0);
+            setContractor("");
+            setGovernment("");
+
         } catch (error: any) {
             toast.error(error.data?.message || "Failed to create project");
         }
@@ -159,6 +183,14 @@ export default function CreateProjectForm() {
                             <div className="text-sm text-gray-400 mt-2 animate-fade-in">
                                 Selected Location: {location.place}
                             </div>
+                        )}
+                        {location && !location.place && (
+                            <input
+                                type="text"
+                                placeholder="Enter location name"
+                                className="w-full p-2 mt-2 text-black rounded-md"
+                                onChange={(e) => setLocation({ ...location, place: e.target.value })}
+                            />
                         )}
                     </div>
                 </div>

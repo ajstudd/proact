@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { FiChevronLeft, FiChevronRight, FiX, FiMaximize } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiX, FiMaximize, FiDownload, FiZoomIn, FiZoomOut } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
@@ -18,6 +18,8 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
     const [numPages, setNumPages] = useState<number | null>(null);
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+    const [scale, setScale] = useState<number>(1.0);
+    const [isPageLoading, setIsPageLoading] = useState<boolean>(false);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
@@ -26,9 +28,10 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
     }
 
     function changePage(offset: number) {
-        if (!numPages) return;
+        if (!numPages || isPageLoading) return;
         const newPageNumber = pageNumber + offset;
         if (newPageNumber >= 1 && newPageNumber <= numPages) {
+            setIsPageLoading(true);
             setPageNumber(newPageNumber);
         }
     }
@@ -44,6 +47,21 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
             }
         }
         setIsFullscreen(!isFullscreen);
+    };
+
+    const zoomIn = () => {
+        setScale(prevScale => Math.min(prevScale + 0.1, 2.0));
+    };
+
+    const zoomOut = () => {
+        setScale(prevScale => Math.max(prevScale - 0.1, 0.5));
+    };
+
+    const downloadPdf = () => {
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = 'document.pdf';
+        link.click();
     };
 
     useEffect(() => {
@@ -79,6 +97,24 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
                             <h3 className="text-xl font-semibold">Project Documentation</h3>
                             <div className="flex space-x-2">
                                 <button
+                                    onClick={zoomIn}
+                                    className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+                                >
+                                    <FiZoomIn />
+                                </button>
+                                <button
+                                    onClick={zoomOut}
+                                    className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+                                >
+                                    <FiZoomOut />
+                                </button>
+                                <button
+                                    onClick={downloadPdf}
+                                    className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+                                >
+                                    <FiDownload />
+                                </button>
+                                <button
                                     onClick={toggleFullscreen}
                                     className="p-2 hover:bg-gray-700 rounded-full transition-colors"
                                 >
@@ -93,7 +129,12 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
                             </div>
                         </div>
 
-                        <div className="flex justify-center bg-white p-4 rounded-md shadow-inner">
+                        <div className="flex justify-center bg-white p-4 rounded-md shadow-inner relative">
+                            {isPageLoading && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                                </div>
+                            )}
                             <Document
                                 file={pdfUrl}
                                 onLoadSuccess={onDocumentLoadSuccess}
@@ -102,10 +143,14 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
                                 error={<p className="text-center text-red-500 py-10">Error loading PDF document.</p>}
                             >
                                 <Page
+                                    key={`page_${pageNumber}`}
                                     pageNumber={pageNumber}
+                                    scale={scale}
                                     renderTextLayer={false}
                                     renderAnnotationLayer={false}
                                     className="shadow-lg"
+                                    onLoadSuccess={() => setIsPageLoading(false)}
+                                    onRenderError={() => setIsPageLoading(false)}
                                 />
                             </Document>
                         </div>
@@ -113,8 +158,8 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
                         <div className="flex items-center justify-between mt-4 text-white">
                             <button
                                 onClick={() => changePage(-1)}
-                                disabled={pageNumber <= 1}
-                                className={`px-4 py-2 rounded-lg ${pageNumber <= 1
+                                disabled={pageNumber <= 1 || isPageLoading}
+                                className={`px-4 py-2 rounded-lg ${pageNumber <= 1 || isPageLoading
                                     ? "opacity-50 cursor-not-allowed"
                                     : "hover:bg-gray-700 transition-colors"
                                     }`}
@@ -129,8 +174,8 @@ export const PdfToSlides: React.FC<PdfToSlidesProps> = ({ pdfUrl, isOpen, onClos
                             </p>
                             <button
                                 onClick={() => changePage(1)}
-                                disabled={numPages !== null && pageNumber >= numPages}
-                                className={`px-4 py-2 rounded-lg ${numPages !== null && pageNumber >= numPages
+                                disabled={(numPages !== null && pageNumber >= numPages) || isPageLoading}
+                                className={`px-4 py-2 rounded-lg ${(numPages !== null && pageNumber >= numPages) || isPageLoading
                                     ? "opacity-50 cursor-not-allowed"
                                     : "hover:bg-gray-700 transition-colors"
                                     }`}

@@ -49,7 +49,7 @@ const ProjectPage = () => {
 
             <div className="relative bg-white p-6 rounded-lg shadow-lg mt-4">
                 <img src={project.bannerUrl} alt={project.title} className="w-full h-64 object-cover rounded-lg" />
-                <h1 className="text-2xl font-bold text-gray-900 mt-4">{project.title}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mt-4">{project.title}</h1>
                 <p className="text-gray-700 mt-2">{project.description}</p>
                 <div className="flex items-center justify-between mt-4 text-gray-700">
                     <div className="flex items-center">
@@ -65,7 +65,7 @@ const ProjectPage = () => {
                         </span>
                     </div>
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 flex space-x-4">
                     <button
                         onClick={() => setIsPdfOpen(true)}
                         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
@@ -74,7 +74,7 @@ const ProjectPage = () => {
                     </button>
                     <button
                         onClick={() => setIsMapOpen(true)}
-                        className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition ml-4"
+                        className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
                     >
                         View Map Location
                     </button>

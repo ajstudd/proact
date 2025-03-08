@@ -30,6 +30,13 @@ export const projectApi = api.injectEndpoints({
 
     getTrimmedProjects: builder.query({
       query: () => "/trimmed",
+      transformResponse: (response: any) => {
+        if (response.status === "error") {
+          throw new Error(response.message);
+        }
+        return response.projects;
+      },
+      providesTags: ["Projects"],
     }),
 
     updateProject: builder.mutation({
@@ -55,6 +62,7 @@ export const projectApi = api.injectEndpoints({
         method: "POST",
         body: formData,
       }),
+      invalidatesTags: ["Projects"],
     }),
   }),
 });
@@ -64,6 +72,7 @@ export const {
   useGetAllProjectsQuery,
   useGetProjectByIdQuery,
   useUpdateProjectMutation,
+  useGetTrimmedProjectsQuery,
   useDeleteProjectMutation,
   useUploadFileMutation,
 } = projectApi;

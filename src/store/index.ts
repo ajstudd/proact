@@ -35,7 +35,8 @@ export const store = configureStore({
       api.middleware,
       userApi.middleware,
       postApi.middleware,
-      imageApi.middleware
+      imageApi.middleware,
+      projectApi.middleware
     ),
 });
 

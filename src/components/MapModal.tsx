@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import ReactDOMServer from 'react-dom/server';
 
 // Dynamically import MapContainer with SSR disabled
 const MapContainer = dynamic(() => import("react-leaflet").then(mod => mod.MapContainer), { ssr: false });
@@ -66,11 +68,13 @@ const MapContainerWithMarker = ({ location }: { location: { lat: number; lng: nu
         // Import Leaflet dynamically to avoid server-side rendering issues
         const L = require('leaflet');
 
-        return new L.Icon({
-            iconUrl: "/marker-icon.png",
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34]
+        return new L.DivIcon({
+            html: ReactDOMServer.renderToString(
+                <FaMapMarkerAlt className="text-red-500 text-3xl animate-bounce" />
+            ),
+            className: "custom-marker-icon",
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
         });
     }, []);
 

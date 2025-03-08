@@ -52,16 +52,16 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
         mapRef.current = map; // Store map instance in ref
 
         useMapEvents({
-            click(e) {
+            async click(e) {
+                const place = await fetchPlaceName(e.latlng.lat, e.latlng.lng);
                 setPosition(e.latlng);
-                onLocationSelect(e.latlng.lat, e.latlng.lng, "Unnamed Location");
+                onLocationSelect(e.latlng.lat, e.latlng.lng, place);
                 map.flyTo(e.latlng, map.getZoom());
             },
         });
 
         return position ? <Marker position={position} icon={customMarkerIcon} /> : null;
     }
-
 
     async function handleSearch() {
         if (!search) {
@@ -99,7 +99,6 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
             }
         }
     }
-
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full">
