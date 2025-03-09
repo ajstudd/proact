@@ -9,12 +9,26 @@ import UpdatesTimeline from "components/UpdatesTimeline";
 import PdfToSlides from "components/PdfToSlides";
 import MapModal from "components/MapModal";
 import ProjectStakeholders from "components/ProjectStakeholders";
-import { useGetProjectByIdQuery } from "@services"; // Import the API hook
+import {
+    useGetProjectByIdQuery,
+    useLikeProjectMutation,
+    useDislikeProjectMutation,
+    useAddCommentMutation,
+    useRemoveCommentMutation,
+    useLikeCommentMutation,
+    useDislikeCommentMutation
+} from "@services";
+import { useSelector } from "react-redux";
+import { RootState } from "@store";
 
 const ProjectPage = () => {
     const router = useRouter();
     const { id } = router.query; // ✅ Get project ID from URL
     const [projectId, setProjectId] = useState<string | null>(null);
+
+    // Get current user ID from redux state - FIXED
+    const currentUser = useSelector((state: RootState) => state.userSlice);
+    const currentUserId = currentUser?.id;
 
     useEffect(() => {
         if (id) {
@@ -24,15 +38,97 @@ const ProjectPage = () => {
 
     const { data: project, error, isLoading } = useGetProjectByIdQuery(projectId!, {
         skip: !projectId,
-    }); // Use the API hook
+    });
+
+    // Get mutations for interactions
+    const [likeProject] = useLikeProjectMutation();
+    const [dislikeProject] = useDislikeProjectMutation();
+    const [addComment] = useAddCommentMutation();
+    const [removeComment] = useRemoveCommentMutation();
+    const [likeComment] = useLikeCommentMutation();
+    const [dislikeComment] = useDislikeCommentMutation();
 
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [isPdfOpen, setIsPdfOpen] = useState(false);
 
+    // Handlers for user interactions
+    const handleLike = async () => {
+        if (!projectId) return;
+        try {
+            await likeProject(projectId).unwrap();
+        } catch (error) {
+            console.error("Failed to like project:", error);
+        }
+    };
+
+    const handleDislike = async () => {
+        if (!projectId) return;
+        try {
+            await dislikeProject(projectId).unwrap();
+        } catch (error) {
+            console.error("Failed to dislike project:", error);
+        }
+    };
+
+    const handleAddComment = async (comment: string, parentCommentId?: string) => {
+        if (!projectId || !currentUserId) {
+            alert("You must be logged in to comment");
+            return;
+        }
+
+        try {
+            await addComment({
+                projectId,
+                comment,
+                parentCommentId
+            }).unwrap();
+        } catch (error) {
+            console.error("Failed to add comment:", error);
+        }
+    };
+
+    const handleDeleteComment = async (commentId: string) => {
+        if (!projectId) return;
+        try {
+            await removeComment({ projectId, commentId }).unwrap();
+        } catch (error) {
+            console.error("Failed to delete comment:", error);
+        }
+    };
+
+    const handleLikeComment = async (commentId: string) => {
+        if (!projectId || !currentUserId) {
+            alert("You must be logged in to like comments");
+            return;
+        }
+
+        try {
+            await likeComment({ projectId, commentId }).unwrap();
+        } catch (error) {
+            console.error("Failed to like comment:", error);
+        }
+    };
+
+    const handleDislikeComment = async (commentId: string) => {
+        if (!projectId || !currentUserId) {
+            alert("You must be logged in to dislike comments");
+            return;
+        }
+
+        try {
+            await dislikeComment({ projectId, commentId }).unwrap();
+        } catch (error) {
+            console.error("Failed to dislike comment:", error);
+        }
+    };
+
     if (isLoading) return <p className="text-center text-gray-500 mt-20">Loading...</p>;
     if (error) return <p className="text-center text-red-500 mt-20">Error loading project data.</p>;
     if (!project) return <p className="text-center text-gray-500 mt-20">Project not found.</p>;
-    console.log('project', project);
+
+    // Check if user has liked or disliked the project
+    const userHasLiked = project.likes.includes(currentUserId || '');
+    const userHasDisliked = project.dislikes.includes(currentUserId || '');
 
     return (
         <motion.div
@@ -93,16 +189,20 @@ const ProjectPage = () => {
                 likesCount={project.likes.length}
                 dislikesCount={project.dislikes.length}
                 createdAt={project.createdAt}
-                onLike={() => { }}
-                onDislike={() => { }}
+                onLike={handleLike}
+                onDislike={handleDislike}
+                userHasLiked={userHasLiked}
+                userHasDisliked={userHasDisliked}
             />
 
             <Comments
                 projectId={project._id}
-                comments={project.comments}
-                onAddComment={() => { }}
-                onLikeComment={() => { }}
-                onDislikeComment={() => { }}
+                comments={project.comments || []}
+                onAddComment={handleAddComment}
+                onLikeComment={handleLikeComment}
+                onDislikeComment={handleDislikeComment}
+                onDeleteComment={handleDeleteComment}
+                currentUserId={currentUserId}
             />
 
             <UpdatesTimeline updates={project.updates} />

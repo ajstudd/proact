@@ -93,9 +93,12 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
                 <div className="flex space-x-4">
                     <button
                         onClick={onLike}
+                        disabled={userHasDisliked}
                         className={`px-4 py-2 rounded-md flex items-center transition ${userHasLiked
-                            ? 'bg-green-100 text-green-700'
-                            : 'hover:bg-gray-100'
+                                ? 'bg-green-100 text-green-700'
+                                : userHasDisliked
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'hover:bg-gray-100'
                             }`}
                     >
                         <FiThumbsUp className={`mr-2 ${userHasLiked ? 'text-green-600' : ''}`} />
@@ -104,9 +107,12 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
 
                     <button
                         onClick={onDislike}
+                        disabled={userHasLiked}
                         className={`px-4 py-2 rounded-md flex items-center transition ${userHasDisliked
-                            ? 'bg-red-100 text-red-700'
-                            : 'hover:bg-gray-100'
+                                ? 'bg-red-100 text-red-700'
+                                : userHasLiked
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'hover:bg-gray-100'
                             }`}
                     >
                         <FiThumbsDown className={`mr-2 ${userHasDisliked ? 'text-red-600' : ''}`} />

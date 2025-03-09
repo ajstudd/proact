@@ -3,52 +3,51 @@ import {
   FetchArgs,
   createApi,
   fetchBaseQuery,
-} from '@reduxjs/toolkit/query/react';
+} from "@reduxjs/toolkit/query/react";
 import {
   UserAuthResponsePayload,
   RegisterUserRequestPayload,
   LoginAuthRequestPayload,
   ErrorResponse,
   IUserData,
-} from '../types';
+} from "../types";
 import {
   LoginPasswordPayload,
   LoginPasswordResponsePayload,
   LoginSuccessResponsePayload,
-} from '../types/auth';
-import { transformAuthResponse } from '../utils/transformTokens';
+} from "../types/auth";
+import { transformAuthResponse } from "../utils/transformTokens";
 
-const API_URL: string | undefined = process.env['NEXT_PUBLIC_API_URL'];
+const API_URL: string | undefined = process.env["NEXT_PUBLIC_API_URL"];
 //add env.local file in root folder and add NEXT_PUBLIC_API_URL=your api url
 
 export const authApi = createApi({
-  reducerPath: 'authApi',
+  reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${API_URL}/auth`,
-  }) as BaseQueryFn<FetchArgs, unknown, { status: number; data: ErrorResponse }>,
+  }) as BaseQueryFn<
+    FetchArgs,
+    unknown,
+    { status: number; data: ErrorResponse }
+  >,
   endpoints: (builder) => ({
     /** 🔐 User Login */
-    login: builder.mutation<LoginSuccessResponsePayload, LoginAuthRequestPayload>({
+    login: builder.mutation<
+      LoginSuccessResponsePayload,
+      LoginAuthRequestPayload
+    >({
       query: (body) => ({
-        url: '/login',
-        method: 'POST',
+        url: "/login",
+        method: "POST",
         body,
       }),
     }),
 
-    /** 🔐 Admin Login */
-    adminLogin: builder.mutation<LoginPasswordResponsePayload, LoginPasswordPayload>({
-      query: (body) => ({
-        url: '/admin/login',
-        method: 'POST',
-        body,
-      }),
-    }),
     /** 📝 Register User */
     register: builder.mutation<void, RegisterUserRequestPayload>({
       query: (body) => ({
-        url: '/register',
-        method: 'POST',
+        url: "/register",
+        method: "POST",
         body,
       }),
     }),
@@ -56,8 +55,8 @@ export const authApi = createApi({
     /** 🔑 Forgot Password */
     forgotPassword: builder.mutation<void, string>({
       query: (email) => ({
-        url: '/forgot-password',
-        method: 'POST',
+        url: "/forgot-password",
+        method: "POST",
         body: { email },
       }),
     }),
@@ -65,8 +64,8 @@ export const authApi = createApi({
     /** 🔄 Reset Password */
     resetPassword: builder.mutation<void, { token: string; password: string }>({
       query: ({ password, token }) => ({
-        url: '/reset-password',
-        method: 'POST',
+        url: "/reset-password",
+        method: "POST",
         body: { password },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -74,21 +73,11 @@ export const authApi = createApi({
       }),
     }),
 
-    /** 🔄 Refresh Access Token */
-    newAccessToken: builder.mutation<UserAuthResponsePayload, string>({
-      query: (refreshToken) => ({
-        url: '/refresh-tokens',
-        method: 'POST',
-        body: { refreshToken },
-      }),
-      transformResponse: transformAuthResponse,
-    }),
-
     /** 👤 Get User Info */
-    me: builder.mutation<IUserData, string>({
+    me: builder.query<IUserData, string>({
       query: (token) => ({
-        url: '/me',
-        method: 'GET',
+        url: "/me",
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -96,11 +85,10 @@ export const authApi = createApi({
     }),
 
     /** 🚪 Logout */
-    logout: builder.mutation<void, string>({
-      query: (refreshToken) => ({
-        url: '/logout',
-        method: 'POST',
-        body: { refreshToken },
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: "/logout",
+        method: "POST",
       }),
     }),
   }),
@@ -108,11 +96,9 @@ export const authApi = createApi({
 
 export const {
   useLoginMutation,
-  useAdminLoginMutation,
   useRegisterMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
-  useNewAccessTokenMutation,
-  useMeMutation,
+  useMeQuery,
   useLogoutMutation,
 } = authApi;

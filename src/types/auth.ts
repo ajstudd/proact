@@ -23,8 +23,16 @@ export interface Tokens {
 }
 
 export interface UserAuthResponsePayload {
-  user: User;
-  tokens: Tokens;
+  accessToken: string;
+  refreshToken?: string;
+  user: {
+    id: string;
+    name: string;
+    email?: string;
+    phone?: string;
+    role: string;
+    isVerified: boolean;
+  };
 }
 
 export interface UserAuthRequestPayload {
@@ -35,19 +43,32 @@ export interface UserAuthRequestPayload {
   password: string;
 }
 
-export type LoginAuthRequestPayload = Pick<
-  UserAuthRequestPayload,
-  'email' | 'password'
->;
+// export type LoginAuthRequestPayload = Pick<
+//   UserAuthRequestPayload,
+//   "email" | "password"
+// >;
+
+export interface LoginAuthRequestPayload {
+  email?: string;
+  phone?: string;
+  password: string;
+}
 
 export interface LoginAuthResponsePayload {
   user: User;
   token: string;
 }
 export interface LoginSuccessResponsePayload {
-  message: string;
-  resp : LoginAuthResponsePayload;
-};
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email?: string;
+    phone?: string;
+    role: string;
+    isVerified: boolean;
+  };
+}
 
 // {
 //   "message": "Login successful!",
@@ -63,20 +84,20 @@ export interface LoginSuccessResponsePayload {
 //   }
 // }
 
-
-
 export interface VerifyOtpRequestPayload {
   otp: string;
   email?: string;
   phone?: string;
 }
 
-export interface RegisterUserRequestPayload  {
-  email: string;
-  phone: string;
+export interface RegisterUserRequestPayload {
   name: string;
+  email?: string;
+  phone?: string;
   password: string;
-  role: string;
+  role?: "ADMIN" | "USER" | "CONTRACTOR" | "GOVERNMENT";
+  governmentId?: string;
+  contractorLicense?: string;
 }
 // export interface RegisterUserRequestPayload extends UserAuthRequestPayload {
 //   repeatPassword: string;
@@ -97,12 +118,24 @@ export interface LoginPasswordPayload {
   password: string;
 }
 export interface LoginPasswordResponsePayload {
-  message: string;
   token: string;
+  user: {
+    id: string;
+    name: string;
+    email?: string;
+    role: string;
+    isVerified: boolean;
+  };
 }
 
 export interface RequestOtpRequestPayload {
   email: string;
   phone: string;
-  method : string;
+  method: string;
+}
+
+export interface AuthToken {
+  id: string;
+  role: string;
+  isVerified: boolean;
 }
