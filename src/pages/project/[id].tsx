@@ -8,6 +8,7 @@ import Comments from "components/Comments";
 import UpdatesTimeline from "components/UpdatesTimeline";
 import PdfToSlides from "components/PdfToSlides";
 import MapModal from "components/MapModal";
+import ProjectStakeholders from "components/ProjectStakeholders";
 import { useGetProjectByIdQuery } from "@services"; // Import the API hook
 
 const ProjectPage = () => {
@@ -80,6 +81,11 @@ const ProjectPage = () => {
                     </button>
                 </div>
             </div>
+
+            <ProjectStakeholders
+                contractor={project.contractor}
+                government={project.government}
+            />
 
             <ProjectStats
                 budget={project.budget}

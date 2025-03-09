@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FiMapPin, FiThumbsUp, FiThumbsDown, FiDollarSign, FiCalendar } from "react-icons/fi";
+import { FiMapPin, FiThumbsUp, FiThumbsDown, FiDollarSign, FiCalendar, FiUsers } from "react-icons/fi";
+import { MdAccountBalance } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -20,6 +21,16 @@ interface ProjectCardProps {
     likes?: number[];
     dislikes?: number[];
     createdAt?: string;
+    contractor?: {
+        _id: string;
+        name: string;
+        id: string;
+    };
+    government?: {
+        _id: string;
+        name: string;
+        id: string;
+    };
 }
 
 const ProjectCard = ({
@@ -32,7 +43,9 @@ const ProjectCard = ({
     expenditure,
     likes = [],
     dislikes = [],
-    createdAt
+    createdAt,
+    contractor,
+    government
 }: ProjectCardProps) => {
     const router = useRouter();
     const formattedDate = createdAt ? new Date(createdAt).toLocaleDateString() : 'Unknown date';
@@ -88,6 +101,24 @@ const ProjectCard = ({
                         {formattedDate}
                     </div>
                 </div>
+
+                {/* Stakeholder information */}
+                {(contractor || government) && (
+                    <div className="flex flex-wrap gap-2 mt-2 mb-3 text-xs text-gray-600">
+                        {contractor && (
+                            <div className="flex items-center bg-amber-50 px-2 py-1 rounded">
+                                <FiUsers className="mr-1 text-amber-600" />
+                                <span className="line-clamp-1">{contractor.name}</span>
+                            </div>
+                        )}
+                        {government && (
+                            <div className="flex items-center bg-blue-50 px-2 py-1 rounded">
+                                <MdAccountBalance className="mr-1 text-blue-600" />
+                                <span className="line-clamp-1">{government.name}</span>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
                     <div className="flex items-center space-x-4">
