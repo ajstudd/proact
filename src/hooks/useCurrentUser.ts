@@ -1,32 +1,26 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { getAuthToken, getCurrentUserId } from "../utils/authUtils";
+import { useAuth } from "../contexts/AuthContext";
 
 /**
- * Custom hook for accessing current user data and authentication status
- * across the application
+ * Hook to provide access to the currently authenticated user
  */
 export const useCurrentUser = () => {
-  const user = useSelector((state: RootState) => state.userSlice);
-  console.log("user", user);
-
-  // Get fresh token and userId every time the hook is called
-  const token = getAuthToken();
-  const userId = getCurrentUserId();
-
-  // Determine authentication status
-  const isAuthenticated = Boolean(token) && user.isAuthenticated;
+  const userState = useSelector((state: RootState) => state.userSlice);
+  console.log("userState", userState);
+  const auth = useAuth();
 
   return {
-    user,
-    userId,
-    token,
-    isAuthenticated,
-    role: user.role || "USER",
-    // Shorthand helpers for role checking
-    isAdmin: user.role === "ADMIN",
-    isContractor: user.role === "CONTRACTOR",
-    isGovernment: user.role === "GOVERNMENT",
+    user: userState,
+    isAuthenticated: userState.isAuthenticated,
+    userId: userState?.id,
+    userRole: userState?.role,
+    isAdmin: auth.isAdmin,
+    isGovernment: auth.isGovernment,
+    isContractor: auth.isContractor,
+    isUser: auth.isUser,
+    canManageProjects: auth.isAdmin || auth.isGovernment,
+    canEditProjects: auth.isAdmin || auth.isGovernment || auth.isContractor,
   };
 };
 

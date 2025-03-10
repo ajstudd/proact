@@ -60,13 +60,13 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
     });
 
     const {
-        data: userData,
+        data: responseData,
         isSuccess,
         refetch,
     } = useMeQuery(token || "", {
         skip: !token,
     });
-
+    const userData = responseData?.user;
     useEffect(() => {
         const initializeAuth = async () => {
             if (!token) {
@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
                     if (isSuccess && userData) {
                         dispatch(
                             saveUser({
-                                id: userData.id,
+                                id: userData._id,
                                 name: userData.name,
                                 email: userData.email,
                                 phone: userData.phone,

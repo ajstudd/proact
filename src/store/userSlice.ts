@@ -33,6 +33,10 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     saveUser(state, action: PayloadAction<Partial<UserState>>) {
+      console.log("{ ...state, ...action.payload }", {
+        ...state,
+        ...action.payload,
+      });
       return { ...state, ...action.payload };
     },
     setUserAuthentication(state, action: PayloadAction<boolean>) {

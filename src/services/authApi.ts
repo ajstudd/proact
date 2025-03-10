@@ -91,7 +91,12 @@ export const authApi = createApi({
     }),
 
     /** 👤 Get User Info */
-    me: builder.query<IUserData, string>({
+    me: builder.query<
+      {
+        user: IUserData;
+      },
+      string
+    >({
       query: (token) => ({
         url: "/me",
         method: "GET",

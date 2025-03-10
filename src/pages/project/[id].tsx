@@ -16,9 +16,14 @@ import {
     useAddCommentMutation,
     useRemoveCommentMutation,
     useLikeCommentMutation,
-    useDislikeCommentMutation
+    useDislikeCommentMutation,
+    useAddProjectUpdateMutation,
+    useEditProjectUpdateMutation,
+    useRemoveProjectUpdateMutation
 } from "@services";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { useAuth } from "../../contexts/AuthContext";
+import { useRBAC } from "../../hooks/useRBAC"; // Added RBAC hook
 import { toast } from "react-toastify"; // Assuming you use react-hot-toast for notifications
 
 const ProjectPage = () => {
@@ -28,6 +33,8 @@ const ProjectPage = () => {
 
     // Get current user using our new hook
     const { user, isAuthenticated, userId } = useCurrentUser();
+    const auth = useAuth();
+    const { isGovernment, isContractor } = useRBAC(); // Using RBAC hook
 
     useEffect(() => {
         if (id) {
@@ -46,6 +53,11 @@ const ProjectPage = () => {
     const [removeComment] = useRemoveCommentMutation();
     const [likeComment] = useLikeCommentMutation();
     const [dislikeComment] = useDislikeCommentMutation();
+
+    // Project update mutations
+    const [addProjectUpdate] = useAddProjectUpdateMutation();
+    const [editProjectUpdate] = useEditProjectUpdateMutation();
+    const [removeProjectUpdate] = useRemoveProjectUpdateMutation();
 
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [isPdfOpen, setIsPdfOpen] = useState(false);
@@ -147,6 +159,62 @@ const ProjectPage = () => {
         }
     };
 
+    // Project update handlers
+    const handleAddUpdate = async (content: string, media?: string[]) => {
+        if (!projectId || !isAuthenticated) {
+            toast.error("You must be logged in to add updates");
+            return;
+        }
+
+        try {
+            await addProjectUpdate({
+                projectId,
+                updateData: { content, media }
+            }).unwrap();
+            toast.success("Project update added successfully");
+        } catch (error) {
+            console.error("Failed to add update:", error);
+            toast.error("Failed to add update");
+        }
+    };
+
+    const handleEditUpdate = async (updateId: string, content: string, media?: string[]) => {
+        if (!projectId || !isAuthenticated) {
+            toast.error("You must be logged in to edit updates");
+            return;
+        }
+
+        try {
+            await editProjectUpdate({
+                projectId,
+                updateId,
+                updateData: { content, media }
+            }).unwrap();
+            toast.success("Project update edited successfully");
+        } catch (error) {
+            console.error("Failed to edit update:", error);
+            toast.error("Failed to edit update");
+        }
+    };
+
+    const handleDeleteUpdate = async (updateId: string) => {
+        if (!projectId || !isAuthenticated) {
+            toast.error("You must be logged in to delete updates");
+            return;
+        }
+
+        try {
+            await removeProjectUpdate({
+                projectId,
+                updateId
+            }).unwrap();
+            toast.success("Project update removed successfully");
+        } catch (error) {
+            console.error("Failed to delete update:", error);
+            toast.error("Failed to delete update");
+        }
+    };
+
     if (isLoading) return <p className="text-center text-gray-500 mt-20">Loading...</p>;
     if (error) return <p className="text-center text-red-500 mt-20">Error loading project data.</p>;
     if (!project) return <p className="text-center text-gray-500 mt-20">Project not found.</p>;
@@ -154,6 +222,17 @@ const ProjectPage = () => {
     // Check if user has liked or disliked the project
     const userHasLiked = project.likes.includes(userId || '');
     const userHasDisliked = project.dislikes.includes(userId || '');
+
+    // Using RBAC approach for checking update management permissions
+    console.log('project.contractor._id', project.contractor._id)
+    console.log('isAuthenticated', isAuthenticated)
+    console.log('userId', userId)
+    console.log('project.government._id', project.government._id)
+    console.log('isGovernment', isGovernment)
+    const canManageUpdates = isAuthenticated &&
+        ((isGovernment && project.government._id === userId) ||
+            (isContractor && project.contractor._id === userId));
+    console.log('isContractor', isContractor)
 
     return (
         <motion.div
@@ -220,6 +299,15 @@ const ProjectPage = () => {
                 userHasDisliked={userHasDisliked}
             />
 
+            <UpdatesTimeline
+                updates={project.updates || []}
+                projectId={project._id}
+                onAddUpdate={handleAddUpdate}
+                onEditUpdate={handleEditUpdate}
+                onDeleteUpdate={handleDeleteUpdate}
+                canManageUpdates={canManageUpdates}
+            />
+
             <Comments
                 projectId={project._id}
                 comments={project.comments || []}
@@ -229,8 +317,6 @@ const ProjectPage = () => {
                 onDeleteComment={handleDeleteComment}
                 currentUserId={userId || undefined}
             />
-
-            <UpdatesTimeline updates={project.updates} />
 
             <PdfToSlides pdfUrl={project.pdfUrl} isOpen={isPdfOpen} onClose={() => setIsPdfOpen(false)} />
             <MapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} location={project.location} />

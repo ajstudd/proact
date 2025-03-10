@@ -8,6 +8,7 @@ export * from "./posts";
 
 export interface IUserData {
   id: string;
+  _id?: string;
   name: string;
   email?: string;
   phone?: string;
