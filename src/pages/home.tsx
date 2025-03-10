@@ -6,11 +6,14 @@ import ProjectCard from "components/ProjectCard";
 import CreateProjectForm from "components/CreateProject";
 import { useGetTrimmedProjectsQuery } from "@services";
 import { FiPlus, FiLoader } from "react-icons/fi";
+import RoleBasedGuard from "components/RoleBasedGuard";
+import { useRBAC } from "hooks/useRBAC";
 
 const HomePage = () => {
     const [mounted, setMounted] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const { data: projects, isLoading, isError, refetch } = useGetTrimmedProjectsQuery({});
+    const { hasPermission } = useRBAC();
 
     useEffect(() => {
         setMounted(true);
@@ -27,18 +30,23 @@ const HomePage = () => {
         <div className="min-h-screen bg-gray-100 p-4 md:p-6 max-w-6xl mx-auto">
             <h1 className="text-3xl font-bold text-gray-900 text-center mb-6">Government Projects</h1>
 
-            {/* Create Project Toggle Button - Only rendered client-side after mounting */}
-            <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className="mb-6 mx-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            {/* Create Project Toggle Button - Only rendered for users with appropriate permission */}
+            <RoleBasedGuard
+                permissions={["create:project"]}
+                requireVerified={true}
             >
-                <FiPlus /> {showCreateForm ? "Hide Form" : "Create New Project"}
-            </motion.button>
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowCreateForm(!showCreateForm)}
+                    className="mb-6 mx-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                    <FiPlus /> {showCreateForm ? "Hide Form" : "Create New Project"}
+                </motion.button>
+            </RoleBasedGuard>
 
             {/* Conditionally show the create form */}
-            {showCreateForm && (
+            {showCreateForm && hasPermission("create:project") && (
                 <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
@@ -87,16 +95,19 @@ const HomePage = () => {
                 </motion.div>
             )}
 
-            {/* Empty state */}
+            {/* Empty state - Show create button only to users with permission */}
             {projects && projects.length === 0 && !isLoading && (
                 <div className="flex flex-col items-center justify-center py-10 bg-white rounded-lg shadow-md">
                     <p className="text-gray-600 text-xl mb-4">No projects found</p>
-                    <button
-                        onClick={() => setShowCreateForm(true)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                    >
-                        Create Your First Project
-                    </button>
+
+                    <RoleBasedGuard permissions={["create:project"]}>
+                        <button
+                            onClick={() => setShowCreateForm(true)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                        >
+                            Create Your First Project
+                        </button>
+                    </RoleBasedGuard>
                 </div>
             )}
         </div>
