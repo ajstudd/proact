@@ -18,17 +18,16 @@ import {
     useLikeCommentMutation,
     useDislikeCommentMutation
 } from "@services";
-import { useSelector } from "react-redux";
-import { RootState } from "@store";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { toast } from "react-toastify"; // Assuming you use react-hot-toast for notifications
 
 const ProjectPage = () => {
     const router = useRouter();
-    const { id } = router.query; // ✅ Get project ID from URL
+    const { id } = router.query; // Get project ID from URL
     const [projectId, setProjectId] = useState<string | null>(null);
 
-    // Get current user ID from redux state - FIXED
-    const currentUser = useSelector((state: RootState) => state.userSlice);
-    const currentUserId = currentUser?.id;
+    // Get current user using our new hook
+    const { user, isAuthenticated, userId } = useCurrentUser();
 
     useEffect(() => {
         if (id) {
@@ -54,25 +53,49 @@ const ProjectPage = () => {
     // Handlers for user interactions
     const handleLike = async () => {
         if (!projectId) return;
+
+        if (!isAuthenticated) {
+            toast.error("Please log in to support this project");
+            // You might want to redirect to login page
+            // router.push('/login');
+            return;
+        }
+
         try {
             await likeProject(projectId).unwrap();
+            toast.success("Project supported successfully");
         } catch (error) {
             console.error("Failed to like project:", error);
+            toast.error("Failed to support project");
         }
     };
 
     const handleDislike = async () => {
         if (!projectId) return;
+
+        if (!isAuthenticated) {
+            toast.error("Please log in to oppose this project");
+            // You might want to redirect to login page
+            // router.push('/login');
+            return;
+        }
+
         try {
             await dislikeProject(projectId).unwrap();
+            toast.success("Project opposed successfully");
         } catch (error) {
             console.error("Failed to dislike project:", error);
+            toast.error("Failed to oppose project");
         }
     };
 
     const handleAddComment = async (comment: string, parentCommentId?: string) => {
-        if (!projectId || !currentUserId) {
-            alert("You must be logged in to comment");
+        if (!projectId) return;
+
+        if (!isAuthenticated) {
+            toast.error("Please log in to comment");
+            // You might want to redirect to login page
+            // router.push('/login');
             return;
         }
 
@@ -82,8 +105,10 @@ const ProjectPage = () => {
                 comment,
                 parentCommentId
             }).unwrap();
+            toast.success("Comment added successfully");
         } catch (error) {
             console.error("Failed to add comment:", error);
+            toast.error("Failed to add comment");
         }
     };
 
@@ -97,8 +122,8 @@ const ProjectPage = () => {
     };
 
     const handleLikeComment = async (commentId: string) => {
-        if (!projectId || !currentUserId) {
-            alert("You must be logged in to like comments");
+        if (!projectId || !isAuthenticated) {
+            toast.error("You must be logged in to like comments");
             return;
         }
 
@@ -110,8 +135,8 @@ const ProjectPage = () => {
     };
 
     const handleDislikeComment = async (commentId: string) => {
-        if (!projectId || !currentUserId) {
-            alert("You must be logged in to dislike comments");
+        if (!projectId || !isAuthenticated) {
+            toast.error("You must be logged in to dislike comments");
             return;
         }
 
@@ -127,8 +152,8 @@ const ProjectPage = () => {
     if (!project) return <p className="text-center text-gray-500 mt-20">Project not found.</p>;
 
     // Check if user has liked or disliked the project
-    const userHasLiked = project.likes.includes(currentUserId || '');
-    const userHasDisliked = project.dislikes.includes(currentUserId || '');
+    const userHasLiked = project.likes.includes(userId || '');
+    const userHasDisliked = project.dislikes.includes(userId || '');
 
     return (
         <motion.div
@@ -202,7 +227,7 @@ const ProjectPage = () => {
                 onLikeComment={handleLikeComment}
                 onDislikeComment={handleDislikeComment}
                 onDeleteComment={handleDeleteComment}
-                currentUserId={currentUserId}
+                currentUserId={userId || undefined}
             />
 
             <UpdatesTimeline updates={project.updates} />

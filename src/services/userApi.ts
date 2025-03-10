@@ -1,5 +1,5 @@
 import { UpdateUserPayload, UpdateUserResponse } from "../types";
-import { getToken } from "../utils/getToken";
+import { getAuthToken } from "../utils/authUtils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const API_URL: string = process.env.NEXT_PUBLIC_API_URL!;
@@ -9,7 +9,7 @@ export const userApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${API_URL}/user`,
     prepareHeaders: (headers) => {
-      const token = getToken();
+      const token = getAuthToken();
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }

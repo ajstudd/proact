@@ -59,14 +59,17 @@ export interface LoginAuthResponsePayload {
   token: string;
 }
 export interface LoginSuccessResponsePayload {
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    email?: string;
-    phone?: string;
-    role: string;
-    isVerified: boolean;
+  message: string;
+  resp: {
+    token: string;
+    user: {
+      id: string;
+      name: string;
+      email?: string;
+      phone?: string;
+      role: string;
+      isVerified: boolean;
+    };
   };
 }
 

@@ -54,6 +54,7 @@ const VerifyAccount = ({ decryptedEmail }: { decryptedEmail: string }) => {
             toast.success("OTP sent successfully!");
             setStep(2);
         } catch (error: any) {
+            console.log('error', error)
             toast.error(error.data?.message || "Failed to send OTP");
         }
     };

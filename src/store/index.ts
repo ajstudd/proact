@@ -22,6 +22,7 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [imageApi.reducerPath]: imageApi.reducer,
     [postApi.reducerPath]: postApi.reducer,
+    [otpApi.reducerPath]: otpApi.reducer,
     userSlice,
     postsSlice,
     uiSlice,
@@ -36,7 +37,8 @@ export const store = configureStore({
       userApi.middleware,
       postApi.middleware,
       imageApi.middleware,
-      projectApi.middleware
+      projectApi.middleware,
+      otpApi.middleware
     ),
 });
 

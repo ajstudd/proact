@@ -33,13 +33,14 @@ const Login = () => {
       console.log("response", response);
       toast.success("Login successful!");
 
-      const { token, user } = response.resp;
+      const { token, user } = response?.resp;
+      console.log('response?.resp', response?.resp)
 
       // ✅ Store token & user details
       setAuthData(token, user);
 
       if (!user.isVerified) {
-        const encryptedEmail = encryptEmail(user.email);
+        const encryptedEmail = encryptEmail(user.email || "");
         toast.info("Account not verified. Redirecting to OTP verification...");
         router.push(`/otp/${encryptedEmail}`);
       } else {

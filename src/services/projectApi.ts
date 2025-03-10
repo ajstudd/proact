@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { getCurrentUserId, getAuthToken } from "../utils/authUtils";
 
 export const projectApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -139,20 +140,29 @@ export const projectApi = api.injectEndpoints({
 
     // Project interactions (likes/dislikes)
     likeProject: builder.mutation({
-      query: (projectId) => ({
-        url: `/interaction/${projectId}/like`,
-        method: "POST",
-      }),
+      query: (projectId) => {
+        const userId = getCurrentUserId();
+        // No need to manually add auth header as it's handled in the base query
+        return {
+          url: `/interaction/${projectId}/like`,
+          method: "POST",
+          body: { userId },
+        };
+      },
       invalidatesTags: (result, error, projectId) => [
         { type: "Projects", id: projectId },
       ],
     }),
 
     dislikeProject: builder.mutation({
-      query: (projectId) => ({
-        url: `/interaction/${projectId}/dislike`,
-        method: "POST",
-      }),
+      query: (projectId) => {
+        const userId = getCurrentUserId();
+        return {
+          url: `/interaction/${projectId}/dislike`,
+          method: "POST",
+          body: { userId },
+        };
+      },
       invalidatesTags: (result, error, projectId) => [
         { type: "Projects", id: projectId },
       ],
@@ -160,44 +170,59 @@ export const projectApi = api.injectEndpoints({
 
     // Comments
     addComment: builder.mutation({
-      query: ({ projectId, comment, parentCommentId }) => ({
-        url: `/comments/${projectId}`,
-        method: "POST",
-        body: {
-          content: comment,
-          parentComment: parentCommentId || null,
-        },
-      }),
+      query: ({ projectId, comment, parentCommentId }) => {
+        const userId = getCurrentUserId();
+        return {
+          url: `/comments`,
+          method: "POST",
+          body: {
+            content: comment,
+            projectId,
+            userId,
+            parentComment: parentCommentId || null,
+          },
+        };
+      },
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
       ],
     }),
 
     removeComment: builder.mutation({
-      query: ({ projectId, commentId }) => ({
-        url: `/comments/${projectId}/${commentId}`,
-        method: "DELETE",
-      }),
+      query: ({ projectId, commentId }) => {
+        return {
+          url: `/comments/${commentId}`,
+          method: "DELETE",
+        };
+      },
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
       ],
     }),
 
     likeComment: builder.mutation({
-      query: ({ projectId, commentId }) => ({
-        url: `/comments/${projectId}/${commentId}/like`,
-        method: "POST",
-      }),
+      query: ({ projectId, commentId }) => {
+        const userId = getCurrentUserId();
+        return {
+          url: `/comments/${commentId}/like`,
+          method: "POST",
+          body: { userId },
+        };
+      },
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
       ],
     }),
 
     dislikeComment: builder.mutation({
-      query: ({ projectId, commentId }) => ({
-        url: `/comments/${projectId}/${commentId}/dislike`,
-        method: "POST",
-      }),
+      query: ({ projectId, commentId }) => {
+        const userId = getCurrentUserId();
+        return {
+          url: `/comments/${commentId}/dislike`,
+          method: "POST",
+          body: { userId },
+        };
+      },
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
       ],

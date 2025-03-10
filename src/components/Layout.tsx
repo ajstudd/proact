@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Header from "./Header";
 import Sidebar from "./SideBar";
 import { Box } from "@chakra-ui/react";
@@ -8,11 +8,11 @@ import { useRouter } from "next/router";
 import { GlobalToast } from "./toast";
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const MainLayout: React.FC<Props> = (props) => {
-  const router  = useRouter();
+export const MainLayout = ({ children }: Props) => {
+  const router = useRouter();
   const location = router.pathname;
 
   const hideSidebar =
@@ -39,7 +39,7 @@ export const MainLayout: React.FC<Props> = (props) => {
             msOverflowStyle: "none",
           }}
         >
-          <div style={{ height: "100%" }}>{props.children}</div>
+          <div style={{ height: "100%" }}>{children}</div>
           <style jsx>
             {`
               ::-webkit-scrollbar {

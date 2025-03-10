@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiSend, FiThumbsUp, FiThumbsDown, FiTrash, FiMessageSquare } from "react-icons/fi";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 interface Comment {
     _id: string;
@@ -44,6 +45,12 @@ export const Comments: React.FC<CommentsProps> = ({
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [replyContent, setReplyContent] = useState("");
 
+    // Get authentication status from our hook
+    const { isAuthenticated, userId } = useCurrentUser();
+
+    // Use the userId from the hook if not provided directly
+    const effectiveUserId = currentUserId || userId;
+
     useEffect(() => {
         // Filter root comments (those without parentComment)
         const rootComments = comments.filter(comment => !comment.parentComment);
@@ -57,6 +64,11 @@ export const Comments: React.FC<CommentsProps> = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!isAuthenticated) {
+            alert("You must be logged in to comment");
+            return;
+        }
+
         if (newComment.trim()) {
             onAddComment(newComment);
             setNewComment("");
@@ -90,6 +102,9 @@ export const Comments: React.FC<CommentsProps> = ({
 
     const CommentItem = ({ comment, index, isReply = false }: { comment: Comment, index: number, isReply?: boolean }) => {
         const replies = getReplies(comment._id);
+        const userLiked = comment.likes.includes(effectiveUserId || '');
+        const userDisliked = comment.dislikes.includes(effectiveUserId || '');
+        const isCommentAuthor = effectiveUserId === comment.user._id;
 
         return (
             <motion.div
@@ -113,28 +128,31 @@ export const Comments: React.FC<CommentsProps> = ({
                         <p className="mt-1 text-gray-700">{comment.content}</p>
                         <div className="flex items-center mt-2 space-x-4">
                             <button
-                                onClick={() => onLikeComment(comment._id)}
+                                onClick={() => isAuthenticated ? onLikeComment(comment._id) : alert("Please log in to like comments")}
                                 className="flex items-center text-sm text-gray-600 hover:text-blue-600"
+                                disabled={!isAuthenticated}
                             >
-                                <FiThumbsUp className={`mr-1 ${comment.likes.includes(currentUserId || '') ? 'text-blue-600' : ''}`} />
+                                <FiThumbsUp className={`mr-1 ${userLiked ? 'text-blue-600' : ''}`} />
                                 {comment.likes.length}
                             </button>
                             <button
-                                onClick={() => onDislikeComment(comment._id)}
+                                onClick={() => isAuthenticated ? onDislikeComment(comment._id) : alert("Please log in to dislike comments")}
                                 className="flex items-center text-sm text-gray-600 hover:text-red-600"
+                                disabled={!isAuthenticated}
                             >
-                                <FiThumbsDown className={`mr-1 ${comment.dislikes.includes(currentUserId || '') ? 'text-red-600' : ''}`} />
+                                <FiThumbsDown className={`mr-1 ${userDisliked ? 'text-red-600' : ''}`} />
                                 {comment.dislikes.length}
                             </button>
                             <button
-                                onClick={() => setReplyingTo(replyingTo === comment._id ? null : comment._id)}
+                                onClick={() => isAuthenticated ? setReplyingTo(replyingTo === comment._id ? null : comment._id) : alert("Please log in to reply")}
                                 className="flex items-center text-sm text-gray-600 hover:text-blue-600"
+                                disabled={!isAuthenticated}
                             >
                                 <FiMessageSquare className="mr-1" /> Reply
                             </button>
 
                             {/* Show delete button if user is the author */}
-                            {currentUserId && comment.user._id === currentUserId && onDeleteComment && (
+                            {isCommentAuthor && onDeleteComment && (
                                 <button
                                     onClick={() => onDeleteComment(comment._id)}
                                     className="flex items-center text-sm text-gray-600 hover:text-red-600 ml-auto"
@@ -196,17 +214,21 @@ export const Comments: React.FC<CommentsProps> = ({
                         type="text"
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Add a comment..."
+                        placeholder={isAuthenticated ? "Add a comment..." : "Please log in to comment"}
                         className="flex-grow p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={!isAuthenticated}
                     />
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white px-4 rounded-r hover:bg-blue-700 transition flex items-center"
-                        disabled={!newComment.trim()}
+                        className={`bg-blue-600 text-white px-4 rounded-r ${!isAuthenticated || !newComment.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition flex items-center`}
+                        disabled={!isAuthenticated || !newComment.trim()}
                     >
                         <FiSend className="mr-2" /> Post
                     </button>
                 </div>
+                {!isAuthenticated && (
+                    <p className="text-sm text-gray-500 mt-1">Please log in to join the conversation</p>
+                )}
             </form>
 
             {/* Comments list */}
