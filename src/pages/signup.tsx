@@ -144,7 +144,7 @@ const Register = () => {
     email: "",
     phone: "",
     password: "",
-    role: "USER", // Default role
+    role: "USER" as "USER" | "CONTRACTOR" | "GOVERNMENT" | "ADMIN" | undefined, // Default role
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
