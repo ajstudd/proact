@@ -1,12 +1,12 @@
-import { LocalStorageKeys } from '../configs/localStorageKeys';
-import { ErrorResponse, UserAuthResponsePayload } from '../types';
+import { LocalStorageKeys } from "../configs/localStorageKeys";
+import { ErrorResponse, UserAuthResponsePayload } from "../types";
 // import { reAuthBaseQuery } from '@/utils/reAuth';
 import {
   BaseQueryFn,
   FetchArgs,
   createApi,
   fetchBaseQuery,
-} from '@reduxjs/toolkit/query/react';
+} from "@reduxjs/toolkit/query/react";
 
 const API_URL: string = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -15,23 +15,23 @@ const baseQuery = fetchBaseQuery({
 });
 
 export const mediaApi = createApi({
-  reducerPath: 'mediaApi',
+  reducerPath: "mediaApi",
   baseQuery,
-  endpoints: builder => ({
+  endpoints: (builder) => ({
     upload: builder.mutation<{ uploadImgLoc: string }, FormData>({
-      query: body => ({
-        url: '/upload',
-        method: 'POST',
+      query: (body) => ({
+        url: "/upload",
+        method: "POST",
         body,
-        headers: {
-          Authorization: `Bearer ${
-            (
-              JSON.parse(
-                localStorage.getItem(LocalStorageKeys.AUTH_DATA)!
-              ) as UserAuthResponsePayload
-            ).tokens.access.token
-          }`,
-        },
+        // headers: {
+        //   Authorization: `Bearer ${
+        //     (
+        //       JSON.parse(
+        //         localStorage.getItem(LocalStorageKeys.AUTH_DATA)!
+        //       ) as UserAuthResponsePayload
+        //     ).tokens.access.token
+        //   }`,
+        // },
       }),
     }),
   }),

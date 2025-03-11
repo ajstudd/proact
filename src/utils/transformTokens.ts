@@ -1,7 +1,7 @@
-import { Tokens, UserAuthResponsePayload } from '../types';
+import { Tokens, UserAuthResponsePayload } from "../types";
 
 const transformTokens = (response: Tokens) => {
-  console.log('response', response);
+  console.log("response", response);
 
   return {
     access: {
@@ -17,7 +17,7 @@ const transformTokens = (response: Tokens) => {
 
 export const transformAuthResponse = (response: UserAuthResponsePayload) => ({
   ...response,
-  tokens: {
-    ...transformTokens(response.tokens),
-  },
+  // tokens: {
+  //   ...transformTokens(response.tokens),
+  // },
 });
