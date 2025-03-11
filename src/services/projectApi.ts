@@ -200,6 +200,7 @@ export const projectApi = api.injectEndpoints({
       ],
     }),
 
+    // Updated to match the API routes exactly
     likeComment: builder.mutation({
       query: ({ projectId, commentId }) => {
         const userId = getCurrentUserId();
@@ -214,6 +215,7 @@ export const projectApi = api.injectEndpoints({
       ],
     }),
 
+    // Updated to match the API routes exactly
     dislikeComment: builder.mutation({
       query: ({ projectId, commentId }) => {
         const userId = getCurrentUserId();

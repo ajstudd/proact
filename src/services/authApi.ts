@@ -16,7 +16,6 @@ import {
   LoginPasswordResponsePayload,
   LoginSuccessResponsePayload,
 } from "../types/auth";
-import { transformAuthResponse } from "../utils/transformTokens";
 import { clearAuthData } from "../utils/authUtils";
 
 const API_URL: string | undefined = process.env["NEXT_PUBLIC_API_URL"];

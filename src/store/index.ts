@@ -13,6 +13,7 @@ import {
 import userSlice from "./userSlice";
 import uiSlice from "./uiSlice";
 import postsSlice from "./postsSlice";
+import commentsSlice from "./commentsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     userSlice,
     postsSlice,
     uiSlice,
+    commentsSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FiArrowLeft, FiMapPin, FiThumbsUp, FiThumbsDown } from "react-icons/fi";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
@@ -42,6 +42,7 @@ const ProjectPage = () => {
         }
     }, [id]);
 
+    // Load the project and comments
     const { data: project, error, isLoading } = useGetProjectByIdQuery(projectId!, {
         skip: !projectId,
     });
@@ -61,6 +62,16 @@ const ProjectPage = () => {
 
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [isPdfOpen, setIsPdfOpen] = useState(false);
+
+    // Add local state for comments to enable optimistic updates
+    const [localComments, setLocalComments] = useState<any[]>([]);
+
+    // Sync local comments with API data when it changes
+    useEffect(() => {
+        if (project?.comments) {
+            setLocalComments(project.comments);
+        }
+    }, [project?.comments]);
 
     // Handlers for user interactions
     const handleLike = async () => {
@@ -101,63 +112,90 @@ const ProjectPage = () => {
         }
     };
 
-    const handleAddComment = async (comment: string, parentCommentId?: string) => {
+    const handleAddComment = useCallback(async (comment: string, parentCommentId?: string) => {
         if (!projectId) return;
 
         if (!isAuthenticated) {
             toast.error("Please log in to comment");
-            // You might want to redirect to login page
-            // router.push('/login');
             return;
         }
 
         try {
+            // API call first, no need for optimistic updates as Redux will handle the state
             await addComment({
                 projectId,
                 comment,
                 parentCommentId
             }).unwrap();
+
             toast.success("Comment added successfully");
         } catch (error) {
             console.error("Failed to add comment:", error);
             toast.error("Failed to add comment");
         }
-    };
+    }, [projectId, isAuthenticated, addComment]);
 
-    const handleDeleteComment = async (commentId: string) => {
+    const handleDeleteComment = useCallback(async (commentId: string) => {
         if (!projectId) return;
         try {
+            // Optimistic delete
+            setLocalComments(prevComments => {
+                // First try to delete from top level comments
+                const topLevelFiltered = prevComments.filter(c => c._id !== commentId);
+
+                if (topLevelFiltered.length < prevComments.length) {
+                    return topLevelFiltered;
+                }
+
+                // If not found at top level, search in replies
+                return prevComments.map(c => ({
+                    ...c,
+                    replies: (c.replies || []).filter((r: any) => r?._id !== commentId)
+                }));
+            });
+
+            // Make actual API call
             await removeComment({ projectId, commentId }).unwrap();
         } catch (error) {
             console.error("Failed to delete comment:", error);
-        }
-    };
+            toast.error("Failed to delete comment");
 
-    const handleLikeComment = async (commentId: string) => {
+            // Revert optimistic update if there's an error
+            if (project?.comments) {
+                setLocalComments(project.comments);
+            }
+        }
+    }, [projectId, removeComment, project?.comments]);
+
+    const handleLikeComment = useCallback(async (commentId: string) => {
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to like comments");
             return;
         }
 
         try {
+            // API call - local state is handled by the Comments component now
             await likeComment({ projectId, commentId }).unwrap();
         } catch (error) {
             console.error("Failed to like comment:", error);
+            toast.error("Failed to like comment");
         }
-    };
+    }, [projectId, isAuthenticated, likeComment]);
 
-    const handleDislikeComment = async (commentId: string) => {
+    const handleDislikeComment = useCallback(async (commentId: string) => {
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to dislike comments");
             return;
         }
 
         try {
+            // API call - local state is handled by the Comments component now
             await dislikeComment({ projectId, commentId }).unwrap();
         } catch (error) {
             console.error("Failed to dislike comment:", error);
+            toast.error("Failed to dislike comment");
         }
-    };
+    }, [projectId, isAuthenticated, dislikeComment]);
 
     // Project update handlers
     const handleAddUpdate = async (content: string, media?: string[]) => {
