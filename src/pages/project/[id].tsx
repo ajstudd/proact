@@ -10,6 +10,7 @@ import PdfToSlides from "components/PdfToSlides";
 import MapModal from "components/MapModal";
 import ProjectStakeholders from "components/ProjectStakeholders";
 import ReportModal from "components/ReportModal"; // Import the new component
+import RoleBasedGuard from "components/RoleBasedGuard"; // Import the guard component
 import {
     useGetProjectByIdQuery,
     useLikeProjectMutation,
@@ -82,8 +83,6 @@ const ProjectPage = () => {
 
         if (!isAuthenticated) {
             toast.error("Please log in to support this project");
-            // You might want to redirect to login page
-            // router.push('/login');
             return;
         }
 
@@ -101,8 +100,6 @@ const ProjectPage = () => {
 
         if (!isAuthenticated) {
             toast.error("Please log in to oppose this project");
-            // You might want to redirect to login page
-            // router.push('/login');
             return;
         }
 
@@ -257,23 +254,17 @@ const ProjectPage = () => {
     };
 
     if (isLoading) return <p className="text-center text-gray-500 mt-20">Loading...</p>;
-    if (error) return <p className="text-center text-red-500 mt-20">Error loading project data.</p>;
+    if (error) return <p className="text-center text-gray-500 mt-20">Error loading project data.</p>;
     if (!project) return <p className="text-center text-gray-500 mt-20">Project not found.</p>;
 
     // Check if user has liked or disliked the project
-    const userHasLiked = project.likes.includes(userId || '');
-    const userHasDisliked = project.dislikes.includes(userId || '');
+    const userHasLiked = isAuthenticated && project.likes.includes(userId || '');
+    const userHasDisliked = isAuthenticated && project.dislikes.includes(userId || '');
 
     // Using RBAC approach for checking update management permissions
-    console.log('project.contractor._id', project.contractor._id)
-    console.log('isAuthenticated', isAuthenticated)
-    console.log('userId', userId)
-    console.log('project.government._id', project.government._id)
-    console.log('isGovernment', isGovernment)
     const canManageUpdates = isAuthenticated &&
         ((isGovernment && project.government._id === userId) ||
             (isContractor && project.contractor._id === userId));
-    console.log('isContractor', isContractor)
 
     return (
         <motion.div
@@ -320,6 +311,7 @@ const ProjectPage = () => {
                     >
                         View Map Location
                     </button>
+                    {/* Report corruption button always available to all users */}
                     <button
                         onClick={() => setIsReportModalOpen(true)}
                         className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition flex items-center"
@@ -344,6 +336,7 @@ const ProjectPage = () => {
                 onDislike={handleDislike}
                 userHasLiked={userHasLiked}
                 userHasDisliked={userHasDisliked}
+                isAuthenticated={isAuthenticated} // Pass authentication status
             />
 
             <UpdatesTimeline
@@ -353,6 +346,7 @@ const ProjectPage = () => {
                 onEditUpdate={handleEditUpdate}
                 onDeleteUpdate={handleDeleteUpdate}
                 canManageUpdates={canManageUpdates}
+                isAuthenticated={isAuthenticated} // Pass authentication status
             />
 
             <Comments
@@ -363,12 +357,13 @@ const ProjectPage = () => {
                 onDislikeComment={handleDislikeComment}
                 onDeleteComment={handleDeleteComment}
                 currentUserId={userId || undefined}
+                isAuthenticated={isAuthenticated} // Pass authentication status explicitly
             />
 
             <PdfToSlides pdfUrl={project.pdfUrl} isOpen={isPdfOpen} onClose={() => setIsPdfOpen(false)} />
             <MapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} location={project.location} />
 
-            {/* Add the report modal */}
+            {/* Report corruption modal - available to all users */}
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                 style={{ display: isReportModalOpen ? "flex" : "none" }}
             >

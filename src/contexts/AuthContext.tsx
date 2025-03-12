@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
     children,
     publicPages = []
 }) => {
+    console.log('publicPages', publicPages)
     const [isLoading, setIsLoading] = useState(true);
     const dispatch = useDispatch();
     const pathname = usePathname();
@@ -73,8 +74,24 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
                 // No token found, user is not authenticated
                 dispatch(setUserAuthentication(false));
 
+                // Check if current path matches any public page pattern
+                const isPublicPage = publicPages.some(publicPath => {
+                    // Handle exact matches
+                    if (publicPath === pathname) return true;
+
+                    // Handle dynamic routes like /project/[id]
+                    if (publicPath.includes('[id]')) {
+                        const baseRoute = publicPath.split('/[')[0];
+                        console.log('baseRoute', baseRoute)
+                        return pathname?.startsWith(baseRoute);
+                    }
+                    return false;
+                });
+
+                console.log('isPublicPage', isPublicPage);
                 // If not on a public page, redirect to login
-                if (!publicPages.includes(pathname || "")) {
+                if (!isPublicPage) {
+                    console.log("Redirecting to login");
                     router.replace("/login");
                 }
 

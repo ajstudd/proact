@@ -8,7 +8,7 @@ export interface UserState {
   photo?: string;
   role?: "ADMIN" | "USER" | "CONTRACTOR" | "GOVERNMENT";
   isVerified?: boolean;
-  isAuthenticated?: boolean;
+  isAuthenticated: boolean;
   designation?: string;
   department?: string;
   governmentId?: string;

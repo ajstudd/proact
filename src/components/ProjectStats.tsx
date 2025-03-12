@@ -11,6 +11,7 @@ interface ProjectStatsProps {
     onDislike: () => void;
     userHasLiked?: boolean;
     userHasDisliked?: boolean;
+    isAuthenticated?: boolean; // Add isAuthenticated prop
 }
 
 const ProjectStats: React.FC<ProjectStatsProps> = ({
@@ -23,6 +24,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
     onDislike,
     userHasLiked = false,
     userHasDisliked = false,
+    isAuthenticated = false, // Default to false
 }) => {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-IN', {
@@ -93,13 +95,12 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
                 <div className="flex space-x-4">
                     <button
                         onClick={onLike}
-                        disabled={userHasDisliked}
+                        disabled={!isAuthenticated}
                         className={`px-4 py-2 rounded-md flex items-center transition ${userHasLiked
-                                ? 'bg-green-100 text-green-700'
-                                : userHasDisliked
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : 'hover:bg-gray-100'
-                            }`}
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={isAuthenticated ? 'Support this project' : 'Please log in to support this project'}
                     >
                         <FiThumbsUp className={`mr-2 ${userHasLiked ? 'text-green-600' : ''}`} />
                         {likesCount} Support
@@ -107,19 +108,24 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
 
                     <button
                         onClick={onDislike}
-                        disabled={userHasLiked}
+                        disabled={!isAuthenticated}
                         className={`px-4 py-2 rounded-md flex items-center transition ${userHasDisliked
-                                ? 'bg-red-100 text-red-700'
-                                : userHasLiked
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : 'hover:bg-gray-100'
-                            }`}
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={isAuthenticated ? 'Oppose this project' : 'Please log in to oppose this project'}
                     >
                         <FiThumbsDown className={`mr-2 ${userHasDisliked ? 'text-red-600' : ''}`} />
                         {dislikesCount} Oppose
                     </button>
                 </div>
             </div>
+
+            {!isAuthenticated && (
+                <div className="mt-2 text-center text-sm text-gray-500">
+                    Please log in to support or oppose this project
+                </div>
+            )}
         </div>
     );
 };

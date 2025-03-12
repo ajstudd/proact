@@ -13,6 +13,7 @@ interface CommentsProps {
     onDislikeComment: (commentId: string) => void;
     onDeleteComment?: (commentId: string) => void;
     currentUserId?: string;
+    isAuthenticated?: boolean;
 }
 
 // Separate component for the comment input to avoid unnecessary re-renders
