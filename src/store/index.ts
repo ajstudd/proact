@@ -9,6 +9,7 @@ import {
   otpApi,
   api,
   projectApi,
+  reportApi,
 } from "../services";
 import userSlice from "./userSlice";
 import uiSlice from "./uiSlice";
@@ -24,6 +25,7 @@ export const store = configureStore({
     [imageApi.reducerPath]: imageApi.reducer,
     [postApi.reducerPath]: postApi.reducer,
     [otpApi.reducerPath]: otpApi.reducer,
+    [reportApi.reducerPath]: reportApi.reducer,
     userSlice,
     postsSlice,
     uiSlice,
@@ -40,7 +42,8 @@ export const store = configureStore({
       postApi.middleware,
       imageApi.middleware,
       projectApi.middleware,
-      otpApi.middleware
+      otpApi.middleware,
+      reportApi.middleware
     ),
 });
 

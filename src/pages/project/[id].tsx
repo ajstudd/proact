@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useState, useEffect, useCallback } from "react";
-import { FiArrowLeft, FiMapPin, FiThumbsUp, FiThumbsDown } from "react-icons/fi";
+import { FiArrowLeft, FiMapPin, FiThumbsUp, FiThumbsDown, FiAlertCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import ProjectStats from "components/ProjectStats";
@@ -9,6 +9,7 @@ import UpdatesTimeline from "components/UpdatesTimeline";
 import PdfToSlides from "components/PdfToSlides";
 import MapModal from "components/MapModal";
 import ProjectStakeholders from "components/ProjectStakeholders";
+import ReportModal from "components/ReportModal"; // Import the new component
 import {
     useGetProjectByIdQuery,
     useLikeProjectMutation,
@@ -36,6 +37,11 @@ const ProjectPage = () => {
     const auth = useAuth();
     const { isGovernment, isContractor } = useRBAC(); // Using RBAC hook
 
+    // State for modals
+    const [isMapOpen, setIsMapOpen] = useState(false);
+    const [isPdfOpen, setIsPdfOpen] = useState(false);
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false); // Add this state
+
     useEffect(() => {
         if (id) {
             setProjectId(id as string);
@@ -59,9 +65,6 @@ const ProjectPage = () => {
     const [addProjectUpdate] = useAddProjectUpdateMutation();
     const [editProjectUpdate] = useEditProjectUpdateMutation();
     const [removeProjectUpdate] = useRemoveProjectUpdateMutation();
-
-    const [isMapOpen, setIsMapOpen] = useState(false);
-    const [isPdfOpen, setIsPdfOpen] = useState(false);
 
     // Add local state for comments to enable optimistic updates
     const [localComments, setLocalComments] = useState<any[]>([]);
@@ -304,7 +307,7 @@ const ProjectPage = () => {
                         </span>
                     </div>
                 </div>
-                <div className="mt-4 flex space-x-4">
+                <div className="mt-4 flex flex-wrap gap-2">
                     <button
                         onClick={() => setIsPdfOpen(true)}
                         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
@@ -316,6 +319,12 @@ const ProjectPage = () => {
                         className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
                     >
                         View Map Location
+                    </button>
+                    <button
+                        onClick={() => setIsReportModalOpen(true)}
+                        className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition flex items-center"
+                    >
+                        <FiAlertCircle className="mr-2" /> Report Corruption
                     </button>
                 </div>
             </div>
@@ -358,6 +367,18 @@ const ProjectPage = () => {
 
             <PdfToSlides pdfUrl={project.pdfUrl} isOpen={isPdfOpen} onClose={() => setIsPdfOpen(false)} />
             <MapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} location={project.location} />
+
+            {/* Add the report modal */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                style={{ display: isReportModalOpen ? "flex" : "none" }}
+            >
+                <ReportModal
+                    isOpen={isReportModalOpen}
+                    onClose={() => setIsReportModalOpen(false)}
+                    projectId={project._id}
+                    projectTitle={project.title}
+                />
+            </div>
         </motion.div>
     );
 };

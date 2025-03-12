@@ -6,12 +6,12 @@ import { FiMenu, FiChevronLeft, FiHome, FiClipboard, FiUsers, FiBell, FiBriefcas
 import { motion } from "framer-motion";
 
 const menuItems = [
-    { label: "Dashboard", icon: FiHome, path: "/government-dashboard" },
-    { label: "Projects", icon: FiClipboard, path: "/government-projects" },
-    { label: "Contractors", icon: FiUsers, path: "/government-contractors" },
-    { label: "Corruption Reports", icon: FiBriefcase, path: "/government-reports" },
-    { label: "Notifications", icon: FiBell, path: "/government-notifications" },
-    { label: "Settings", icon: FiSettings, path: "/government-settings" }
+    { label: "Dashboard", icon: FiHome, path: "/dashboard" },
+    { label: "Projects", icon: FiClipboard, path: "/projects" },
+    { label: "Contractors", icon: FiUsers, path: "/contractors" },
+    { label: "Corruption Reports", icon: FiBriefcase, path: "/reports" },
+    { label: "Notifications", icon: FiBell, path: "/notifications" },
+    { label: "Settings", icon: FiSettings, path: "/settings" }
 ];
 
 const GovernmentSidebar = ({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) => {
