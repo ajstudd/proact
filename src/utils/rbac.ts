@@ -51,7 +51,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "edit:post",
   ],
   CONTRACTOR: ["submit:proposals", "view:reports", "create:post"],
-  USER: ["create:project"],
+  USER: [],
 };
 
 /**

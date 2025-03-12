@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { getCurrentUserId, getAuthToken } from "../utils/authUtils";
+import { ProjectSearchResponse } from "../types";
 
 export const projectApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -83,6 +84,39 @@ export const projectApi = api.injectEndpoints({
         });
 
         return `/search?${queryParams.toString()}`;
+      },
+      transformResponse: (response: any) => {
+        if (response.status === "error") {
+          throw new Error(response.message);
+        }
+        return response;
+      },
+    }),
+
+    // Add fast search endpoint
+    fastSearchProjects: builder.query<
+      ProjectSearchResponse,
+      {
+        title?: string;
+        description?: string;
+        location?: string;
+        startDate?: string;
+        endDate?: string;
+        id?: string;
+        limit?: number;
+        page?: number;
+      }
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            queryParams.append(key, value.toString());
+          }
+        });
+
+        return `/fast-search?${queryParams.toString()}`;
       },
       transformResponse: (response: any) => {
         if (response.status === "error") {
@@ -241,6 +275,7 @@ export const {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
   useSearchProjectsQuery,
+  useFastSearchProjectsQuery, // Export the new hook
   useGetProjectUpdatesQuery,
   useAddProjectUpdateMutation,
   useEditProjectUpdateMutation,

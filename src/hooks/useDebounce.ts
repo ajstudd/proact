@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 
-// Custom hook for debouncing
-const useDebounce = (value: string, delay = 500) => {
-    const [debouncedValue, setDebouncedValue] = useState(value);
+// Custom hook for debouncing with generic type
+const useDebounce = <T>(value: T, delay = 500) => {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
 
-        return () => clearTimeout(handler);
-    }, [value, delay]);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
 
-    return debouncedValue;
+  return debouncedValue;
 };
 
 export default useDebounce;

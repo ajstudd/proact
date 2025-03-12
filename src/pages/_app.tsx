@@ -5,16 +5,14 @@ import { store } from "../store";
 import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AuthProvider, useAuth } from "../contexts/AuthContext"; // Updated import
+import { AuthProvider, useAuth } from "../contexts/AuthContext";
 
 import "../../global.css";
 import { useRouter } from "next/router";
 
 // Layouts
 import HomeLayout from "components/HomeLayout"; // Public Layout
-import { MainLayout } from "components/Layout"; // General Logged-in Layout
-import ContractorLayout from "components/ContractorLayout"; // Contractor-Specific Layout
-import GovernmentLayout from "components/GovernmentLayout"; // Government-Specific Layout
+import UnifiedLayout from "components/UnifiedLayout"; // Unified authenticated layout
 import AuthLayout from "components/LoggedOutLayout"; // Login/Register Layout
 
 const roboto = Roboto({
@@ -33,7 +31,6 @@ const noAuthPages = ["/login", "/signup", "/onboarding", "/", "/otp/[email]"];
 function AppContent({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const auth = useAuth();
-  console.log('auth', auth);
 
   // ✅ Prevent rendering protected pages before checking auth
   if (auth.isLoading) {
@@ -46,21 +43,14 @@ function AppContent({ Component, pageProps }: AppProps) {
     return <p className="text-center text-gray-500 mt-20">Redirecting...</p>;
   }
 
-  // 🛠️ **Dynamically Assign Layout**
-  let Layout = HomeLayout; // Default public layout
+  // 🛠️ **Simplified Layout Selection**
+  let Layout;
   if (noAuthPages.includes(router.pathname)) {
     Layout = AuthLayout; // Login/Register pages
   } else if (auth.isAuthenticated) {
-    switch (auth.userRole) {
-      case "GOVERNMENT":
-        Layout = GovernmentLayout;
-        break;
-      case "CONTRACTOR":
-        Layout = ContractorLayout;
-        break;
-      default:
-        Layout = HomeLayout;
-    }
+    Layout = UnifiedLayout; // One layout for all authenticated users
+  } else {
+    Layout = HomeLayout; // Default public layout
   }
 
   return (

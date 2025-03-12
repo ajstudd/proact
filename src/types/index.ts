@@ -27,6 +27,37 @@ export interface IUserData {
   updatedAt?: Date;
 }
 
+// New interface for project search results
+export interface ProjectSearchResult {
+  _id: string;
+  title: string;
+  bannerUrl?: string;
+  description: string;
+  location?: {
+    place: string;
+    coordinates?: [number, number];
+  };
+  budget?: number;
+  contractor?: {
+    _id: string;
+    name: string;
+  };
+  government?: {
+    _id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProjectSearchResponse {
+  projects: ProjectSearchResult[];
+  total: number;
+  limit: number;
+  skip: number;
+  hasMore: boolean;
+}
+
 export interface UpdateUserPayload {
   name?: string;
   email?: string;

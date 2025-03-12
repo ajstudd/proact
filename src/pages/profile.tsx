@@ -17,7 +17,7 @@ export default function Profile() {
 
   return (
     <motion.div
-      className="flex flex-col items-center bg-gray-900 text-white min-h-screen p-6"
+      className="flex flex-col items-center rounded-lg bg-gray-900 text-white min-h-screen p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}

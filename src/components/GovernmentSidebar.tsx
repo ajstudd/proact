@@ -6,7 +6,7 @@ import { FiMenu, FiChevronLeft, FiHome, FiClipboard, FiUsers, FiBell, FiBriefcas
 import { motion } from "framer-motion";
 
 const menuItems = [
-    { label: "Dashboard", icon: FiHome, path: "/dashboard" },
+    { label: "Home", icon: FiHome, path: "/home" },
     { label: "Projects", icon: FiClipboard, path: "/projects" },
     { label: "Contractors", icon: FiUsers, path: "/contractors" },
     { label: "Corruption Reports", icon: FiBriefcase, path: "/reports" },
