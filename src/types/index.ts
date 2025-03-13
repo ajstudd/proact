@@ -25,6 +25,7 @@ export interface IUserData {
   reputationScore?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  bookmarks?: string[];
 }
 
 // New interface for project search results
@@ -81,6 +82,38 @@ export interface UpdateUserResponse {
   department?: string;
   experience?: number;
   reputationScore?: number;
+  bookmarks?: string[];
+}
+
+export interface BookmarkResponse {
+  message: string;
+  bookmarks: BookmarkedProject[];
+}
+
+export interface BookmarkedProjectsResponse {
+  bookmarks: BookmarkedProject[];
+}
+
+export interface BookmarkedProject {
+  _id: string;
+  title: string;
+  bannerUrl?: string;
+  description: string;
+  location: {
+    place: string;
+    coordinates?: [number, number];
+  };
+  budget?: number;
+  contractor?: {
+    _id: string;
+    name: string;
+  };
+  government?: {
+    _id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ErrorResponse {

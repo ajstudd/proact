@@ -1,4 +1,9 @@
-import { UpdateUserPayload, UpdateUserResponse } from "../types";
+import {
+  UpdateUserPayload,
+  UpdateUserResponse,
+  BookmarkResponse,
+  BookmarkedProjectsResponse,
+} from "../types";
 import { getAuthToken } from "../utils/authUtils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
@@ -16,6 +21,7 @@ export const userApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ["Bookmarks"],
   endpoints: (builder) => ({
     updateUser: builder.mutation<UpdateUserResponse, UpdateUserPayload>({
       query: (body) => ({
@@ -24,7 +30,31 @@ export const userApi = createApi({
         body,
       }),
     }),
+    bookmarkProject: builder.mutation<BookmarkResponse, { projectId: string }>({
+      query: (body) => ({
+        url: "/bookmarks",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Bookmarks"],
+    }),
+    removeBookmark: builder.mutation<BookmarkResponse, string>({
+      query: (projectId) => ({
+        url: `/bookmarks/${projectId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Bookmarks"],
+    }),
+    getBookmarkedProjects: builder.query<BookmarkedProjectsResponse, void>({
+      query: () => "/bookmarks",
+      providesTags: ["Bookmarks"],
+    }),
   }),
 });
 
-export const { useUpdateUserMutation } = userApi;
+export const {
+  useUpdateUserMutation,
+  useBookmarkProjectMutation,
+  useRemoveBookmarkMutation,
+  useGetBookmarkedProjectsQuery,
+} = userApi;

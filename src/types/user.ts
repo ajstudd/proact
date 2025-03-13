@@ -1,4 +1,4 @@
-import { Role } from './auth';
+import { Role } from "./auth";
 
 export interface IUser {
   name: string;
@@ -18,7 +18,9 @@ export interface TUser {
   photo?: string;
   id?: string;
   email: string;
+  bookmarks?: string[];
 }
+
 export interface ToUser {
   _id: string;
   role: String;
@@ -30,7 +32,9 @@ export interface ToUser {
   photo: string;
   id: string;
   email: string;
+  bookmarks?: string[];
 }
+
 export interface IUserData {
   user: TUser;
 }
@@ -47,4 +51,36 @@ export interface UpdateUserResponse {
   __v: number;
   id: string;
   subscription: string;
+  bookmarks?: string[];
+}
+
+export interface BookmarkedProject {
+  _id: string;
+  title: string;
+  bannerUrl?: string;
+  description: string;
+  location: {
+    place: string;
+    coordinates?: [number, number];
+  };
+  budget?: number;
+  contractor?: {
+    _id: string;
+    name: string;
+  };
+  government?: {
+    _id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BookmarkResponse {
+  message: string;
+  bookmarks: BookmarkedProject[];
+}
+
+export interface BookmarkedProjectsResponse {
+  bookmarks: BookmarkedProject[];
 }

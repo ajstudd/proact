@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useState, useEffect, useCallback } from "react";
-import { FiArrowLeft, FiMapPin, FiThumbsUp, FiThumbsDown, FiAlertCircle } from "react-icons/fi";
+import { FiArrowLeft, FiMapPin, FiThumbsUp, FiThumbsDown, FiAlertCircle, FiBookmark } from "react-icons/fi";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import ProjectStats from "components/ProjectStats";
@@ -26,6 +26,7 @@ import {
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRBAC } from "../../hooks/useRBAC"; // Added RBAC hook
+import { useBookmarks } from "../../hooks/useBookmarks"; // Import the new hook
 import { toast } from "react-toastify"; // Assuming you use react-hot-toast for notifications
 
 const ProjectPage = () => {
@@ -37,6 +38,13 @@ const ProjectPage = () => {
     const { user, isAuthenticated, userId } = useCurrentUser();
     const auth = useAuth();
     const { isGovernment, isContractor } = useRBAC(); // Using RBAC hook
+
+    // Use our new bookmark hook
+    const {
+        isProjectBookmarked,
+        toggleBookmark,
+        isBookmarking
+    } = useBookmarks();
 
     // State for modals
     const [isMapOpen, setIsMapOpen] = useState(false);
@@ -76,6 +84,31 @@ const ProjectPage = () => {
             setLocalComments(project.comments);
         }
     }, [project?.comments]);
+
+    // Handle bookmark toggle
+    const handleBookmarkToggle = async () => {
+        if (!projectId) return;
+
+        if (!isAuthenticated) {
+            toast.error("Please log in to bookmark this project");
+            return;
+        }
+
+        try {
+            const result = await toggleBookmark(projectId);
+            if (result.success) {
+                const message = isProjectBookmarked(projectId)
+                    ? "Project removed from bookmarks"
+                    : "Project added to bookmarks";
+                toast.success(message);
+            } else if (result.message) {
+                toast.error(result.message);
+            }
+        } catch (error) {
+            console.error("Failed to toggle bookmark:", error);
+            toast.error("Failed to update bookmark status");
+        }
+    };
 
     // Handlers for user interactions
     const handleLike = async () => {
@@ -261,6 +294,9 @@ const ProjectPage = () => {
     const userHasLiked = isAuthenticated && project.likes.includes(userId || '');
     const userHasDisliked = isAuthenticated && project.dislikes.includes(userId || '');
 
+    // Check if project is bookmarked
+    const projectIsBookmarked = isAuthenticated && projectId ? isProjectBookmarked(projectId) : false;
+
     // Using RBAC approach for checking update management permissions
     const canManageUpdates = isAuthenticated &&
         ((isGovernment && project.government._id === userId) ||
@@ -281,6 +317,22 @@ const ProjectPage = () => {
             </button>
 
             <div className="relative bg-white p-6 rounded-lg shadow-lg mt-4">
+                <div className="absolute top-4 right-4 z-10">
+                    <button
+                        onClick={handleBookmarkToggle}
+                        disabled={isBookmarking}
+                        className={`p-2 rounded-full ${projectIsBookmarked
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                            } transition-colors`}
+                        aria-label={projectIsBookmarked ? "Remove bookmark" : "Add bookmark"}
+                    >
+                        <FiBookmark
+                            className={`${projectIsBookmarked ? 'fill-current' : ''}`}
+                            size={20}
+                        />
+                    </button>
+                </div>
                 <img src={project.bannerUrl} alt={project.title} className="w-full h-64 object-cover rounded-lg" />
                 <h1 className="text-3xl font-bold text-gray-900 mt-4">{project.title}</h1>
                 <p className="text-gray-700 mt-2">{project.description}</p>
