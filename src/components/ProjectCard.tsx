@@ -6,7 +6,7 @@ import { MdAccountBalance } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-interface ProjectCardProps {
+export interface ProjectCardProps {
     _id: string;
     title: string;
     description: string;
@@ -33,20 +33,11 @@ interface ProjectCardProps {
     };
 }
 
-const ProjectCard = ({
-    _id,
-    title,
-    description,
-    bannerUrl,
-    location,
-    budget,
-    expenditure,
-    likes = [],
-    dislikes = [],
-    createdAt,
-    contractor,
-    government
-}: ProjectCardProps) => {
+interface componentProps {
+    project: ProjectCardProps;
+}
+const ProjectCard = ({ project }: componentProps) => {
+    const { _id, title, description, bannerUrl, location, budget, likes = [], dislikes = [], createdAt, contractor, government } = project;
     const router = useRouter();
     const formattedDate = createdAt ? new Date(createdAt).toLocaleDateString() : 'Unknown date';
     const formattedBudget = new Intl.NumberFormat('en-IN', {

@@ -19,6 +19,10 @@ export interface TUser {
   id?: string;
   email: string;
   bookmarks?: string[];
+  isVerified?: boolean;
+  contractorLicense?: string;
+  contractorId?: string;
+  governmentId?: string;
 }
 
 export interface ToUser {
@@ -52,6 +56,84 @@ export interface UpdateUserResponse {
   id: string;
   subscription: string;
   bookmarks?: string[];
+  isVerified?: boolean;
+  photo?: string;
+  phone?: string;
+  governmentId?: string;
+  contractorLicense?: string;
+}
+
+export interface UserProfileResponse {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: Role;
+  photo?: string;
+  isVerified?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  id: string;
+  contractorLicense?: string;
+  contractorId?: string;
+  governmentId?: string;
+}
+
+export interface EmailVerificationPayload {
+  token: string;
+  email: string;
+}
+
+export interface EmailVerificationResponse {
+  message: string;
+  user: UserProfileResponse;
+}
+
+// For user comments
+export interface Comment {
+  _id: string;
+  content: string;
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  project: {
+    _id: string;
+    name: string;
+    location: {
+      place: string;
+      coordinates?: [number, number];
+    };
+    creator: {
+      _id: string;
+      name: string;
+      email: string;
+    };
+  };
+  likes: string[];
+  dislikes: string[];
+  replies: Array<{
+    _id: string;
+    content: string;
+    user: {
+      _id: string;
+      name: string;
+      email: string;
+      avatar?: string;
+    };
+    likes: string[];
+    dislikes: string[];
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserCommentsResponse {
+  comments: Comment[];
 }
 
 export interface BookmarkedProject {

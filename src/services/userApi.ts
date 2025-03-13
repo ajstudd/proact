@@ -1,8 +1,14 @@
+import { ProjectsResponse } from "types/project";
 import {
   UpdateUserPayload,
   UpdateUserResponse,
   BookmarkResponse,
   BookmarkedProjectsResponse,
+  UserProfileResponse,
+  EmailVerificationPayload,
+  EmailVerificationResponse,
+  UserCommentsResponse,
+  // UserProjectsResponse,
 } from "../types";
 import { getAuthToken } from "../utils/authUtils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
@@ -21,7 +27,7 @@ export const userApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Bookmarks"],
+  tagTypes: ["Bookmarks", "Profile", "Comments", "Projects"],
   endpoints: (builder) => ({
     updateUser: builder.mutation<UpdateUserResponse, UpdateUserPayload>({
       query: (body) => ({
@@ -29,6 +35,40 @@ export const userApi = createApi({
         method: "PATCH",
         body,
       }),
+      invalidatesTags: ["Profile"],
+    }),
+    editProfile: builder.mutation<
+      {
+        message: string;
+        user: UpdateUserResponse;
+      },
+      FormData
+    >({
+      query: (formData) => ({
+        url: "/edit-profile",
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: ["Profile"],
+    }),
+    verifyEmailChange: builder.mutation<
+      EmailVerificationResponse,
+      EmailVerificationPayload
+    >({
+      query: (body) => ({
+        url: "/verify-email",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Profile"],
+    }),
+    getUserProfile: builder.query<UserProfileResponse, void>({
+      query: () => "/profile",
+      providesTags: ["Profile"],
+    }),
+    getUserComments: builder.query<UserCommentsResponse, string>({
+      query: (userId) => `/comments/user/${userId}`,
+      providesTags: ["Comments"],
     }),
     bookmarkProject: builder.mutation<BookmarkResponse, { projectId: string }>({
       query: (body) => ({
@@ -49,12 +89,21 @@ export const userApi = createApi({
       query: () => "/bookmarks",
       providesTags: ["Bookmarks"],
     }),
+    getUserProjects: builder.query<ProjectsResponse, void>({
+      query: () => "/projects",
+      providesTags: ["Projects"],
+    }),
   }),
 });
 
 export const {
   useUpdateUserMutation,
+  useEditProfileMutation,
+  useVerifyEmailChangeMutation,
+  useGetUserProfileQuery,
+  useGetUserCommentsQuery,
   useBookmarkProjectMutation,
   useRemoveBookmarkMutation,
   useGetBookmarkedProjectsQuery,
+  useGetUserProjectsQuery,
 } = userApi;

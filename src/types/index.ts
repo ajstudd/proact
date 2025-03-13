@@ -26,6 +26,7 @@ export interface IUserData {
   createdAt?: Date;
   updatedAt?: Date;
   bookmarks?: string[];
+  contractorId?: string;
 }
 
 // New interface for project search results

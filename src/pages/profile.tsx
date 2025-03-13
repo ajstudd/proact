@@ -1,18 +1,32 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaUserShield, FaCheckCircle, FaTimesCircle, FaUser } from "react-icons/fa";
+import { FaUserShield, FaCheckCircle, FaTimesCircle, FaUser, FaEdit } from "react-icons/fa";
 import { getUserData } from "@utils";
+import { useState } from "react";
+import EditProfileModal from "../components/profile/EditProfileModal";
+import UserCommentsTab from "../components/profile/UserCommentsTab";
+import BookmarkedProjectsTab from "../components/profile/BookmarkedProjectsTab";
+import UserProjectsTab from "../components/profile/UserProjectsTab";
+import useUserState from "hooks/useUserState";
 
 export default function Profile() {
-  const user = getUserData();
+  const user = useUserState();
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
 
   // Extract user details
   const profileInfo = {
-    name: user?.name || "Unknown User",
-    email: user?.email || "No Email Provided",
-    isVerified: user?.isVerified || false,
-    profile: user?.profile || "https://www.w3schools.com/howto/img_avatar.png", // Default avatar
+    name: user?.user.name || "Unknown User",
+    email: user?.user.email || "No Email Provided",
+    isVerified: user?.user.isVerified || false,
+    profile: user?.user.photo || "https://www.w3schools.com/howto/img_avatar.png", // Default avatar
+    role: user?.user.role || "USER",
+    contractorId: user?.user.contractorLicense,
+    governmentId: user?.user.governmentId,
+  };
+
+  const handleEditProfile = () => {
+    setEditModalOpen(true);
   };
 
   return (
@@ -39,10 +53,6 @@ export default function Profile() {
 
         {/* User Role & Verification Status */}
         <div className="mt-4 flex justify-center gap-4 text-gray-300">
-          {/* <div className="flex items-center gap-2">
-            <FaUserShield className="text-blue-400 text-xl" />
-            <p className="text-sm font-semibold">{profileInfo.role}</p>
-          </div> */}
           <div className="flex items-center gap-2">
             {profileInfo.isVerified ? (
               <>
@@ -57,6 +67,14 @@ export default function Profile() {
             )}
           </div>
         </div>
+
+        {/* Edit Profile Button */}
+        <button
+          className="mt-4 flex items-center gap-2 text-blue-400 hover:text-blue-300"
+          onClick={handleEditProfile}
+        >
+          <FaEdit /> Edit Profile
+        </button>
       </motion.div>
 
       {/* Sections */}
@@ -68,22 +86,40 @@ export default function Profile() {
       >
         {/* Navigation Tabs */}
         <div className="flex justify-between border-b border-gray-700 pb-2">
-          <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-            <FaUser /> My Posts
-          </button>
-          <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-            <FaUser /> Contributions
-          </button>
-          <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-            <FaUser /> Bookmarked Projects
-          </button>
+          {profileInfo.role === "USER" ? (
+            <>
+              <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
+                <FaUser /> My Comments
+              </button>
+              <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
+                <FaUser /> Bookmarked Projects
+              </button>
+            </>
+          ) : (
+            <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
+              <FaUser /> My Projects
+            </button>
+          )}
         </div>
 
         {/* Placeholder Content */}
         <div className="mt-6 text-gray-400 text-center">
-          <p>Coming soon...</p>
+          {profileInfo.role === "USER" ? (
+            <>
+              <UserCommentsTab />
+              <BookmarkedProjectsTab />
+            </>
+          ) : (
+            <UserProjectsTab />
+          )}
         </div>
       </motion.div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setEditModalOpen(false)}
+      />
     </motion.div>
   );
 }
