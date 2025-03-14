@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaUserShield, FaCheckCircle, FaTimesCircle, FaUser, FaEdit } from "react-icons/fa";
+import { FaUserShield, FaCheckCircle, FaTimesCircle, FaUser, FaEdit, FaBookmark, FaComments, FaProjectDiagram } from "react-icons/fa";
 import { getUserData } from "@utils";
 import { useState } from "react";
 import EditProfileModal from "../components/profile/EditProfileModal";
@@ -10,9 +10,14 @@ import BookmarkedProjectsTab from "../components/profile/BookmarkedProjectsTab";
 import UserProjectsTab from "../components/profile/UserProjectsTab";
 import useUserState from "hooks/useUserState";
 
+type TabType = "comments" | "bookmarks" | "projects";
+
 export default function Profile() {
   const user = useUserState();
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>(
+    user?.user?.role === "USER" ? "comments" : "projects"
+  );
 
   // Extract user details
   const profileInfo = {
@@ -27,6 +32,10 @@ export default function Profile() {
 
   const handleEditProfile = () => {
     setEditModalOpen(true);
+  };
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
   };
 
   return (
@@ -70,7 +79,7 @@ export default function Profile() {
 
         {/* Edit Profile Button */}
         <button
-          className="mt-4 flex items-center gap-2 text-blue-400 hover:text-blue-300"
+          className="mt-4 flex items-center gap-2 text-blue-400 hover:text-blue-300 mx-auto"
           onClick={handleEditProfile}
         >
           <FaEdit /> Edit Profile
@@ -85,33 +94,37 @@ export default function Profile() {
         transition={{ duration: 0.7 }}
       >
         {/* Navigation Tabs */}
-        <div className="flex justify-between border-b border-gray-700 pb-2">
+        <div className="flex border-b border-gray-700 pb-2">
           {profileInfo.role === "USER" ? (
             <>
-              <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-                <FaUser /> My Comments
+              <button
+                className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'comments' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+                onClick={() => handleTabChange('comments')}
+              >
+                <FaComments /> My Comments
               </button>
-              <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-                <FaUser /> Bookmarked Projects
+              <button
+                className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'bookmarks' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+                onClick={() => handleTabChange('bookmarks')}
+              >
+                <FaBookmark /> Bookmarked Projects
               </button>
             </>
           ) : (
-            <button className="flex items-center gap-2 text-blue-400 hover:text-blue-300">
-              <FaUser /> My Projects
+            <button
+              className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'projects' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+              onClick={() => handleTabChange('projects')}
+            >
+              <FaProjectDiagram /> My Projects
             </button>
           )}
         </div>
 
-        {/* Placeholder Content */}
-        <div className="mt-6 text-gray-400 text-center">
-          {profileInfo.role === "USER" ? (
-            <>
-              <UserCommentsTab />
-              <BookmarkedProjectsTab />
-            </>
-          ) : (
-            <UserProjectsTab />
-          )}
+        {/* Tab Content */}
+        <div className="mt-6">
+          {activeTab === 'comments' && <UserCommentsTab />}
+          {activeTab === 'bookmarks' && <BookmarkedProjectsTab />}
+          {activeTab === 'projects' && <UserProjectsTab />}
         </div>
       </motion.div>
 

@@ -10,25 +10,26 @@ const VerifyEmailPage = () => {
     const { verifyEmailChange, isVerifyEmailLoading, isVerifyEmailSuccess, verifyEmailError } = useProfile();
     const [verified, setVerified] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [verificationAttempted, setVerificationAttempted] = useState(false);
 
     useEffect(() => {
         const verifyEmail = async () => {
-            if (token && email && typeof token === 'string' && typeof email === 'string') {
+            if (token && email && typeof token === 'string' && typeof email === 'string' && !verificationAttempted) {
+                setVerificationAttempted(true);
                 try {
                     await verifyEmailChange(token, email);
                     setVerified(true);
-                    // Redirect to profile page after successful verification
-                    setTimeout(() => router.push('/profile'), 3000);
+                    setTimeout(() => window.location.href = '/profile', 1000);
                 } catch (err: any) {
                     setError(err.data?.message || 'Verification failed. Please try again.');
                 }
             }
         };
 
-        if (token && email) {
+        if (token && email && !verified && !error && !verificationAttempted) {
             verifyEmail();
         }
-    }, [token, email, verifyEmailChange, router]);
+    }, [token, email, verifyEmailChange, router, verified, error, verificationAttempted]);
 
     if (isVerifyEmailLoading) {
         return (

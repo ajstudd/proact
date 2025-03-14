@@ -1,7 +1,9 @@
 import React from "react";
 import { Box, SimpleGrid, Text, Spinner, Alert, AlertIcon } from "@chakra-ui/react";
 import { useGetUserProjectsQuery } from "../../services/userApi";
-import ProjectCard, { ProjectCardProps } from "../ProjectCard"; // Assuming you have a ProjectCard component
+// import ProjectCard, { ProjectCardProps } from "../ProjectCard";
+import { TrimmedProject } from "types/project";
+import ProjectCard from "components/ProjectCard";
 
 const UserProjectsTab: React.FC = () => {
     const { data, isLoading, error } = useGetUserProjectsQuery();
@@ -34,8 +36,8 @@ const UserProjectsTab: React.FC = () => {
 
     return (
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} mt={4}>
-            {data.projects.map((project: any) => (
-                <ProjectCard key={project._id} project={project} />
+            {data.projects.map((project: TrimmedProject) => (
+                <ProjectCard key={project._id} {...project} />
             ))}
         </SimpleGrid>
     );

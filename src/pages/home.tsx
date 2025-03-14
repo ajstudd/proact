@@ -8,11 +8,13 @@ import { useGetTrimmedProjectsQuery } from "@services";
 import { FiPlus, FiLoader } from "react-icons/fi";
 import RoleBasedGuard from "components/RoleBasedGuard";
 import { useRBAC } from "hooks/useRBAC";
+import { TrimmedProject } from "types/project";
 
 const HomePage = () => {
     const [mounted, setMounted] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const { data: projects, isLoading, isError, refetch } = useGetTrimmedProjectsQuery({});
+    console.log('projects', projects);
     const { hasPermission } = useRBAC();
 
     useEffect(() => {
@@ -89,7 +91,7 @@ const HomePage = () => {
                     transition={{ duration: 0.5 }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                    {projects.map((project: any) => (
+                    {projects.map((project: TrimmedProject) => (
                         <ProjectCard key={project._id} {...project} />
                     ))}
                 </motion.div>

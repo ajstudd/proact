@@ -1,9 +1,8 @@
-import { ProjectsResponse } from "types/project";
+import { ProjectsResponse, BookmarkedProjectsResponse, TrimmedProjectsResponse } from "types/project";
 import {
   UpdateUserPayload,
   UpdateUserResponse,
   BookmarkResponse,
-  BookmarkedProjectsResponse,
   UserProfileResponse,
   EmailVerificationPayload,
   EmailVerificationResponse,
@@ -89,7 +88,7 @@ export const userApi = createApi({
       query: () => "/bookmarks",
       providesTags: ["Bookmarks"],
     }),
-    getUserProjects: builder.query<ProjectsResponse, void>({
+    getUserProjects: builder.query<TrimmedProjectsResponse, void>({
       query: () => "/projects",
       providesTags: ["Projects"],
     }),

@@ -96,38 +96,24 @@ export interface Comment {
   user: {
     _id: string;
     name: string;
-    email: string;
-    avatar?: string;
+    photo?: string;
   };
   project: {
     _id: string;
-    name: string;
+    title: string;
+    bannerUrl?: string;
     location: {
       place: string;
       coordinates?: [number, number];
     };
-    creator: {
+    government?: {
       _id: string;
       name: string;
-      email: string;
     };
   };
   likes: string[];
   dislikes: string[];
-  replies: Array<{
-    _id: string;
-    content: string;
-    user: {
-      _id: string;
-      name: string;
-      email: string;
-      avatar?: string;
-    };
-    likes: string[];
-    dislikes: string[];
-    createdAt: string;
-    updatedAt: string;
-  }>;
+  replies: Comment[];
   createdAt: string;
   updatedAt: string;
 }
