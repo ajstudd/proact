@@ -52,13 +52,24 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
 
     // Clear the dropdown when clicking outside
     useEffect(() => {
-        const handleClickOutside = () => {
-            setShowContractorDropdown(false);
+        const handleClickOutside = (event: MouseEvent) => {
+            // Don't close if clicking on the dropdown items
+            const dropdownElement = document.getElementById('contractor-dropdown');
+            const inputElement = document.getElementById('contractor-search');
+
+            if (
+                dropdownElement &&
+                !dropdownElement.contains(event.target as Node) &&
+                inputElement &&
+                !inputElement.contains(event.target as Node)
+            ) {
+                setShowContractorDropdown(false);
+            }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside as EventListener);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside as EventListener);
         };
     }, []);
 
@@ -88,7 +99,13 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
         }
     };
 
-    const selectContractor = (selectedUser: Contractor) => {
+    const selectContractor = (selectedUser: Contractor, e?: React.MouseEvent) => {
+        // Prevent event propagation
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
         setSelectedContractor(selectedUser);
         setContractor(selectedUser._id);
         setContractorSearchQuery(selectedUser.name);
@@ -207,6 +224,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                     <label className="mb-2 font-semibold">Contractor</label>
                     <div className="relative">
                         <input
+                            id="contractor-search"
                             type="text"
                             value={contractorSearchQuery}
                             onChange={handleContractorSearch}
@@ -218,10 +236,14 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                                     setShowContractorDropdown(true);
                                 }
                             }}
+                            disabled={!!selectedContractor}
                         />
 
                         {showContractorDropdown && contractorSearchResults && (
-                            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                            <div
+                                id="contractor-dropdown"
+                                className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+                            >
                                 {isSearchingContractors && (
                                     <div className="p-2 text-gray-500">Searching...</div>
                                 )}
@@ -234,7 +256,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                                     <div
                                         key={user._id}
                                         className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
-                                        onClick={() => selectContractor(user)}
+                                        onClick={(e) => selectContractor(user, e)}
                                     >
                                         {user.photo && (
                                             <img
@@ -256,30 +278,35 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                     </div>
 
                     {selectedContractor && (
-                        <div className="mt-2 p-2 bg-blue-900 rounded-md flex items-center">
+                        <div className="mt-2 p-3 bg-blue-900 rounded-md flex items-center">
                             {selectedContractor.photo && (
                                 <img
                                     src={selectedContractor.photo}
                                     alt={selectedContractor.name}
-                                    className="w-8 h-8 rounded-full mr-2"
+                                    className="w-10 h-10 rounded-full mr-3"
                                 />
                             )}
                             <div className="flex-1">
-                                <div className="font-medium">{selectedContractor.name}</div>
-                                <div className="text-xs text-gray-300">
-                                    {selectedContractor.contractorLicense ? `License: ${selectedContractor.contractorLicense}` : ''}
+                                <div className="font-medium text-lg">{selectedContractor.name}</div>
+                                <div className="text-sm text-gray-300">
+                                    {selectedContractor.email && <div>{selectedContractor.email}</div>}
+                                    {selectedContractor.phone && <div>{selectedContractor.phone}</div>}
+                                    {selectedContractor.contractorLicense && <div>License: {selectedContractor.contractorLicense}</div>}
                                 </div>
                             </div>
                             <button
                                 type="button"
-                                className="text-gray-300 hover:text-white"
+                                className="ml-2 bg-red-800 hover:bg-red-700 text-white p-1.5 rounded-full transition-colors"
                                 onClick={() => {
                                     setSelectedContractor(null);
                                     setContractor("");
                                     setContractorSearchQuery("");
                                 }}
+                                title="Remove contractor"
                             >
-                                ✕
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                </svg>
                             </button>
                         </div>
                     )}
