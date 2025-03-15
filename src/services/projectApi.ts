@@ -6,11 +6,18 @@ export const projectApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // Project CRUD operations
     createProject: builder.mutation({
-      query: (formData) => ({
-        url: "/create",
-        method: "POST",
-        body: formData,
-      }),
+      query: (formData) => {
+        const token = getAuthToken();
+        console.log("token", token);
+        return {
+          url: "/create",
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+      },
       invalidatesTags: ["Projects"],
     }),
 
@@ -37,7 +44,24 @@ export const projectApi = api.injectEndpoints({
     }),
 
     getTrimmedProjects: builder.query({
-      query: () => "/trimmed",
+      query: (params = {}) => {
+        const queryParams = new URLSearchParams();
+
+        // Add userId parameter if provided
+        if (params.userId) {
+          queryParams.append("userId", params.userId);
+        }
+
+        // Add any other parameters that might be needed
+        Object.entries(params).forEach(([key, value]) => {
+          if (key !== "userId" && value !== undefined && value !== null) {
+            queryParams.append(key, value.toString());
+          }
+        });
+
+        const queryString = queryParams.toString();
+        return `/trimmed${queryString ? `?${queryString}` : ""}`;
+      },
       transformResponse: (response: any) => {
         if (response.status === "error") {
           throw new Error(response.message);

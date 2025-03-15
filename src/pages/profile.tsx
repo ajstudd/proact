@@ -15,9 +15,7 @@ type TabType = "comments" | "bookmarks" | "projects";
 export default function Profile() {
   const user = useUserState();
   const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>(
-    user?.user?.role === "USER" ? "comments" : "projects"
-  );
+  const [activeTab, setActiveTab] = useState<TabType>("comments");
 
   // Extract user details
   const profileInfo = {
@@ -95,36 +93,32 @@ export default function Profile() {
       >
         {/* Navigation Tabs */}
         <div className="flex border-b border-gray-700 pb-2">
-          {profileInfo.role === "USER" ? (
-            <>
-              <button
-                className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'comments' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
-                onClick={() => handleTabChange('comments')}
-              >
-                <FaComments /> My Comments
-              </button>
-              <button
-                className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'bookmarks' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
-                onClick={() => handleTabChange('bookmarks')}
-              >
-                <FaBookmark /> Bookmarked Projects
-              </button>
-            </>
-          ) : (
-            <button
-              className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'projects' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
-              onClick={() => handleTabChange('projects')}
-            >
-              <FaProjectDiagram /> My Projects
-            </button>
-          )}
+
+          <button
+            className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'comments' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+            onClick={() => handleTabChange('comments')}
+          >
+            <FaComments /> My Comments
+          </button>
+          <button
+            className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'bookmarks' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+            onClick={() => handleTabChange('bookmarks')}
+          >
+            <FaBookmark /> Bookmarked Projects
+          </button>
         </div>
 
+        {/* // <button
+          //   className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'projects' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+          //   onClick={() => handleTabChange('projects')}
+          // >
+          //   <FaProjectDiagram /> My Projects
+          // </button> */}
         {/* Tab Content */}
         <div className="mt-6">
           {activeTab === 'comments' && <UserCommentsTab />}
           {activeTab === 'bookmarks' && <BookmarkedProjectsTab />}
-          {activeTab === 'projects' && <UserProjectsTab />}
+          {/* {activeTab === 'projects' && <UserProjectsTab />} */}
         </div>
       </motion.div>
 

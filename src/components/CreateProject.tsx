@@ -28,7 +28,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
     const [location, setLocation] = useState<{ lat: number; lng: number; place: string } | null>(null);
     const [budget, setBudget] = useState<number>(0);
     const [contractor, setContractor] = useState("");
-    const [government, setGovernment] = useState("");
+    // const [government, setGovernment] = useState("");
     console.log('location', location);
 
     const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +53,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
             formData.append("description", pdfFile ? "" : descriptionText);
             formData.append("budget", budget.toString());
             formData.append("contractor", contractor);
-            formData.append("government", government);
+            // formData.append("government", government);
 
             if (location) {
                 formData.append("location[lat]", location.lat.toString());
@@ -90,7 +90,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
             setLocation(null);
             setBudget(0);
             setContractor("");
-            setGovernment("");
+            // setGovernment("");
 
         } catch (error: any) {
             toast.error(error.data?.message || "Failed to create project");
@@ -163,7 +163,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                     />
                 </div>
 
-                <div className="flex flex-col">
+                {/* <div className="flex flex-col">
                     <label className="mb-2 font-semibold">Government ID</label>
                     <input
                         type="text"
@@ -173,7 +173,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                         className="w-full p-2 text-black rounded-md"
                         required
                     />
-                </div>
+                </div> */}
 
                 <div>
                     <label className="block mb-2 font-semibold">Project Location</label>
