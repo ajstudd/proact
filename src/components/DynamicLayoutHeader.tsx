@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Flex, Input, IconButton, VStack, Image, Text, Button, Spinner } from "@chakra-ui/react";
-import { FiSearch, FiX, FiMapPin } from "react-icons/fi";
+import { Box, Flex, Input, IconButton, VStack, Image, Text, Button, Spinner, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider } from "@chakra-ui/react";
+import { FiSearch, FiX, FiMapPin, FiLogOut, FiUser } from "react-icons/fi";
 import { motion } from "framer-motion";
 import useProjectSearch from "hooks/useProjectSearch";
 import { useRouter } from "next/router";
 import useScreenSize from "hooks/useScreenSize";
 import { ProjectSearchResult } from "../types";
+import { useAuth } from "../contexts/AuthContext";
+import useUserState from "../hooks/useUserState";
 
 interface HeaderProps {
     hideSearch?: boolean;
@@ -16,8 +18,6 @@ interface HeaderProps {
 const buttonConfig: Record<string, { text: string; link: string } | null> = {
     "/signup": { text: "Login", link: "/login" },
     "/login": { text: "Sign Up", link: "/signup" },
-    "/home": { text: "Dashboard", link: "/dashboard" }, // Example: Button on home page
-    "/projects": { text: "My Projects", link: "/dashboard/projects" }, // Example: Button for projects
 };
 
 const Header = ({ hideSearch = false }: HeaderProps) => {
@@ -25,8 +25,11 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
     const { screenSize } = useScreenSize();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const router = useRouter();
+    const { isAuthenticated, logout } = useAuth();
+    const { user } = useUserState();
 
-    const button = buttonConfig[router.pathname] || null;
+    // Only show button config if user is not authenticated
+    const button = !isAuthenticated ? buttonConfig[router.pathname] || null : null;
 
     const handleResultClick = (project: ProjectSearchResult) => {
         router.push(`/project/${project._id}`);
@@ -37,16 +40,24 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
         return project.bannerUrl || 'https://via.placeholder.com/150?text=No+Image';
     };
 
+    const navigateToProfile = () => {
+        router.push('/profile');
+    };
+
+    const handleLogout = () => {
+        logout();
+    };
+
     return (
-        <Box as="header" className="bg-gray-800 text-white px-6 shadow-md fixed w-full top-0 z-10 h-16 flex items-center">
+        <Box as="header" className="bg-gray-800 text-white px-6 shadow-md fixed w-full top-0 z-20 h-16 flex items-center">
             <Text fontSize="xl" fontWeight="bold" className="w-[33%]">Proactive India</Text>
 
-            <Flex className="w-[67%] mx-auto px-1 lg:px-4 justify-end lg:justify-start">
+            <Flex className="w-[67%] mx-auto px-1 lg:px-4 justify-between items-center">
                 {/* Conditionally Render Search Bar & Button */}
                 {!hideSearch && (
                     <>
-                        {/* Desktop Search Bar (Visible on md+) */}
-                        <div className="flex relative w-[450px] hidden lg:flex">
+                        {/* Desktop/Tablet Search Bar (Visible on md+) */}
+                        <div className={`relative ${screenSize === "small" ? "hidden" : "flex"} w-[450px]`}>
                             <IconButton
                                 aria-label="Search"
                                 icon={<FiSearch />}
@@ -69,8 +80,8 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                             )}
                         </div>
 
-                        {/* Mobile Search Icon (Hidden on md+) */}
-                        {screenSize !== "large" && (
+                        {/* Mobile Search Icon (Only visible on small screens) */}
+                        {screenSize === "small" && (
                             <IconButton
                                 aria-label="Search"
                                 icon={<FiSearch />}
@@ -80,15 +91,75 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                         )}
                     </>
                 )}
+
+                {/* User Profile and Authentication Section - Fixed alignment */}
+                <Flex ml="auto" alignItems="center">
+                    {isAuthenticated ? (
+                        <Menu placement="bottom-end" offset={[0, 5]} gutter={0}>
+                            <MenuButton
+                                as={Button}
+                                variant="unstyled"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                p={1}
+                                minW="auto"
+                                h="auto"
+                            >
+                                <Image
+                                    src={user?.photo || "/default-avatar.png"}
+                                    alt={user?.name || "User"}
+                                    className="rounded-full cursor-pointer border-solid border-[2px] border-gray-200"
+                                    width={32}
+                                    height={32}
+                                    objectFit="cover"
+                                />
+                            </MenuButton>
+                            <MenuList
+                                className="bg-white text-gray-800 rounded-md shadow-lg py-2 min-w-[180px] z-[50] mt-1 absolute right-0"
+                                sx={{
+                                    zIndex: 50,
+                                    position: "relative"
+                                }}
+                            >
+                                <div
+                                    onClick={navigateToProfile}
+                                    className="px-3 py-3 flex items-center text-sm text-gray-800 hover:bg-teal-50 cursor-pointer"
+                                >
+                                    <FiUser className="mr-2.5" /> Profile
+                                </div>
+                                <div className="border-t border-gray-100 my-1"></div>
+                                <div
+                                    onClick={handleLogout}
+                                    className="px-3 py-3 flex items-center text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                                >
+                                    <FiLogOut className="mr-2.5" /> Logout
+                                </div>
+                            </MenuList>
+                        </Menu>
+                    ) : button ? (
+                        <Button
+                            variant="outline"
+                            colorScheme="teal"
+                            size="sm"
+                            fontWeight="medium"
+                            _hover={{ bg: "teal.500", color: "white" }}
+                            transition="all 0.2s"
+                            onClick={() => router.push(button.link)}
+                        >
+                            {button.text}
+                        </Button>
+                    ) : null}
+                </Flex>
             </Flex>
 
             {/* Mobile Expanding Search Bar (Visible only when active) */}
-            {isSearchOpen && !hideSearch && (
+            {isSearchOpen && !hideSearch && screenSize === "small" && (
                 <motion.div
                     initial={{ width: "0px", opacity: 0 }}
                     animate={{ width: "100%", opacity: 1 }}
                     exit={{ width: "0px", opacity: 0 }}
-                    className="absolute top-16 left-0 w-full p-4 bg-gray-900 flex items-center gap-2 md:hidden"
+                    className="absolute top-16 left-0 w-full p-4 bg-gray-900 flex items-center gap-2"
                 >
                     <Input
                         className="text-black flex-1 rounded-lg px-4 shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -191,16 +262,6 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                         ))}
                     </div>
                 </div>
-            )}
-            {button && (
-                <Button
-                    variant="outline"
-                    colorScheme="teal"
-                    className="ml-auto hover:bg-teal-500 hover:text-white transition-all"
-                    onClick={() => router.push(button.link)}
-                >
-                    {button.text}
-                </Button>
             )}
         </Box>
     );

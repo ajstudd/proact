@@ -1,4 +1,5 @@
 import React from "react";
+import { FaRupeeSign } from "react-icons/fa";
 import { FiThumbsUp, FiThumbsDown, FiDollarSign, FiCalendar, FiUsers } from "react-icons/fi";
 
 interface ProjectStatsProps {
@@ -53,7 +54,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
                 <div>
                     <div className="flex items-center justify-between mb-2">
                         <span className="flex items-center text-gray-700">
-                            <FiDollarSign className="mr-2 text-green-600" /> Budget vs Expenditure
+                            <FaRupeeSign className="mr-2 text-green-600" /> Budget vs Expenditure
                         </span>
                     </div>
                     <div className="mb-1 flex justify-between">

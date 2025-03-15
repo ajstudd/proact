@@ -35,7 +35,6 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
         menuItems = [
             { label: "Home", icon: FiHome, path: "/home" },
             { label: "Assigned Projects", icon: FiClipboard, path: "/projects" },
-            { label: "Progress", icon: FiMessageCircle, path: "/contractor-progress" },
             { label: "Notifications", icon: FiBell, path: "/notifications" },
             { label: "Profile", icon: FiUser, path: "/profile" },
             { label: "Settings", icon: FiSettings, path: "/settings" }
