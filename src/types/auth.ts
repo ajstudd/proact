@@ -102,11 +102,6 @@ export interface RegisterUserRequestPayload {
   governmentId?: string;
   contractorLicense?: string;
 }
-// export interface RegisterUserRequestPayload extends UserAuthRequestPayload {
-//   repeatPassword: string;
-//   terms?: boolean;
-//   marketing?: boolean;
-// }
 
 export interface ForgotPasswordRequestPayload {
   email: string;

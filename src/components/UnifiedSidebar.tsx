@@ -17,7 +17,7 @@ const commonMenuItems = [
 // Role-specific menu items
 const roleSpecificItems = {
     GOVERNMENT: [
-        { label: "Contractors", icon: FiUsers, path: "/contractors" },
+        // { label: "Contractors", icon: FiUsers, path: "/contractors" },
         { label: "Corruption Reports", icon: FiBriefcase, path: "/reports" },
         { label: "Projects", icon: FiClipboard, path: "/projects" },
     ],

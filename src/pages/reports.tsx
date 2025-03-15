@@ -180,7 +180,8 @@ const ReportsPage = () => {
                     </button>
 
                     <div className="relative inline-block text-left">
-                        <button
+                        {/* Will be enabled in future */}
+                        {/* <button
                             type="button"
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -191,7 +192,7 @@ const ReportsPage = () => {
                             <FiDownload className="mr-2 h-4 w-4" />
                             Export
                             <FiChevronRight className="ml-1 h-4 w-4 transform rotate-90" />
-                        </button>
+                        </button> */}
                         {showExportMenu && (
                             <div className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div className="py-1">

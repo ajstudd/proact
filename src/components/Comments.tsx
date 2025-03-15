@@ -148,7 +148,7 @@ const CommentItem = memo(({
         >
             <div className="flex items-start">
                 <img
-                    src={comment.user?.photo?.url || "https://via.placeholder.com/40"}
+                    src={comment.user?.photo || "https://via.placeholder.com/40"}
                     alt={comment.user.name}
                     className="w-10 h-10 rounded-full mr-3"
                 />

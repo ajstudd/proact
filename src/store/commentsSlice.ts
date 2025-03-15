@@ -6,9 +6,7 @@ interface Comment {
   user: {
     _id: string;
     name: string;
-    photo?: {
-      url: string;
-    };
+    photo?: string;
   };
   createdAt: string;
   updatedAt: string;

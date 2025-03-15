@@ -103,13 +103,18 @@ const VerifyAccount = ({ decryptedEmail }: { decryptedEmail: string }) => {
                         </div>
 
                         {method === "phone" && (
-                            <input
-                                type="text"
-                                placeholder="Enter Phone Number"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                className="w-full p-2 mb-4 rounded-lg text-black"
-                            />
+                            <>
+                                <div className="bg-yellow-800 text-yellow-200 p-3 mb-4 rounded-lg text-sm">
+                                    ⚠️ Our SMS services are currently down. Please consider using email OTP instead.
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Enter Phone Number"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className="w-full p-2 mb-4 rounded-lg text-black"
+                                />
+                            </>
                         )}
 
                         <button
