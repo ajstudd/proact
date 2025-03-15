@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaRupeeSign } from "react-icons/fa";
-import { FiThumbsUp, FiThumbsDown, FiDollarSign, FiCalendar, FiUsers } from "react-icons/fi";
+import { FiThumbsUp, FiThumbsDown, FiDollarSign, FiCalendar, FiUsers, FiEdit } from "react-icons/fi";
+import { toast } from "react-toastify";
+import { useUpdateProjectExpenditureMutation } from "../services/projectApi";
 
 interface ProjectStatsProps {
     budget: number;
@@ -12,7 +14,9 @@ interface ProjectStatsProps {
     onDislike: () => void;
     userHasLiked?: boolean;
     userHasDisliked?: boolean;
-    isAuthenticated?: boolean; // Add isAuthenticated prop
+    isAuthenticated?: boolean;
+    projectId: string; // Added project ID for API calls
+    canManageProject?: boolean; // Flag to determine if user can manage expenditure
 }
 
 const ProjectStats: React.FC<ProjectStatsProps> = ({
@@ -25,8 +29,14 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
     onDislike,
     userHasLiked = false,
     userHasDisliked = false,
-    isAuthenticated = false, // Default to false
+    isAuthenticated = false,
+    projectId,
+    canManageProject = false,
 }) => {
+    const [updateExpenditure] = useUpdateProjectExpenditureMutation();
+    const [isEditingExpenditure, setIsEditingExpenditure] = useState(false);
+    const [newExpenditure, setNewExpenditure] = useState(expenditure);
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -45,6 +55,28 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
 
     const progressPercentage = Math.min(Math.round((expenditure / budget) * 100), 100);
 
+    const handleExpenditureSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (newExpenditure < 0) {
+            toast.error("Expenditure cannot be negative");
+            return;
+        }
+
+        try {
+            await updateExpenditure({
+                projectId,
+                expenditure: newExpenditure
+            }).unwrap();
+
+            toast.success("Project expenditure updated successfully");
+            setIsEditingExpenditure(false);
+        } catch (error) {
+            console.error("Failed to update expenditure:", error);
+            toast.error("Failed to update expenditure");
+        }
+    };
+
     return (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-xl font-semibold mb-4">Project Statistics</h3>
@@ -56,11 +88,54 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
                         <span className="flex items-center text-gray-700">
                             <FaRupeeSign className="mr-2 text-green-600" /> Budget vs Expenditure
                         </span>
+
+                        {canManageProject && (
+                            <button
+                                onClick={() => setIsEditingExpenditure(!isEditingExpenditure)}
+                                className="text-blue-500 hover:text-blue-700"
+                                title="Update expenditure"
+                            >
+                                <FiEdit size={18} />
+                            </button>
+                        )}
                     </div>
-                    <div className="mb-1 flex justify-between">
-                        <span className="text-sm">Budget: {formatCurrency(budget)}</span>
-                        <span className="text-sm">Spent: {formatCurrency(expenditure)}</span>
-                    </div>
+
+                    {isEditingExpenditure ? (
+                        <form onSubmit={handleExpenditureSubmit} className="mb-3">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    value={newExpenditure}
+                                    onChange={(e) => setNewExpenditure(Number(e.target.value))}
+                                    className="border border-gray-300 rounded-md px-3 py-1 w-full"
+                                    min="0"
+                                    step="1000"
+                                />
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsEditingExpenditure(false);
+                                        setNewExpenditure(expenditure);
+                                    }}
+                                    className="bg-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-400"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    ) : (
+                        <div className="mb-1 flex justify-between">
+                            <span className="text-sm">Budget: {formatCurrency(budget)}</span>
+                            <span className="text-sm">Spent: {formatCurrency(expenditure)}</span>
+                        </div>
+                    )}
+
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                         <div
                             className={`h-2.5 rounded-full ${progressPercentage > 90 ? 'bg-red-600' :

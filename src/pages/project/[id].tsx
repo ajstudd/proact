@@ -230,8 +230,13 @@ const ProjectPage = () => {
         }
     }, [projectId, isAuthenticated, dislikeComment]);
 
-    // Project update handlers
-    const handleAddUpdate = async (content: string, media?: string[]) => {
+    // Determine if the current user can manage this project
+    const canManageProject = isAuthenticated &&
+        ((isGovernment && project?.government?._id === userId) ||
+            (isContractor && project?.contractor?._id === userId));
+
+    // Project update handlers - Updated to handle file uploads
+    const handleAddUpdate = async (content: string, mediaFiles?: File[]) => {
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to add updates");
             return;
@@ -240,7 +245,8 @@ const ProjectPage = () => {
         try {
             await addProjectUpdate({
                 projectId,
-                updateData: { content, media }
+                content,
+                media: mediaFiles
             }).unwrap();
             toast.success("Project update added successfully");
         } catch (error) {
@@ -249,7 +255,7 @@ const ProjectPage = () => {
         }
     };
 
-    const handleEditUpdate = async (updateId: string, content: string, media?: string[]) => {
+    const handleEditUpdate = async (updateId: string, content: string, mediaFiles?: File[], keepExistingMedia: boolean = true) => {
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to edit updates");
             return;
@@ -259,7 +265,9 @@ const ProjectPage = () => {
             await editProjectUpdate({
                 projectId,
                 updateId,
-                updateData: { content, media }
+                content,
+                media: mediaFiles,
+                keepExistingMedia
             }).unwrap();
             toast.success("Project update edited successfully");
         } catch (error) {
@@ -389,6 +397,8 @@ const ProjectPage = () => {
                 userHasLiked={userHasLiked}
                 userHasDisliked={userHasDisliked}
                 isAuthenticated={isAuthenticated} // Pass authentication status
+                projectId={project._id} // Pass projectId
+                canManageProject={canManageProject} // Pass management permissions
             />
 
             <UpdatesTimeline

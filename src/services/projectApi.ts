@@ -165,22 +165,54 @@ export const projectApi = api.injectEndpoints({
     }),
 
     addProjectUpdate: builder.mutation({
-      query: ({ projectId, updateData }) => ({
-        url: `/${projectId}/updates`,
-        method: "POST",
-        body: updateData,
-      }),
+      query: ({ projectId, content, media }) => {
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append("content", content);
+
+        // Append media files if they exist
+        if (media && media.length > 0) {
+          media.forEach((file: any) => {
+            formData.append("media", file);
+          });
+        }
+
+        return {
+          url: `/${projectId}/updates`,
+          method: "POST",
+          body: formData,
+          // No need to set Content-Type as it's automatically set with FormData
+        };
+      },
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
       ],
     }),
 
     editProjectUpdate: builder.mutation({
-      query: ({ projectId, updateId, updateData }) => ({
-        url: `/${projectId}/updates/${updateId}`,
-        method: "PUT",
-        body: updateData,
-      }),
+      query: ({ projectId, updateId, content, media, keepExistingMedia }) => {
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append("content", content);
+
+        // Flag to indicate whether to keep existing media
+        if (keepExistingMedia !== undefined) {
+          formData.append("keepExistingMedia", String(keepExistingMedia));
+        }
+
+        // Append media files if they exist
+        if (media && media.length > 0) {
+          media.forEach((file: any) => {
+            formData.append("media", file);
+          });
+        }
+
+        return {
+          url: `/${projectId}/updates/${updateId}`,
+          method: "PUT",
+          body: formData,
+        };
+      },
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
       ],
@@ -190,6 +222,18 @@ export const projectApi = api.injectEndpoints({
       query: ({ projectId, updateId }) => ({
         url: `/${projectId}/updates/${updateId}`,
         method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { projectId }) => [
+        { type: "Projects", id: projectId },
+      ],
+    }),
+
+    // New endpoint for updating project expenditure
+    updateProjectExpenditure: builder.mutation({
+      query: ({ projectId, expenditure }) => ({
+        url: `/${projectId}/expenditure`,
+        method: "PUT",
+        body: { expenditure },
       }),
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
@@ -304,6 +348,7 @@ export const {
   useAddProjectUpdateMutation,
   useEditProjectUpdateMutation,
   useRemoveProjectUpdateMutation,
+  useUpdateProjectExpenditureMutation, // Export the new mutation hook
   useLikeProjectMutation,
   useDislikeProjectMutation,
   useAddCommentMutation,

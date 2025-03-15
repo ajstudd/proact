@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiEdit2, FiTrash2, FiCalendar, FiPlus, FiClock } from "react-icons/fi";
+import { FiFileText, FiImage, FiPlusCircle, FiEdit, FiTrash2, FiPlus, FiCalendar, FiEdit2 } from "react-icons/fi";
 import { motion } from "framer-motion";
 import AddUpdateModal from "./AddUpdateModal";
 
@@ -21,11 +21,11 @@ interface Update {
 interface UpdatesTimelineProps {
     updates: Update[];
     projectId?: string;
-    onAddUpdate: (content: string, media?: string[]) => Promise<void>;
-    onEditUpdate: (updateId: string, content: string, media?: string[]) => Promise<void>;
+    onAddUpdate: (content: string, media?: File[]) => Promise<void>;
+    onEditUpdate: (updateId: string, content: string, media?: File[], keepExistingMedia?: boolean) => Promise<void>;
     onDeleteUpdate?: (updateId: string) => Promise<void>;
     canManageUpdates?: boolean;
-    isAuthenticated?: boolean; // Add isAuthenticated prop
+    isAuthenticated?: boolean;
 }
 
 const UpdatesTimeline: React.FC<UpdatesTimelineProps> = ({
@@ -35,26 +35,21 @@ const UpdatesTimeline: React.FC<UpdatesTimelineProps> = ({
     onEditUpdate,
     onDeleteUpdate,
     canManageUpdates = false,
-    isAuthenticated = false, // Default to false
+    isAuthenticated = false,
 }) => {
-    console.log('canManageUpdates', canManageUpdates)
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingUpdate, setEditingUpdate] = useState<Update | null>(null);
-    const [newUpdate, setNewUpdate] = useState('');
-    const [isAdding, setIsAdding] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [editContent, setEditContent] = useState('');
 
-    const handleAddUpdate = async (content: string, media?: string[]) => {
-        if (onAddUpdate && isAuthenticated) { // Check authentication
+    const handleAddUpdate = async (content: string, media?: File[]) => {
+        if (onAddUpdate && isAuthenticated) {
             await onAddUpdate(content, media);
         }
         setIsAddModalOpen(false);
     };
 
-    const handleEditUpdate = async (content: string, media?: string[]) => {
-        if (editingUpdate && onEditUpdate && isAuthenticated) { // Check authentication
-            await onEditUpdate(editingUpdate._id, content, media);
+    const handleEditUpdate = async (content: string, media?: File[], keepExistingMedia?: boolean) => {
+        if (editingUpdate && onEditUpdate && isAuthenticated) {
+            await onEditUpdate(editingUpdate._id, content, media, keepExistingMedia);
             setEditingUpdate(null);
         }
     };
@@ -63,29 +58,6 @@ const UpdatesTimeline: React.FC<UpdatesTimelineProps> = ({
         if (onDeleteUpdate && confirm("Are you sure you want to delete this update?")) {
             await onDeleteUpdate(updateId);
         }
-    };
-
-    const handleAddSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (newUpdate.trim() && isAuthenticated) { // Check authentication
-            onAddUpdate(newUpdate.trim());
-            setNewUpdate('');
-            setIsAdding(false);
-        }
-    };
-
-    const handleEditSubmit = (e: React.FormEvent, updateId: string) => {
-        e.preventDefault();
-        if (editContent.trim() && isAuthenticated) { // Check authentication
-            onEditUpdate(updateId, editContent.trim());
-            setEditingId(null);
-            setEditContent('');
-        }
-    };
-
-    const handleStartEdit = (update: Update) => {
-        setEditingId(update._id);
-        setEditContent(update.content);
     };
 
     const formatDate = (dateString: string) => {
