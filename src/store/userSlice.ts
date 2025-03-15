@@ -16,6 +16,8 @@ export interface UserState {
   contributions?: number;
   experience?: number;
   reputationScore?: number;
+  unreadNotificationsCount?: number;
+  totalNotificationsCount?: number;
 }
 
 const initialState: UserState = {
@@ -26,6 +28,8 @@ const initialState: UserState = {
   isAuthenticated: false,
   isVerified: false,
   role: "USER",
+  unreadNotificationsCount: 0,
+  totalNotificationsCount: 0,
 };
 
 const userSlice = createSlice({

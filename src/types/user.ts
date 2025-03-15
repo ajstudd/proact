@@ -77,6 +77,8 @@ export interface UserProfileResponse {
   contractorLicense?: string;
   contractorId?: string;
   governmentId?: string;
+  unreadNotificationsCount?: number;
+  totalNotificationsCount?: number;
 }
 
 export interface EmailVerificationPayload {

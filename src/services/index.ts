@@ -8,6 +8,7 @@ export * from "./api";
 export * from "./uploadApi";
 export * from "./projectApi";
 export * from "./reportApi";
+export * from "./notificationsApi";
 
 // // Export all API services
 // export { authApi } from "./authApi";

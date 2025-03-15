@@ -1,20 +1,29 @@
 "use client";
 
-import { Box, Icon, Flex, Text } from "@chakra-ui/react";
+import { Box, Icon, Flex, Text, Badge } from "@chakra-ui/react";
 import { FiHome, FiUser, FiMessageCircle, FiBell, FiSettings, FiClipboard, FiUsers, FiBriefcase } from "react-icons/fi";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
+import { useGetUnreadCountQuery } from "../services/notificationsApi";
+import useUserState from "hooks/useUserState";
 
 const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
     const router = useRouter();
     const pathname = usePathname();
     const { userRole } = useAuth();
+    const { data: notificationData } = useGetUnreadCountQuery();
+    const { user } = useUserState();
+
+    // Use user state's notification count if available, otherwise use API data
+    const unreadCount = user?.unreadNotificationsCount !== undefined
+        ? user.unreadNotificationsCount
+        : (notificationData?.unreadCount || 0);
 
     // Base menu items for all users
     let menuItems = [
         { label: "Home", icon: FiHome, path: "/home" },
         { label: "Profile", icon: FiUser, path: "/profile" },
-        { label: "Notifications", icon: FiBell, path: "/notifications" },
+        { label: "Notifications", icon: FiBell, path: "/notifications", badge: unreadCount },
         { label: "Settings", icon: FiSettings, path: "/settings" }
     ];
 
@@ -25,8 +34,8 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
             { label: "Home", icon: FiHome, path: "/home" },
             { label: "Profile", icon: FiUser, path: "/profile" },
             { label: "Projects", icon: FiClipboard, path: "/projects" },
-            { label: "Contractors", icon: FiUsers, path: "/contractors" },
-            { label: "Notifications", icon: FiBell, path: "/notifications" },
+            // { label: "Contractors", icon: FiUsers, path: "/contractors" },
+            { label: "Notifications", icon: FiBell, path: "/notifications", badge: unreadCount },
             { label: "Corruption Reports", icon: FiBriefcase, path: "/reports" },
             { label: "Settings", icon: FiSettings, path: "/settings" }
         ];
@@ -35,7 +44,7 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
         menuItems = [
             { label: "Home", icon: FiHome, path: "/home" },
             { label: "Assigned Projects", icon: FiClipboard, path: "/projects" },
-            { label: "Notifications", icon: FiBell, path: "/notifications" },
+            { label: "Notifications", icon: FiBell, path: "/notifications", badge: unreadCount },
             { label: "Profile", icon: FiUser, path: "/profile" },
             { label: "Settings", icon: FiSettings, path: "/settings" }
         ];
@@ -56,8 +65,26 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
                                 ${isActive ? "text-blue-400 bg-gray-700" : "hover:bg-gray-700"}
                             `}
                             onClick={() => router.push(item.path)}
+                            position="relative"
                         >
                             <Icon as={item.icon} boxSize={14} />
+                            {item.badge && item.badge > 0 && (
+                                <Badge
+                                    colorScheme="red"
+                                    borderRadius="full"
+                                    position="absolute"
+                                    top="-2px"
+                                    right="-2px"
+                                    fontSize="xs"
+                                    minW="18px"
+                                    h="18px"
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    {item.badge > 99 ? '99+' : item.badge}
+                                </Badge>
+                            )}
                             {showLabels && <Text fontSize="xs" mt={1}>{item.label}</Text>}
                         </Flex>
                     );

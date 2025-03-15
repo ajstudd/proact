@@ -77,18 +77,6 @@ export const authApi = createApi({
       }),
     }),
 
-    /** 🔄 Reset Password */
-    resetPassword: builder.mutation<void, { token: string; password: string }>({
-      query: ({ password, token }) => ({
-        url: "/reset-password",
-        method: "POST",
-        body: { password },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }),
-    }),
-
     /** 👤 Get User Info */
     me: builder.query<
       {
@@ -128,7 +116,6 @@ export const {
   useLoginMutation,
   useRegisterMutation,
   useForgotPasswordMutation,
-  useResetPasswordMutation,
   useMeQuery,
   useLogoutMutation,
 } = authApi;
