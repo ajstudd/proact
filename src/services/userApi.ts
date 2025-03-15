@@ -106,6 +106,30 @@ export const userApi = createApi({
         body: credentials,
       }),
     }),
+    searchUsers: builder.query<
+      { users: any[]; total: number; hasMore: boolean },
+      { query: string; limit?: number; page?: number }
+    >({
+      query: ({ query, limit = 10, page = 1 }) => {
+        const queryParams = new URLSearchParams();
+        queryParams.append("query", query);
+        queryParams.append("limit", limit.toString());
+        queryParams.append("page", page.toString());
+        return `/search?${queryParams.toString()}`;
+      },
+    }),
+    searchContractors: builder.query<
+      { users: any[]; total: number; hasMore: boolean },
+      { query: string; limit?: number; page?: number }
+    >({
+      query: ({ query, limit = 10, page = 1 }) => {
+        const queryParams = new URLSearchParams();
+        queryParams.append("query", query);
+        queryParams.append("limit", limit.toString());
+        queryParams.append("page", page.toString());
+        return `/search/contractors?${queryParams.toString()}`;
+      },
+    }),
   }),
 });
 
@@ -119,5 +143,7 @@ export const {
   useRemoveBookmarkMutation,
   useGetBookmarkedProjectsQuery,
   useGetUserProjectsQuery,
-  useResetPasswordMutation, // Export the new hook
+  useResetPasswordMutation,
+  useSearchUsersQuery,
+  useSearchContractorsQuery,
 } = userApi;

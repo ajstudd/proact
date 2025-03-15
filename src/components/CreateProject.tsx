@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dynamic from "next/dynamic";
 import { useCreateProjectMutation, useUploadFileMutation } from "@services"; // RTK API hooks for project and file upload
+import { useSearchContractorsQuery } from "@services"; // Import the contractor search hook
 const MapPicker = dynamic(() => import("./MapPicker"), { ssr: false });
 
 interface CreateProjectFormProps {
     onSuccess?: () => void;
+}
+
+interface Contractor {
+    _id: string;
+    name: string;
+    email?: string;
+    phone?: string;
+    photo?: string;
+    contractorLicense?: string;
 }
 
 export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
@@ -27,9 +37,30 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
     const [pdfUrl, setPdfUrl] = useState("");
     const [location, setLocation] = useState<{ lat: number; lng: number; place: string } | null>(null);
     const [budget, setBudget] = useState<number>(0);
+
+    // Contractor search related state
+    const [contractorSearchQuery, setContractorSearchQuery] = useState("");
     const [contractor, setContractor] = useState("");
-    // const [government, setGovernment] = useState("");
-    console.log('location', location);
+    const [selectedContractor, setSelectedContractor] = useState<Contractor | null>(null);
+    const [showContractorDropdown, setShowContractorDropdown] = useState(false);
+
+    // Use the search contractors query
+    const { data: contractorSearchResults, isLoading: isSearchingContractors } = useSearchContractorsQuery(
+        { query: contractorSearchQuery },
+        { skip: contractorSearchQuery.length < 2 } // Only search when input has at least 2 characters
+    );
+
+    // Clear the dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setShowContractorDropdown(false);
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -43,6 +74,25 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
         if (e.target.files && e.target.files[0]) {
             setPdfFile(e.target.files[0]);
         }
+    };
+
+    const handleContractorSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const query = e.target.value;
+        setContractorSearchQuery(query);
+        setShowContractorDropdown(query.length >= 2);
+
+        // If input is cleared, also clear selected contractor
+        if (!query) {
+            setSelectedContractor(null);
+            setContractor("");
+        }
+    };
+
+    const selectContractor = (selectedUser: Contractor) => {
+        setSelectedContractor(selectedUser);
+        setContractor(selectedUser._id);
+        setContractorSearchQuery(selectedUser.name);
+        setShowContractorDropdown(false);
     };
 
     const handleProjectSubmit = async (e: React.FormEvent) => {
@@ -90,6 +140,8 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
             setLocation(null);
             setBudget(0);
             setContractor("");
+            setContractorSearchQuery("");
+            setSelectedContractor(null);
             // setGovernment("");
 
         } catch (error: any) {
@@ -152,28 +204,86 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                 </div>
 
                 <div className="flex flex-col">
-                    <label className="mb-2 font-semibold">Contractor ID</label>
-                    <input
-                        type="text"
-                        value={contractor}
-                        onChange={(e) => setContractor(e.target.value)}
-                        placeholder="Enter contractor ID"
-                        className="w-full p-2 text-black rounded-md"
-                        required
-                    />
-                </div>
+                    <label className="mb-2 font-semibold">Contractor</label>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={contractorSearchQuery}
+                            onChange={handleContractorSearch}
+                            placeholder="Search for a contractor by name or ID"
+                            className="w-full p-2 text-black rounded-md"
+                            autoComplete="off"
+                            onClick={() => {
+                                if (contractorSearchQuery.length >= 2) {
+                                    setShowContractorDropdown(true);
+                                }
+                            }}
+                        />
 
-                {/* <div className="flex flex-col">
-                    <label className="mb-2 font-semibold">Government ID</label>
-                    <input
-                        type="text"
-                        value={government}
-                        onChange={(e) => setGovernment(e.target.value)}
-                        placeholder="Enter government ID"
-                        className="w-full p-2 text-black rounded-md"
-                        required
-                    />
-                </div> */}
+                        {showContractorDropdown && contractorSearchResults && (
+                            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                                {isSearchingContractors && (
+                                    <div className="p-2 text-gray-500">Searching...</div>
+                                )}
+
+                                {!isSearchingContractors && contractorSearchResults.users?.length === 0 && (
+                                    <div className="p-2 text-gray-500">No contractors found</div>
+                                )}
+
+                                {contractorSearchResults?.users?.map((user) => (
+                                    <div
+                                        key={user._id}
+                                        className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                                        onClick={() => selectContractor(user)}
+                                    >
+                                        {user.photo && (
+                                            <img
+                                                src={user.photo}
+                                                alt={user.name}
+                                                className="w-8 h-8 rounded-full mr-2"
+                                            />
+                                        )}
+                                        <div>
+                                            <div className="font-medium text-black">{user.name}</div>
+                                            <div className="text-xs text-gray-500">
+                                                {user.email || user.phone || user.contractorLicense}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {selectedContractor && (
+                        <div className="mt-2 p-2 bg-blue-900 rounded-md flex items-center">
+                            {selectedContractor.photo && (
+                                <img
+                                    src={selectedContractor.photo}
+                                    alt={selectedContractor.name}
+                                    className="w-8 h-8 rounded-full mr-2"
+                                />
+                            )}
+                            <div className="flex-1">
+                                <div className="font-medium">{selectedContractor.name}</div>
+                                <div className="text-xs text-gray-300">
+                                    {selectedContractor.contractorLicense ? `License: ${selectedContractor.contractorLicense}` : ''}
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                className="text-gray-300 hover:text-white"
+                                onClick={() => {
+                                    setSelectedContractor(null);
+                                    setContractor("");
+                                    setContractorSearchQuery("");
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    )}
+                </div>
 
                 <div>
                     <label className="block mb-2 font-semibold">Project Location</label>
