@@ -3,14 +3,18 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ProjectCard from "components/ProjectCard";
-import { useGetTrimmedProjectsQuery } from "@services";
+import { useGetTrimmedProjectsQuery, useDeleteProjectMutation } from "@services";
 import { FiLoader, FiPlus } from "react-icons/fi";
 import { useCurrentUser } from "hooks/useCurrentUser";
 import { TrimmedProject } from "types/project";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { Dialog } from "../components/Dialog"; // Updated import to use our custom Dialog
 
 const ProjectsPage = () => {
     const [mounted, setMounted] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
     const { user } = useCurrentUser();
 
     // Get user's projects using the userId parameter
@@ -20,6 +24,8 @@ const ProjectsPage = () => {
         isError,
         refetch
     } = useGetTrimmedProjectsQuery({ userId: user?.id });
+
+    const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
 
     const router = useRouter();
 
@@ -34,7 +40,26 @@ const ProjectsPage = () => {
     }
 
     const handleCreateProject = () => {
-        router.push("/create-project");
+        router.push("/home");
+    };
+
+    const handleDeleteClick = (projectId: string) => {
+        setProjectToDelete(projectId);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!projectToDelete) return;
+
+        try {
+            await deleteProject(projectToDelete).unwrap();
+            toast.success("Project deleted successfully");
+            setDeleteModalOpen(false);
+            refetch();
+        } catch (error) {
+            toast.error("Failed to delete the project");
+            console.error("Delete project error:", error);
+        }
     };
 
     return (
@@ -83,7 +108,12 @@ const ProjectsPage = () => {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                     {projects.map((project: TrimmedProject) => (
-                        <ProjectCard key={project._id} {...project} />
+                        <ProjectCard
+                            key={project._id}
+                            {...project}
+                            showActions={true}
+                            onDelete={handleDeleteClick}
+                        />
                     ))}
                 </motion.div>
             )}
@@ -109,6 +139,43 @@ const ProjectsPage = () => {
                     )}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <Dialog
+                open={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                className="relative z-50"
+            >
+                <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+                <div className="fixed inset-0 flex items-center justify-center p-4">
+                    <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-white p-6 shadow-xl">
+                        <Dialog.Title className="text-lg font-medium text-gray-900">Delete Project</Dialog.Title>
+                        <Dialog.Description className="mt-2 text-sm text-gray-500">
+                            Are you sure you want to delete this project? This action cannot be undone.
+                        </Dialog.Description>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setDeleteModalOpen(false)}
+                                className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                                disabled={isDeleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={confirmDelete}
+                                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'Deleting...' : 'Delete'}
+                            </button>
+                        </div>
+                    </Dialog.Panel>
+                </div>
+            </Dialog>
         </div>
     );
 };

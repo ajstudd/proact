@@ -35,6 +35,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, projectId, p
     const [fileName, setFileName] = useState("");
     const { isAuthenticated, userId } = useAuth();
     const [reportAnonymously, setReportAnonymously] = useState(!isAuthenticated);
+    console.log('reportAnonymously', reportAnonymously);
     const [createReport, { isLoading, error }] = useCreateReportMutation();
     const toast = useToast();
 
@@ -135,6 +136,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, projectId, p
             if (attachment) {
                 formData.append('attachment', attachment);
             }
+            console.log('formData', formData)
 
             await createReport(formData).unwrap();
             toast({

@@ -48,7 +48,9 @@ const ReportDetailPage = () => {
     } = useGetReportByIdQuery(reportId as string, {
         skip: !reportId || authLoading,
     });
-    console.log('report', report);
+
+    // const reportedBy = report?.reportedBy.isAnonymous ? "Anonymous Report" : `Reported by: ${report?.reportedBy.userId?.name as string}`;
+    // console.log('report', report);
 
     const [updateStatus, { isLoading: isUpdating }] = useUpdateReportStatusMutation();
 
@@ -173,6 +175,7 @@ const ReportDetailPage = () => {
             toast.error("Failed to reject report");
         }
     };
+
 
     // Format the correct reportedBy name
     const getReporterDisplay = () => {

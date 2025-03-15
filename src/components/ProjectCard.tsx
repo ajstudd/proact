@@ -1,17 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FiMapPin, FiThumbsUp, FiThumbsDown, FiDollarSign, FiCalendar, FiUsers } from "react-icons/fi";
+import { FiMapPin, FiThumbsUp, FiThumbsDown, FiDollarSign, FiCalendar, FiUsers, FiMoreVertical, FiTrash2 } from "react-icons/fi";
 import { MdAccountBalance } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { TrimmedProject } from "types/project";
+import { useState, useRef, useEffect } from "react";
 
+interface ProjectCardProps extends TrimmedProject {
+    showActions?: boolean;
+    onDelete?: (id: string) => void;
+}
 
-const ProjectCard = (project: TrimmedProject) => {
-    console.log('project', project)
-    const { _id, title, description, bannerUrl, location, budget, likes = [], dislikes = [], createdAt, contractor, government } = project;
+const ProjectCard = (props: ProjectCardProps) => {
+    const { _id, title, description, bannerUrl, location, budget, likes = [], dislikes = [], createdAt, contractor, government, showActions, onDelete } = props;
     const router = useRouter();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
     const formattedDate = createdAt ? new Date(createdAt).toLocaleDateString() : 'Unknown date';
     const formattedBudget = budget !== undefined ? new Intl.NumberFormat('en-IN', {
         style: 'currency',
@@ -23,6 +30,33 @@ const ProjectCard = (project: TrimmedProject) => {
         router.push(`/project/${_id}`);
     };
 
+    const handleMenuToggle = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent card click
+        setMenuOpen(!menuOpen);
+    };
+
+    const handleDeleteClick = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent card click
+        if (onDelete) {
+            onDelete(_id);
+        }
+        setMenuOpen(false);
+    };
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     const placeholderImage = "https://via.placeholder.com/400x200?text=No+Image";
 
     return (
@@ -32,9 +66,34 @@ const ProjectCard = (project: TrimmedProject) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all"
+            className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all relative"
             onClick={handleClick}
         >
+            {showActions && (
+                <div className="absolute top-2 right-2 z-10" ref={menuRef}>
+                    <button
+                        onClick={handleMenuToggle}
+                        className="bg-white/80 backdrop-blur-sm hover:bg-gray-100 p-2 rounded-full shadow-md"
+                    >
+                        <FiMoreVertical className="text-gray-700" />
+                    </button>
+
+                    {menuOpen && (
+                        <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg z-20 py-1">
+                            {onDelete && (
+                                <button
+                                    onClick={handleDeleteClick}
+                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+                                >
+                                    <FiTrash2 className="mr-2" />
+                                    Delete Project
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="relative">
                 <div className="h-48 overflow-hidden">
                     <img
@@ -43,7 +102,7 @@ const ProjectCard = (project: TrimmedProject) => {
                         className="w-full h-full object-cover transition-transform hover:scale-105"
                     />
                 </div>
-                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                <div className={`absolute top-4 ${showActions ? 'left-4' : 'right-4'} bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium`}>
                     {formattedBudget}
                 </div>
             </div>

@@ -322,8 +322,8 @@ const ProjectPage = () => {
                         onClick={handleBookmarkToggle}
                         disabled={isBookmarking}
                         className={`p-2 rounded-full ${projectIsBookmarked
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                             } transition-colors`}
                         aria-label={projectIsBookmarked ? "Remove bookmark" : "Add bookmark"}
                     >

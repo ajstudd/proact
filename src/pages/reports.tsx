@@ -15,6 +15,7 @@ const ReportsPage = () => {
     const [filter, setFilter] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
     const [showStats, setShowStats] = useState(true);
+    const [showExportMenu, setShowExportMenu] = useState(false);
 
     // Redirect non-government users
     useEffect(() => {
@@ -111,10 +112,42 @@ const ReportsPage = () => {
         });
     };
 
-    // Simulated export function
+    // Improved export function
     const exportReports = (format: string) => {
-        alert(`Exporting reports as ${format}... This would download a file in a real implementation.`);
+        try {
+            // Close the dropdown after selection
+            setShowExportMenu(false);
+
+            // In a real implementation, this would create the proper file format
+            const exportData = sortedReports.map(report => ({
+                project: report.project.title,
+                description: report.description,
+                status: report.status,
+                date: new Date(report.createdAt).toLocaleString(),
+                reportType: report.fileType
+            }));
+
+            console.log(`Exporting ${exportData.length} reports as ${format}`);
+            alert(`Exporting ${exportData.length} reports as ${format}... This would download a file in a real implementation.`);
+        } catch (err) {
+            console.error("Export error:", err);
+            alert("Failed to export reports. Please try again.");
+        }
     };
+
+    // Function to handle refresh with loading state
+    const handleRefresh = () => {
+        refetch()
+            .then(() => console.log("Reports refreshed successfully"))
+            .catch(err => console.error("Error refreshing reports:", err));
+    };
+
+    // Close export menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => setShowExportMenu(false);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     if (authLoading) {
         return (
@@ -139,7 +172,7 @@ const ReportsPage = () => {
 
                 <div className="flex flex-wrap gap-2">
                     <button
-                        onClick={() => refetch()}
+                        onClick={handleRefresh}
                         className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium bg-white hover:bg-gray-50 text-gray-700"
                     >
                         <FiRefreshCw className="mr-2 h-4 w-4" />
@@ -149,25 +182,31 @@ const ReportsPage = () => {
                     <div className="relative inline-block text-left">
                         <button
                             type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowExportMenu(!showExportMenu);
+                            }}
                             className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium bg-white hover:bg-gray-50 text-gray-700"
                         >
                             <FiDownload className="mr-2 h-4 w-4" />
                             Export
                             <FiChevronRight className="ml-1 h-4 w-4 transform rotate-90" />
                         </button>
-                        <div className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden group-hover:block">
-                            <div className="py-1">
-                                <button onClick={() => exportReports('csv')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                                    Export as CSV
-                                </button>
-                                <button onClick={() => exportReports('pdf')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                                    Export as PDF
-                                </button>
-                                <button onClick={() => exportReports('excel')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                                    Export as Excel
-                                </button>
+                        {showExportMenu && (
+                            <div className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <div className="py-1">
+                                    <button onClick={(e) => { e.stopPropagation(); exportReports('csv'); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                        Export as CSV
+                                    </button>
+                                    <button onClick={(e) => { e.stopPropagation(); exportReports('pdf'); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                        Export as PDF
+                                    </button>
+                                    <button onClick={(e) => { e.stopPropagation(); exportReports('excel'); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                        Export as Excel
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
 
                     <button
@@ -260,7 +299,7 @@ const ReportsPage = () => {
                     <div>
                         <span className="font-medium">Failed to load reports. Please try again.</span>
                         <button
-                            onClick={() => refetch()}
+                            onClick={handleRefresh}
                             className="ml-4 bg-red-100 text-red-800 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors"
                         >
                             Retry

@@ -17,13 +17,12 @@ const commonMenuItems = [
 // Role-specific menu items
 const roleSpecificItems = {
     GOVERNMENT: [
-        { label: "Projects", icon: FiClipboard, path: "/projects" },
         { label: "Contractors", icon: FiUsers, path: "/contractors" },
         { label: "Corruption Reports", icon: FiBriefcase, path: "/reports" },
+        { label: "Projects", icon: FiClipboard, path: "/projects" },
     ],
     CONTRACTOR: [
-        { label: "Assigned Projects", icon: FiClipboard, path: "/contractor-projects" },
-        { label: "Upload Progress", icon: FiUpload, path: "/contractor-progress" },
+        { label: "Assigned Projects", icon: FiClipboard, path: "/projects" },
     ],
     USER: [], // Regular users don't have additional menu items
     ADMIN: [

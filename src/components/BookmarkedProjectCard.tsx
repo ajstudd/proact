@@ -82,8 +82,8 @@ const BookmarkedProjectCard = ({ project, onBookmarkRemoved }: BookmarkedProject
                         className="w-full h-full object-cover transition-transform hover:scale-105"
                     />
                 </div>
-                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    <FiDollarSign className="inline mr-1" /> {formattedBudget}
+                <div className={`absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium`}>
+                    {formattedBudget}
                 </div>
             </div>
 

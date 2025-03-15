@@ -34,7 +34,7 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
         // Replace some items to ensure we have 5 total
         menuItems = [
             { label: "Home", icon: FiHome, path: "/home" },
-            { label: "Projects", icon: FiClipboard, path: "/contractor-projects" },
+            { label: "Assigned Projects", icon: FiClipboard, path: "/projects" },
             { label: "Progress", icon: FiMessageCircle, path: "/contractor-progress" },
             { label: "Notifications", icon: FiBell, path: "/notifications" },
             { label: "Profile", icon: FiUser, path: "/profile" },
