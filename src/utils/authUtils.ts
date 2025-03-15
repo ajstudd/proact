@@ -56,5 +56,7 @@ export const getToken = getAuthToken;
 export const clearAuthData = (): void => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("authData");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
   }
 };

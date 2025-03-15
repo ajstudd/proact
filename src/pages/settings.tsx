@@ -20,19 +20,21 @@ import {
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FiLogOut, FiLock, FiFileText, FiMessageSquare } from "react-icons/fi";
-import { logout } from "../utils/auth";
+import { useAuth } from "../contexts/AuthContext";
 import { useLogoutMutation } from "../services/authApi";
 import ChangePassword from "../components/settings/ChangePassword";
+import { useSubmitFeedbackMutation } from "../services/feedbackApi";
 
 export default function Settings() {
   const router = useRouter();
   const toast = useToast();
+  const { logout } = useAuth();
   const [logoutApi] = useLogoutMutation();
 
   // For feedback modal
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [feedbackText, setFeedbackText] = useState("");
-  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [submitFeedback, { isLoading: isSubmittingFeedback }] = useSubmitFeedbackMutation();
 
   // For change password modal
   const {
@@ -43,14 +45,8 @@ export default function Settings() {
 
   const handleLogout = async () => {
     try {
-      // Get refresh token if you're storing it
-      // const refreshToken = getRefreshToken();
-
-      // Call the logout API endpoint if needed
-      // await logoutApi(refreshToken).unwrap();
-
-      // Clear local auth data
-      await logout();
+      // Call the logout function from AuthContext
+      logout();
 
       toast({
         title: "Logged out successfully",
@@ -85,15 +81,14 @@ export default function Settings() {
       return;
     }
 
-    setIsSubmittingFeedback(true);
-    // Here you would send the feedback to your API
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await submitFeedback({
+        description: feedbackText.trim()
+      }).unwrap();
 
       toast({
         title: "Feedback submitted",
-        description: "Thank you for your feedback!",
+        description: response.message || "Thank you for your feedback!",
         status: "success",
         duration: 3000,
         isClosable: true,
@@ -102,6 +97,7 @@ export default function Settings() {
       setFeedbackText("");
       onClose();
     } catch (error) {
+      console.error("Failed to submit feedback:", error);
       toast({
         title: "Error",
         description: "Failed to submit feedback. Please try again later.",
@@ -109,8 +105,6 @@ export default function Settings() {
         duration: 3000,
         isClosable: true,
       });
-    } finally {
-      setIsSubmittingFeedback(false);
     }
   };
 

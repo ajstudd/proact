@@ -291,16 +291,16 @@ const ProjectPage = () => {
     if (!project) return <p className="text-center text-gray-500 mt-20">Project not found.</p>;
 
     // Check if user has liked or disliked the project
-    const userHasLiked = isAuthenticated && project.likes.includes(userId || '');
-    const userHasDisliked = isAuthenticated && project.dislikes.includes(userId || '');
+    const userHasLiked = isAuthenticated && project.likes?.includes(userId || '');
+    const userHasDisliked = isAuthenticated && project.dislikes?.includes(userId || '');
 
     // Check if project is bookmarked
     const projectIsBookmarked = isAuthenticated && projectId ? isProjectBookmarked(projectId) : false;
 
     // Using RBAC approach for checking update management permissions
     const canManageUpdates = isAuthenticated &&
-        ((isGovernment && project.government._id === userId) ||
-            (isContractor && project.contractor._id === userId));
+        ((isGovernment && project.government?._id === userId) ||
+            (isContractor && project.contractor?._id === userId));
 
     return (
         <motion.div

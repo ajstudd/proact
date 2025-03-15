@@ -1,4 +1,8 @@
-import { ProjectsResponse, BookmarkedProjectsResponse, TrimmedProjectsResponse } from "types/project";
+import {
+  ProjectsResponse,
+  BookmarkedProjectsResponse,
+  TrimmedProjectsResponse,
+} from "types/project";
 import {
   UpdateUserPayload,
   UpdateUserResponse,
@@ -92,6 +96,16 @@ export const userApi = createApi({
       query: () => "/projects",
       providesTags: ["Projects"],
     }),
+    resetPassword: builder.mutation<
+      { message: string; success: boolean },
+      { oldPassword: string; newPassword: string }
+    >({
+      query: (credentials) => ({
+        url: "/reset-password",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
   }),
 });
 
@@ -105,4 +119,5 @@ export const {
   useRemoveBookmarkMutation,
   useGetBookmarkedProjectsQuery,
   useGetUserProjectsQuery,
+  useResetPasswordMutation, // Export the new hook
 } = userApi;

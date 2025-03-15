@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { FaUserShield, FaCheckCircle, FaTimesCircle, FaUser, FaEdit, FaBookmark, FaComments, FaProjectDiagram } from "react-icons/fa";
-import { getUserData } from "@utils";
 import { useState } from "react";
 import EditProfileModal from "../components/profile/EditProfileModal";
 import UserCommentsTab from "../components/profile/UserCommentsTab";

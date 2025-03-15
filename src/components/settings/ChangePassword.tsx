@@ -12,6 +12,7 @@ import {
     IconButton,
 } from '@chakra-ui/react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { useResetPasswordMutation } from '../../services/userApi';
 
 interface ChangePasswordProps {
     onComplete: () => void;
@@ -21,7 +22,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onComplete }) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -32,6 +32,8 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onComplete }) => {
         confirmPassword: '',
     });
 
+    // Use the reset password mutation
+    const [resetPassword, { isLoading }] = useResetPasswordMutation();
     const toast = useToast();
 
     const validateForm = () => {
@@ -51,8 +53,9 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onComplete }) => {
         if (!newPassword) {
             newErrors.newPassword = 'New password is required';
             isValid = false;
-        } else if (newPassword.length < 8) {
-            newErrors.newPassword = 'Password must be at least 8 characters';
+        } else if (newPassword.length < 6) {
+            // Changed from 8 to 6 to match backend validation
+            newErrors.newPassword = 'Password must be at least 6 characters';
             isValid = false;
         }
 
@@ -72,33 +75,40 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onComplete }) => {
             return;
         }
 
-        setIsLoading(true);
-
         try {
-            // Call your API to change password here
-            // Example: await changePasswordMutation({ currentPassword, newPassword });
-
-            // Simulate API call for now
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Call the reset password API endpoint
+            const response = await resetPassword({
+                oldPassword: currentPassword,
+                newPassword: newPassword
+            }).unwrap();
 
             toast({
-                title: 'Password changed successfully',
+                title: 'Success',
+                description: response.message || 'Password changed successfully',
                 status: 'success',
                 duration: 3000,
                 isClosable: true,
             });
 
             onComplete();
-        } catch (error) {
+        } catch (error: any) {
+            const errorMessage = error.data?.message || 'Error changing password. Please try again.';
+
+            // Check for specific error messages from the backend
+            if (errorMessage.includes('incorrect')) {
+                setErrors({
+                    ...errors,
+                    currentPassword: 'Current password is incorrect'
+                });
+            }
+
             toast({
-                title: 'Error changing password',
-                description: 'Please try again later',
+                title: 'Error',
+                description: errorMessage,
                 status: 'error',
                 duration: 5000,
                 isClosable: true,
             });
-        } finally {
-            setIsLoading(false);
         }
     };
 
