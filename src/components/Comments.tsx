@@ -123,6 +123,9 @@ const CommentItem = memo(({
     const userDisliked = comment.dislikes.includes(currentUserId || '');
     const isCommentAuthor = currentUserId === comment.user._id;
 
+    // Check if this comment is already a reply to prevent nested replies
+    const isAlreadyAReply = Boolean(comment.parentComment);
+
     const handleReplyClick = () => {
         if (isAuthenticated) {
             setShowReplyInput(prev => !prev);
@@ -172,12 +175,16 @@ const CommentItem = memo(({
                             <FiThumbsDown className={`mr-1 ${userDisliked ? 'text-red-600' : ''}`} />
                             {comment.dislikes.length}
                         </button>
-                        <button
-                            onClick={handleReplyClick}
-                            className="flex items-center text-sm text-gray-600 hover:text-blue-600"
-                        >
-                            <FiMessageSquare className="mr-1" /> Reply
-                        </button>
+
+                        {/* Only show reply button for top-level comments */}
+                        {!isAlreadyAReply && (
+                            <button
+                                onClick={handleReplyClick}
+                                className="flex items-center text-sm text-gray-600 hover:text-blue-600"
+                            >
+                                <FiMessageSquare className="mr-1" /> Reply
+                            </button>
+                        )}
 
                         {/* Show delete button if user is the author */}
                         {isCommentAuthor && onDelete && (
