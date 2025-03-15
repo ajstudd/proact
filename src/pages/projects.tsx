@@ -10,6 +10,7 @@ import { TrimmedProject } from "types/project";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { Dialog } from "../components/Dialog"; // Updated import to use our custom Dialog
+import { Heading } from "@chakra-ui/react";
 
 const ProjectsPage = () => {
     const [mounted, setMounted] = useState(false);
@@ -63,11 +64,17 @@ const ProjectsPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 md:p-6 max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 text-center mb-6">My Projects</h1>
+        <div className="min-h-screen bg-gray-100 p-4 max-w-6xl mx-auto">
+            <div className=" rounded-t-lg mb-6">
+                <div className="flex justify-between items-center max-w-6xl mx-auto">
+                    <Heading as="h1" size="lg">
+                        My Projects
+                    </Heading>
+                </div>
+            </div>
 
             {/* Create Project Button */}
-            {user && (user.isAuthenticated || user.role === "GOVERNMENT") && (
+            {user && (user.isAuthenticated && user.role === "GOVERNMENT") && (
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}

@@ -8,6 +8,7 @@ import UserCommentsTab from "../components/profile/UserCommentsTab";
 import BookmarkedProjectsTab from "../components/profile/BookmarkedProjectsTab";
 import UserProjectsTab from "../components/profile/UserProjectsTab";
 import useUserState from "hooks/useUserState";
+import { Heading } from "@chakra-ui/react";
 
 type TabType = "comments" | "bookmarks" | "projects";
 
@@ -37,89 +38,94 @@ export default function Profile() {
 
   return (
     <motion.div
-      className="flex flex-col items-center rounded-lg bg-gray-900 text-white min-h-screen p-6"
+      className="flex flex-col rounded-lg bg-gray-900 text-white min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Profile Card */}
-      <motion.div
-        className="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg text-center"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <img
-          className="w-24 h-24 rounded-full mx-auto border-4 border-blue-500 shadow-md"
-          src={profileInfo.profile}
-          alt="Profile"
-        />
-        <h2 className="text-2xl font-bold mt-4">{profileInfo.name}</h2>
-        <p className="text-gray-400">{profileInfo.email}</p>
-
-        {/* User Role & Verification Status */}
-        <div className="mt-4 flex justify-center gap-4 text-gray-300">
-          <div className="flex items-center gap-2">
-            {profileInfo.isVerified ? (
-              <>
-                <FaCheckCircle className="text-green-400 text-xl" />
-                <p className="text-sm font-semibold">Verified</p>
-              </>
-            ) : (
-              <>
-                <FaTimesCircle className="text-red-400 text-xl" />
-                <p className="text-sm font-semibold">Not Verified</p>
-              </>
-            )}
-          </div>
+      {/* Header */}
+      <div className="bg-gray-800 p-4 rounded-t-lg">
+        <div className="flex justify-between items-center max-w-6xl mx-auto">
+          <Heading as="h1" size="lg">
+            Profile
+          </Heading>
         </div>
+      </div>
 
-        {/* Edit Profile Button */}
-        <button
-          className="mt-4 flex items-center gap-2 text-blue-400 hover:text-blue-300 mx-auto"
-          onClick={handleEditProfile}
+      {/* Profile content */}
+      <div className="p-6 max-w-6xl mx-auto w-full">
+        {/* Profile Card */}
+        <motion.div
+          className="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg text-center mx-auto"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
-          <FaEdit /> Edit Profile
-        </button>
-      </motion.div>
+          <img
+            className="w-24 h-24 rounded-full mx-auto border-4 border-blue-500 shadow-md"
+            src={profileInfo.profile}
+            alt="Profile"
+          />
+          <h2 className="text-2xl font-bold mt-4">{profileInfo.name}</h2>
+          <p className="text-gray-400">{profileInfo.email}</p>
 
-      {/* Sections */}
-      <motion.div
-        className="mt-8 w-full max-w-2xl"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7 }}
-      >
-        {/* Navigation Tabs */}
-        <div className="flex border-b border-gray-700 pb-2">
+          {/* User Role & Verification Status */}
+          <div className="mt-4 flex justify-center gap-4 text-gray-300">
+            <div className="flex items-center gap-2">
+              {profileInfo.isVerified ? (
+                <>
+                  <FaCheckCircle className="text-green-400 text-xl" />
+                  <p className="text-sm font-semibold">Verified</p>
+                </>
+              ) : (
+                <>
+                  <FaTimesCircle className="text-red-400 text-xl" />
+                  <p className="text-sm font-semibold">Not Verified</p>
+                </>
+              )}
+            </div>
+          </div>
 
+          {/* Edit Profile Button */}
           <button
-            className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'comments' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
-            onClick={() => handleTabChange('comments')}
+            className="mt-4 flex items-center gap-2 text-blue-400 hover:text-blue-300 mx-auto"
+            onClick={handleEditProfile}
           >
-            <FaComments /> My Comments
+            <FaEdit /> Edit Profile
           </button>
-          <button
-            className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'bookmarks' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
-            onClick={() => handleTabChange('bookmarks')}
-          >
-            <FaBookmark /> Bookmarked Projects
-          </button>
-        </div>
+        </motion.div>
 
-        {/* // <button
-          //   className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'projects' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
-          //   onClick={() => handleTabChange('projects')}
-          // >
-          //   <FaProjectDiagram /> My Projects
-          // </button> */}
-        {/* Tab Content */}
-        <div className="mt-6">
-          {activeTab === 'comments' && <UserCommentsTab />}
-          {activeTab === 'bookmarks' && <BookmarkedProjectsTab />}
-          {/* {activeTab === 'projects' && <UserProjectsTab />} */}
-        </div>
-      </motion.div>
+        {/* Sections */}
+        <motion.div
+          className="mt-8 w-full max-w-2xl mx-auto"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7 }}
+        >
+          {/* Navigation Tabs */}
+          <div className="flex border-b border-gray-700 pb-2">
+            <button
+              className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'comments' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+              onClick={() => handleTabChange('comments')}
+            >
+              <FaComments /> My Comments
+            </button>
+            <button
+              className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'bookmarks' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400 hover:text-blue-300'}`}
+              onClick={() => handleTabChange('bookmarks')}
+            >
+              <FaBookmark /> Bookmarked Projects
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          <div className="mt-6">
+            {activeTab === 'comments' && <UserCommentsTab />}
+            {activeTab === 'bookmarks' && <BookmarkedProjectsTab />}
+            {/* {activeTab === 'projects' && <UserProjectsTab />} */}
+          </div>
+        </motion.div>
+      </div>
 
       {/* Edit Profile Modal */}
       <EditProfileModal

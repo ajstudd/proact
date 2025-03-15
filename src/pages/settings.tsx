@@ -15,7 +15,9 @@ import {
   FormControl,
   FormLabel,
   Textarea,
-  useDisclosure
+  useDisclosure,
+  Heading,
+  Flex
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -113,67 +115,74 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex flex-col py-2 gap-4 h-max w-full">
-      <Box>
-        <h1 className="font-bold text-2xl">Settings</h1>
+    <div className="min-h-screen">
+      {/* Header */}
+      <Box className=" p-4 rounded-t-lg">
+        <Flex justifyContent="space-between" alignItems="center" maxWidth="6xl" mx="auto">
+          <Heading as="h1" size="lg">
+            Settings
+          </Heading>
+        </Flex>
       </Box>
 
-      <VStack spacing={4} align="stretch" w="100%" maxW="600px" mx="auto">
-        {/* Account Settings Section */}
-        <Box>
-          <Text fontSize="lg" fontWeight="bold" mb={2}>Account Settings</Text>
-          <Divider mb={4} />
+      <div className="p-6 max-w-6xl mx-auto">
+        <VStack spacing={4} align="stretch" w="100%" maxW="600px" mx="auto">
+          {/* Account Settings Section */}
+          <Box>
+            <Text fontSize="lg" fontWeight="bold" mb={2}>Account Settings</Text>
+            <Divider mb={4} />
 
-          <Button
-            leftIcon={<FiLock />}
-            variant="outline"
-            w="100%"
-            justifyContent="flex-start"
-            mb={3}
-            onClick={onChangePasswordOpen}
-          >
-            Change Password
-          </Button>
+            <Button
+              leftIcon={<FiLock />}
+              variant="outline"
+              w="100%"
+              justifyContent="flex-start"
+              mb={3}
+              onClick={onChangePasswordOpen}
+            >
+              Change Password
+            </Button>
 
-          <Button
-            leftIcon={<FiLogOut />}
-            colorScheme="red"
-            variant="outline"
-            w="100%"
-            justifyContent="flex-start"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </Box>
+            <Button
+              leftIcon={<FiLogOut />}
+              colorScheme="red"
+              variant="outline"
+              w="100%"
+              justifyContent="flex-start"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </Box>
 
-        {/* Support & Info Section */}
-        <Box mt={6}>
-          <Text fontSize="lg" fontWeight="bold" mb={2}>Support & Information</Text>
-          <Divider mb={4} />
+          {/* Support & Info Section */}
+          <Box mt={6}>
+            <Text fontSize="lg" fontWeight="bold" mb={2}>Support & Information</Text>
+            <Divider mb={4} />
 
-          <Button
-            leftIcon={<FiMessageSquare />}
-            variant="outline"
-            w="100%"
-            justifyContent="flex-start"
-            mb={3}
-            onClick={onOpen}
-          >
-            Send Feedback
-          </Button>
+            <Button
+              leftIcon={<FiMessageSquare />}
+              variant="outline"
+              w="100%"
+              justifyContent="flex-start"
+              mb={3}
+              onClick={onOpen}
+            >
+              Send Feedback
+            </Button>
 
-          <Button
-            leftIcon={<FiFileText />}
-            variant="outline"
-            w="100%"
-            justifyContent="flex-start"
-            onClick={navigateToPrivacyPolicy}
-          >
-            Privacy Policy
-          </Button>
-        </Box>
-      </VStack>
+            <Button
+              leftIcon={<FiFileText />}
+              variant="outline"
+              w="100%"
+              justifyContent="flex-start"
+              onClick={navigateToPrivacyPolicy}
+            >
+              Privacy Policy
+            </Button>
+          </Box>
+        </VStack>
+      </div>
 
       {/* Feedback Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>

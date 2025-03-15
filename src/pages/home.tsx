@@ -9,6 +9,7 @@ import { FiPlus, FiLoader } from "react-icons/fi";
 import RoleBasedGuard from "components/RoleBasedGuard";
 import { useRBAC } from "hooks/useRBAC";
 import { TrimmedProject } from "types/project";
+import { Heading } from "@chakra-ui/react";
 
 const HomePage = () => {
     const [mounted, setMounted] = useState(false);
@@ -29,8 +30,14 @@ const HomePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 md:p-6 max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 text-center mb-6">Government Projects</h1>
+        <div className="min-h-screen bg-gray-100 p-4 max-w-6xl mx-auto">
+            <div className=" rounded-t-lg mb-6">
+                <div className="flex justify-between items-center max-w-6xl mx-auto">
+                    <Heading as="h1" size="lg">
+                        Government Projects
+                    </Heading>
+                </div>
+            </div>
 
             {/* Create Project Toggle Button - Only rendered for users with appropriate permission */}
             <RoleBasedGuard
