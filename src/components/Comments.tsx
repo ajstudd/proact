@@ -4,6 +4,7 @@ import { FiSend, FiThumbsUp, FiThumbsDown, FiTrash, FiMessageSquare } from "reac
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useCommentsState, Comment } from "../hooks/useCommentsState";
 import { useDispatch } from "react-redux";
+import { useAddCommentMutation } from "../services/projectApi";
 
 interface CommentsProps {
     projectId: string;
@@ -106,6 +107,7 @@ const CommentItem = memo(({
     isAuthenticated: boolean;
 }) => {
     const [showReplyInput, setShowReplyInput] = useState(false);
+    const dispatch = useDispatch();
 
     // Format date string
     const formatDate = (dateString: string) => {
@@ -247,6 +249,12 @@ export const Comments: React.FC<CommentsProps> = memo(({
     // Get comments state from our custom hook
     const commentsState = useCommentsState(projectId);
 
+    // Add API mutation hook for adding comments/replies
+    const [addCommentMutation] = useAddCommentMutation();
+
+    // Keep a local reference to track when comments change
+    const [commentVersion, setCommentVersion] = useState(0);
+
     // Use the userId from the hook if not provided directly
     const effectiveUserId = currentUserId || userId;
 
@@ -254,6 +262,7 @@ export const Comments: React.FC<CommentsProps> = memo(({
     useEffect(() => {
         if (comments && comments.length > 0) {
             commentsState.initializeComments(comments);
+            setCommentVersion(prev => prev + 1); // Increment version to force refresh
         }
     }, [comments.length, comments.map(c => c._id).join(',')]);
 
@@ -261,6 +270,7 @@ export const Comments: React.FC<CommentsProps> = memo(({
     const handleNewComment = useCallback((text: string) => {
         if (isAuthenticated) {
             onAddComment(text);
+            // No need to update local state here as API call will refresh data
         } else {
             alert("You must be logged in to comment");
         }
@@ -269,9 +279,28 @@ export const Comments: React.FC<CommentsProps> = memo(({
     // Handle adding a reply
     const handleReply = useCallback((parentId: string, text: string) => {
         if (isAuthenticated) {
-            onAddComment(text, parentId);
+            // Call the API
+            addCommentMutation({
+                projectId,
+                comment: text,
+                parentCommentId: parentId
+            })
+                .unwrap()
+                .then(response => {
+                    // Use the response data to update Redux store
+                    if (response && response.comment) {
+                        // Update local state with the returned comment data
+                        commentsState.addReply(parentId, response.comment);
+                    }
+
+                    // Still call the parent component's handler for any additional logic
+                    onAddComment(text, parentId);
+                })
+                .catch(error => {
+                    console.error("Failed to add reply:", error);
+                });
         }
-    }, [isAuthenticated, onAddComment]);
+    }, [isAuthenticated, projectId, addCommentMutation, commentsState, onAddComment]);
 
     // Handle like action with optimistic UI update
     const handleLike = useCallback((commentId: string) => {

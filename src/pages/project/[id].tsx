@@ -154,14 +154,38 @@ const ProjectPage = () => {
         }
 
         try {
-            // API call first, no need for optimistic updates as Redux will handle the state
-            await addComment({
+            // API call first
+            const response = await addComment({
                 projectId,
                 comment,
                 parentCommentId
             }).unwrap();
+            console.log('response in comment', response)
 
-            toast.success("Comment added successfully");
+            // On successful response, update the local comments state
+            if (response && response.comment) {
+                setLocalComments(prevComments => {
+                    // For replies, find parent comment and add the new reply
+                    if (parentCommentId) {
+                        return prevComments.map(c => {
+                            if (c._id === parentCommentId) {
+                                // Ensure replies array exists
+                                const replies = Array.isArray(c.replies) ? [...c.replies] : [];
+                                // Return updated comment with new reply added
+                                return {
+                                    ...c,
+                                    replies: [...replies, response.comment]
+                                };
+                            }
+                            return c;
+                        });
+                    }
+                    // For top-level comments
+                    return [response.comment, ...prevComments];
+                });
+            }
+
+            toast.success(parentCommentId ? "Reply added successfully" : "Comment added successfully");
         } catch (error) {
             console.error("Failed to add comment:", error);
             toast.error("Failed to add comment");

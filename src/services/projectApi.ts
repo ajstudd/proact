@@ -284,6 +284,13 @@ export const projectApi = api.injectEndpoints({
           },
         };
       },
+      transformResponse: (response: any) => {
+        if (response.status === "error") {
+          throw new Error(response.message);
+        }
+        // Return the comment data for immediate UI update
+        return response;
+      },
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Projects", id: projectId },
       ],
