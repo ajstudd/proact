@@ -30,11 +30,9 @@ const Login = () => {
 
     try {
       const response = await login(formData).unwrap();
-      console.log("response", response);
       toast.success("Login successful!");
 
       const { token, user } = response?.resp;
-      console.log('response?.resp', response?.resp)
 
       // ✅ Store token & user details
       setAuthData(token, user);

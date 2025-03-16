@@ -9,7 +9,6 @@ import { clearAuthData } from "../utils/authUtils";
  */
 export const useUserState = () => {
   const user = useSelector((state: RootState) => state.userSlice);
-  console.log("user", user);
   const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
 

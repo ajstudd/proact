@@ -8,7 +8,6 @@ export const projectApi = api.injectEndpoints({
     createProject: builder.mutation({
       query: (formData) => {
         const token = getAuthToken();
-        console.log("token", token);
         return {
           url: "/create",
           method: "POST",

@@ -73,7 +73,6 @@ export const useProfile = () => {
   const handleProfileUpdate = async (formData: FormData) => {
     try {
       const result = await editProfile(formData).unwrap();
-      console.log("result", result);
       // Update user state with new profile data
       if (result) {
         updateUser({

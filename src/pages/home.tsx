@@ -15,7 +15,6 @@ const HomePage = () => {
     const [mounted, setMounted] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const { data: projects, isLoading, isError, refetch } = useGetTrimmedProjectsQuery({});
-    console.log('projects', projects);
     const { hasPermission } = useRBAC();
 
     useEffect(() => {
