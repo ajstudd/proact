@@ -77,12 +77,12 @@ function Testimonials() {
         <Testimonial
           name="Ravi Kumar"
           text="This platform has completely transformed how we track public projects!"
-          image="/svgs/user1.svg"
+          image="/man.svg"
         />
         <Testimonial
           name="Ananya Singh"
           text="I feel more empowered as a citizen knowing where my tax money is going."
-          image="/svgs/user2.svg"
+          image="/woman.svg"
         />
       </Stack>
     </Box>
@@ -138,22 +138,22 @@ function FeaturesSection() {
         <FeatureCard
           title="Real-Time Updates"
           description="Stay informed with live updates on government projects."
-          svgPath="/svgs/real-time.svg"
+          svgPath="/real-updates.svg"
         />
         <FeatureCard
           title="Public Engagement"
           description="Empower citizens to give feedback, vote, and report issues."
-          svgPath="/svgs/engagement.svg"
+          svgPath="/public-talk.svg"
         />
         <FeatureCard
           title="Secure & Anonymous Reporting"
           description="Ensure corruption reports remain confidential."
-          svgPath="/svgs/secure-reporting.svg"
+          svgPath="/security.svg"
         />
         <FeatureCard
           title="Geotagged Projects"
           description="View projects on an interactive OpenStreetMap."
-          svgPath="/svgs/geotagging.svg"
+          svgPath="/geotag.svg"
         />
       </Flex>
     </Box>
