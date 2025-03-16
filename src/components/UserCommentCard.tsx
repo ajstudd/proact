@@ -11,7 +11,6 @@ interface UserCommentCardProps {
 }
 
 export const UserCommentCard: React.FC<UserCommentCardProps> = ({ comment }) => {
-    console.log('comment', comment);
     return (
         <Box
             p={4}

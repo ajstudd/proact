@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Modal,
     ModalOverlay,
@@ -11,20 +11,16 @@ import {
     FormControl,
     FormLabel,
     Input,
-    FormErrorMessage,
     VStack,
     Avatar,
     Flex,
     Box,
     Tooltip,
     Icon,
-    Text,
     useToast
 } from "@chakra-ui/react";
 import { FaInfoCircle } from "react-icons/fa";
 import { useProfile } from "../../hooks/useProfile";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 
 interface EditProfileModalProps {
     isOpen: boolean;
@@ -42,65 +38,73 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose }) 
         setImagePreview
     } = useProfile();
 
-    const formik = useFormik({
-        enableReinitialize: true, // Add this line to enable reinitialization
-        initialValues: {
-            name: profileData?.name || "",
-            email: profileData?.email || "",
-            phone: profileData?.phone || "",
-            photo: null as File | null
-        },
-        validationSchema: Yup.object({
-            name: Yup.string().required("Name is required"),
-            email: Yup.string().email("Invalid email address").required("Email is required"),
-            phone: Yup.string().required("Phone number is required"),
-            photo: Yup.mixed()
-        }),
-        onSubmit: async (values: any) => {
-            const formData = new FormData();
-            formData.append("name", values.name);
-
-            if (values.email !== profileData?.email) {
-                formData.append("email", values.email);
-            }
-
-            if (values.phone !== profileData?.phone) {
-                formData.append("phone", values.phone);
-            }
-
-            if (values.photo) {
-                formData.append("photo", values.photo);
-            }
-
-            try {
-                await editProfile(formData);
-                toast({
-                    title: "Profile updated",
-                    description: values.email !== profileData?.email ?
-                        "Please check your email to verify your new email address" :
-                        "Your profile has been successfully updated",
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true,
-                });
-                onClose();
-            } catch (error: any) {
-                toast({
-                    title: "Update failed",
-                    description: error.data?.message || "Something went wrong",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
-        },
+    const [formValues, setFormValues] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        photo: null as File | null | undefined
     });
+
+    useEffect(() => {
+        if (profileData) {
+            setFormValues({
+                name: profileData.name || "",
+                email: profileData.email || "",
+                phone: profileData.phone || "",
+                photo: null
+            });
+        }
+    }, [profileData]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            [name]: value
+        }));
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            formik.setFieldValue("photo", file);
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                photo: file
+            }));
             handleImageChange(e);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const formData = new FormData();
+            formData.append("name", formValues.name);
+            formData.append("email", formValues.email);
+            formData.append("phone", formValues.phone);
+            if (formValues.photo) {
+                formData.append("photo", formValues.photo);
+            }
+
+            await editProfile(formData);
+
+            toast({
+                title: "Profile updated",
+                description: "Your profile has been successfully updated",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            });
+            onClose();
+        } catch (error: any) {
+            console.error("Profile update error:", error);
+            toast({
+                title: "Update failed",
+                description: error.data?.message || "Something went wrong during profile update",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
 
@@ -111,7 +115,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose }) 
                 <ModalHeader>Edit Profile</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <form onSubmit={formik.handleSubmit}>
+                    <form onSubmit={handleSubmit}>
                         <VStack spacing={4}>
                             <Flex direction="column" alignItems="center" w="full">
                                 <Avatar
@@ -136,19 +140,17 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose }) 
                                 </FormControl>
                             </Flex>
 
-                            <FormControl isInvalid={!!formik.touched.name && !!formik.errors.name}>
+                            <FormControl>
                                 <FormLabel htmlFor="name">Name</FormLabel>
                                 <Input
                                     id="name"
                                     name="name"
-                                    value={formik.values.name}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
+                                    value={formValues.name}
+                                    onChange={handleChange}
                                 />
-                                <FormErrorMessage>{typeof formik.errors.email === 'string' ? formik.errors.email : ''}</FormErrorMessage>
                             </FormControl>
 
-                            <FormControl isInvalid={!!formik.touched.email && !!formik.errors.email}>
+                            <FormControl>
                                 <FormLabel htmlFor="email">
                                     Email
                                     <Tooltip
@@ -164,14 +166,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose }) 
                                     id="email"
                                     name="email"
                                     type="email"
-                                    value={formik.values.email}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
+                                    value={formValues.email}
+                                    onChange={handleChange}
                                 />
-                                <FormErrorMessage>{typeof formik.errors.email === 'string' ? formik.errors.email : ''}</FormErrorMessage>
                             </FormControl>
 
-                            <FormControl isInvalid={!!formik.touched.phone && !!formik.errors.phone}>
+                            <FormControl>
                                 <FormLabel htmlFor="phone">
                                     Phone
                                     <Tooltip
@@ -186,11 +186,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose }) 
                                 <Input
                                     id="phone"
                                     name="phone"
-                                    value={formik.values.phone}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
+                                    value={formValues.phone}
+                                    onChange={handleChange}
                                 />
-                                <FormErrorMessage>{typeof formik.errors.email === 'string' ? formik.errors.email : ''}</FormErrorMessage>
                             </FormControl>
                         </VStack>
 
@@ -200,8 +198,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose }) 
                             </Button>
                             <Button
                                 colorScheme="blue"
-                                type="submit"
                                 isLoading={isEditProfileLoading}
+                                type="submit"
                             >
                                 Save Changes
                             </Button>
