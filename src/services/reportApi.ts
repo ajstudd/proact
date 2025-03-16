@@ -14,7 +14,10 @@ export interface Report {
   fileUrl: string;
   fileType: "image" | "pdf" | "none";
   reportedBy: {
-    userId?: string;
+    userId?: {
+      _id: string;
+      name: string;
+    } | null;
     isAnonymous: boolean;
   };
   status: "pending" | "investigating" | "resolved" | "rejected";

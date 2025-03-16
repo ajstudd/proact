@@ -183,7 +183,7 @@ const ReportDetailPage = () => {
             return "Anonymous Report";
         }
         if (report.reportedBy.userId) {
-            return `Reported by: ${report.reportedBy.userId}`;
+            return `Reported by: ${report.reportedBy.userId?.name}, UID: ${report.reportedBy.userId?._id}`;
         }
         return `Reporter ID: ${report.reportedBy.userId || "Unknown"}`;
     };
