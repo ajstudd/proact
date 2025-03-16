@@ -50,8 +50,7 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
 
     return (
         <Box as="header" className="bg-gray-800 text-white px-6 shadow-md fixed w-full top-0 z-20 h-16 flex items-center">
-            <Text fontSize="xl" fontWeight="bold" className="w-[33%]">Proactive India</Text>
-
+            <Text fontSize="4xl" fontWeight="bold" className="w-[33%]">Proactive India</Text>
             <Flex className="w-[67%] mx-auto px-1 lg:px-4 justify-between sm:justify-end items-center">
                 {/* Conditionally Render Search Bar & Button */}
                 {!hideSearch && (
@@ -64,7 +63,7 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                                 className="absolute left-6 text-gray-500 bg-transparent"
                             />
                             <Input
-                                className="pl-12 pr-12 py-1 text-black w-full rounded-lg shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="pl-12 pr-12 py-[4px] text-black w-full rounded-md shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Search projects..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -79,21 +78,24 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                                 />
                             )}
                         </div>
-
-                        {/* Mobile Search Icon (Only visible on small screens) */}
-                        {screenSize === "small" && (
-                            <IconButton
-                                aria-label="Search"
-                                icon={<FiSearch />}
-                                className="text-white"
-                                onClick={() => setIsSearchOpen(true)}
-                            />
-                        )}
                     </>
                 )}
 
                 {/* User Profile and Authentication Section - Fixed alignment */}
-                <Flex ml="auto" alignItems="center">
+                <Flex ml="auto" alignItems="center" gap={2}>
+                    {/* Mobile Search Icon - Moved here to be next to the profile picture */}
+                    {!hideSearch && screenSize === "small" && (
+                        <IconButton
+                            aria-label="Search"
+                            icon={<FiSearch />}
+                            className="text-white"
+                            w={32}
+                            h={32}
+                            marginRight={8}
+                            onClick={() => setIsSearchOpen(true)}
+                        />
+                    )}
+
                     {isAuthenticated ? (
                         <Menu placement="bottom-end" offset={[0, 5]} gutter={0}>
                             <MenuButton
@@ -107,7 +109,7 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                                 h="auto"
                             >
                                 <Image
-                                    src={user?.photo || "/default-avatar.png"}
+                                    src={user?.photo || "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="}
                                     alt={user?.name || "User"}
                                     className="rounded-full cursor-pointer border-solid border-[2px] border-gray-200"
                                     width={32}
@@ -153,16 +155,16 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                 </Flex>
             </Flex>
 
-            {/* Mobile Expanding Search Bar (Visible only when active) */}
             {isSearchOpen && !hideSearch && screenSize === "small" && (
                 <motion.div
                     initial={{ width: "0px", opacity: 0 }}
                     animate={{ width: "100%", opacity: 1 }}
                     exit={{ width: "0px", opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="absolute top-16 left-0 w-full p-4 bg-gray-900 flex items-center gap-2"
                 >
                     <Input
-                        className="text-black flex-1 rounded-lg px-4 shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="text-black flex-1 rounded-md px-6 py-[4px] shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Search projects..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
