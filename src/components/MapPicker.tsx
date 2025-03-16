@@ -74,7 +74,6 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
             const data = await res.json();
 
             if (data.length > 0) {
-                console.log('data', data);
                 setSuggestions(data);
             } else {
                 toast.error("Location not found!");

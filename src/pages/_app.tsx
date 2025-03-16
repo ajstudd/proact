@@ -25,7 +25,7 @@ const roboto = Roboto({
 });
 
 // Pages that don't require authentication
-const publicPages = ["/home", "/project/[id]"];
+const publicPages = ["/home", "/project/[id], /otp/[email]"];
 const noAuthPages = ["/login", "/signup", "/onboarding", "/", "/otp/[email]"];
 
 function AppContent({ Component, pageProps }: AppProps) {

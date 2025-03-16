@@ -43,7 +43,6 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
     children,
     publicPages = []
 }) => {
-    console.log('publicPages', publicPages)
     const [isLoading, setIsLoading] = useState(true);
     const dispatch = useDispatch();
     const pathname = usePathname();
@@ -79,16 +78,14 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
                     // Handle exact matches
                     if (publicPath === pathname) return true;
 
-                    // Handle dynamic routes like /project/[id]
-                    if (publicPath.includes('[id]')) {
+                    // Handle dynamic routes like /project/[id] or /otp/[email]
+                    if (publicPath.includes('[')) {
                         const baseRoute = publicPath.split('/[')[0];
-                        console.log('baseRoute', baseRoute)
                         return pathname?.startsWith(baseRoute);
                     }
                     return false;
                 });
 
-                console.log('isPublicPage', isPublicPage);
                 // If not on a public page, redirect to login
                 if (!isPublicPage) {
                     console.log("Redirecting to login");

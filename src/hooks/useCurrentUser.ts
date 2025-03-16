@@ -7,7 +7,6 @@ import { useAuth } from "../contexts/AuthContext";
  */
 export const useCurrentUser = () => {
   const userState = useSelector((state: RootState) => state.userSlice);
-  console.log("userState", userState);
   const auth = useAuth();
 
   return {

@@ -52,7 +52,7 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
         <Box as="header" className="bg-gray-800 text-white px-6 shadow-md fixed w-full top-0 z-20 h-16 flex items-center">
             <Text fontSize="xl" fontWeight="bold" className="w-[33%]">Proactive India</Text>
 
-            <Flex className="w-[67%] mx-auto px-1 lg:px-4 justify-between items-center">
+            <Flex className="w-[67%] mx-auto px-1 lg:px-4 justify-between sm:justify-end items-center">
                 {/* Conditionally Render Search Bar & Button */}
                 {!hideSearch && (
                     <>

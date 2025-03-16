@@ -67,8 +67,7 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
                             onClick={() => router.push(item.path)}
                             position="relative"
                         >
-                            <Icon as={item.icon} boxSize={14} />
-                            {item.badge && item.badge > 0 && (
+                            {/* {item.badge && item.badge > 0 && (
                                 <Badge
                                     colorScheme="red"
                                     borderRadius="full"
@@ -76,15 +75,16 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
                                     top="-2px"
                                     right="-2px"
                                     fontSize="xs"
-                                    minW="18px"
-                                    h="18px"
+                                    minW="8px"
+                                    h="8px"
                                     display="flex"
                                     alignItems="center"
                                     justifyContent="center"
                                 >
                                     {item.badge > 99 ? '99+' : item.badge}
                                 </Badge>
-                            )}
+                            )} */}
+                            <Icon as={item.icon} boxSize={14} />
                             {showLabels && <Text fontSize="xs" mt={1}>{item.label}</Text>}
                         </Flex>
                     );

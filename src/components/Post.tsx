@@ -38,7 +38,6 @@ export const PostCard: React.FC<Props> = (props) => {
 
   const unlockPost = async () => {
     const response = await fetchPostWithPassword({ postId: props.id, password: password }).unwrap();
-    console.log('response', response);
     if (response) {
       dispatch(updatePostInList({
         ...response,
@@ -70,8 +69,8 @@ export const PostCard: React.FC<Props> = (props) => {
         padding: '10px',
         width: '10%',
         borderRadius: '5px',
-      
-      }} onClick={()=>unlockPost()}>Unlock</Button>
+
+      }} onClick={() => unlockPost()}>Unlock</Button>
     </Box>
   );
 

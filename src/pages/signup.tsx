@@ -9,11 +9,20 @@ import { FiUser, FiMail, FiLock, FiBriefcase, FiFileText } from "react-icons/fi"
 import Link from "next/link";
 import { useRegisterMutation } from "@services";
 
+interface FORMDATA {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: "USER" | "CONTRACTOR" | "GOVERNMENT" | "ADMIN" | undefined;
+  contractorLicense?: string;
+}
+
 const Register = () => {
   const router = useRouter();
   const [registerUser, { isLoading }] = useRegisterMutation(); // RTK Mutation Hook
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FORMDATA>({
     name: "",
     email: "",
     phone: "",
@@ -35,6 +44,9 @@ const Register = () => {
     }
 
     try {
+      if (formData.role !== "CONTRACTOR") {
+        delete formData.contractorLicense;
+      }
       await registerUser(formData).unwrap();
       toast.success("Registration successful! Redirecting...");
       router.push("/login");
