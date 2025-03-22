@@ -117,7 +117,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
         try {
             const formData = new FormData();
             formData.append("title", title);
-            formData.append("description", pdfFile ? "" : descriptionText);
+            formData.append("description", descriptionText);
             formData.append("budget", budget.toString());
             formData.append("contractor", contractor);
             // formData.append("government", government);

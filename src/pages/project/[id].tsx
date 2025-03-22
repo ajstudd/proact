@@ -195,7 +195,8 @@ const ProjectPage = () => {
     const handleDeleteComment = useCallback(async (commentId: string) => {
         if (!projectId) return;
         try {
-            // Optimistic delete
+            // Make actual API call
+            await removeComment({ projectId, commentId }).unwrap();
             setLocalComments(prevComments => {
                 // First try to delete from top level comments
                 const topLevelFiltered = prevComments.filter(c => c._id !== commentId);
@@ -210,9 +211,7 @@ const ProjectPage = () => {
                     replies: (c.replies || []).filter((r: any) => r?._id !== commentId)
                 }));
             });
-
-            // Make actual API call
-            await removeComment({ projectId, commentId }).unwrap();
+            toast.success("Comment deleted successfully");
         } catch (error) {
             console.error("Failed to delete comment:", error);
             toast.error("Failed to delete comment");
