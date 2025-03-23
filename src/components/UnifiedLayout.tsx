@@ -17,9 +17,13 @@ const UnifiedLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <Flex direction="column" className="h-screen w-full fixed">
             <Header />
-            <Flex className="flex-1 pt-16 h-[calc(100vh-64px)]">
+            <Flex className={`flex-1 pt-16 h-[calc(100vh-64px)]`}>
                 {!isMobile && <UnifiedSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />}
-                <Box as="main" className="transition-all duration-300 flex-1 bg-gray-100 overflow-y-auto h-full p-4">
+                <Box
+                    as="main"
+                    className="transition-all duration-300 flex-1 bg-gray-100 overflow-y-auto h-full p-4"
+                    pb={isMobile ? "24" : "0"} // Add padding bottom in mobile view
+                >
                     <ChakraProvider>
                         {children}
                     </ChakraProvider>
