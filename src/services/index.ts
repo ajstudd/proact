@@ -7,6 +7,7 @@ export * from "./otpApi";
 export * from "./api";
 export * from "./uploadApi";
 export * from "./projectApi";
+export * from "./analysisApi";
 export * from "./reportApi";
 export * from "./notificationsApi";
 
