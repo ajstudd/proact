@@ -175,28 +175,34 @@ const ProjectAnalysisPage: NextPage = () => {
             <Box
                 maxW="7xl"
                 mx="auto"
-                px={{ base: 2, md: 6 }}
-                py={{ base: 4, md: 10 }}
+                px={{ base: 1, sm: 2, md: 6 }}
+                py={{ base: 2, sm: 4, md: 10 }}
                 minH="100vh"
                 bgGradient="linear(to-br, purple.50, white 60%, blue.50)"
             >
                 {/* Navigation and header */}
-                <Breadcrumb mb={4}>
+                <Breadcrumb mb={{ base: 2, md: 4 }}>
                     <BreadcrumbItem>
                         <BreadcrumbLink onClick={() => router.push("/analytics/dashboard")}>
                             <Flex align="center">
                                 <Box as={FiArrowLeft} mr={2} fontSize="lg" color="blue.500" />
-                                <Text fontWeight="medium" color="blue.700">Back to Dashboard</Text>
+                                <Text fontWeight="medium" color="blue.700" fontSize={{ base: "sm", md: "md" }}>Back to Dashboard</Text>
                             </Flex>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
 
                 {/* Header with refresh button */}
-                <Flex justify="space-between" align="center" mb={10}>
+                <Flex
+                    direction={{ base: "column", sm: "row" }}
+                    justify="space-between"
+                    align={{ base: "stretch", sm: "center" }}
+                    mb={{ base: 6, md: 10 }}
+                    gap={{ base: 4, sm: 0 }}
+                >
                     <Box>
                         <Heading
-                            size="lg"
+                            size={{ base: "md", md: "lg" }}
                             fontWeight="extrabold"
                             letterSpacing="tight"
                             color="purple.800"
@@ -205,7 +211,7 @@ const ProjectAnalysisPage: NextPage = () => {
                         >
                             Project Analysis
                         </Heading>
-                        <Text color="gray.500" mt={1} fontSize="md" fontWeight="medium">
+                        <Text color="gray.500" mt={1} fontSize={{ base: "sm", md: "md" }} fontWeight="medium">
                             Project ID: <Badge colorScheme="purple" fontSize="1em">{id}</Badge>
                         </Text>
                     </Box>
@@ -213,24 +219,25 @@ const ProjectAnalysisPage: NextPage = () => {
                         leftIcon={<FiRefreshCw size={20} />}
                         colorScheme="purple"
                         variant="solid"
-                        size="md"
+                        size={{ base: "sm", md: "md" }}
                         borderRadius="xl"
                         shadow="md"
                         onClick={handleRefresh}
                         isLoading={isRegenerating}
                         _hover={{ bg: "purple.600", transform: "scale(1.04)" }}
                         transition="all 0.2s"
+                        alignSelf={{ base: "flex-start", sm: "auto" }}
                     >
                         Refresh Analysis
                     </Button>
                 </Flex>
 
-                <Text fontSize="sm" color="gray.500" mb={6}>
+                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500" mb={{ base: 4, md: 6 }}>
                     Last updated: {formatDate(analysisData.lastUpdated)}
                 </Text>
 
                 {/* Overview Section */}
-                <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={8} mb={10}>
+                <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr", md: "repeat(4, 1fr)" }} gap={{ base: 4, md: 8 }} mb={{ base: 6, md: 10 }}>
                     {/* Support Stats */}
                     <Box
                         bg="white"
@@ -332,7 +339,7 @@ const ProjectAnalysisPage: NextPage = () => {
                 </Grid>
 
                 {/* Charts Row */}
-                <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={8} mb={10}>
+                <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={{ base: 4, md: 8 }} mb={{ base: 6, md: 10 }}>
                     {/* Sentiment Chart */}
                     <Box
                         bg="white"
@@ -403,7 +410,7 @@ const ProjectAnalysisPage: NextPage = () => {
                 </Grid>
 
                 {/* Detailed Comment Analysis */}
-                <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={8} mb={10}>
+                <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={{ base: 4, md: 8 }} mb={{ base: 6, md: 10 }}>
                     {/* Positive Sentiment */}
                     <Box bg="white" p={8} shadow="lg" borderRadius="2xl">
                         <Heading size="md" mb={4} color="green.600">
@@ -486,13 +493,13 @@ const ProjectAnalysisPage: NextPage = () => {
                 {/* Financial and Progress Analysis */}
                 <Box
                     bg="white"
-                    p={8}
+                    p={{ base: 4, md: 8 }}
                     shadow="lg"
                     borderRadius="2xl"
-                    mb={10}
+                    mb={{ base: 6, md: 10 }}
                 >
-                    <Heading size="md" mb={6} color="green.700" fontWeight="bold">Financial & Progress Analysis</Heading>
-                    <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={8} mb={6}>
+                    <Heading size={{ base: "sm", md: "md" }} mb={6} color="green.700" fontWeight="bold">Financial & Progress Analysis</Heading>
+                    <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={{ base: 4, md: 8 }} mb={6}>
                         <Stat>
                             <StatLabel>Burn Rate</StatLabel>
                             <StatNumber>{formatCurrency(analysisData.financialMetrics.burnRate)}/month</StatNumber>
@@ -531,12 +538,12 @@ const ProjectAnalysisPage: NextPage = () => {
                 {/* Corruption Reports Analysis */}
                 <Box
                     bg="white"
-                    p={8}
+                    p={{ base: 4, md: 8 }}
                     shadow="lg"
                     borderRadius="2xl"
                 >
-                    <Heading size="md" mb={6} color="red.700" fontWeight="bold">Corruption Report Analysis</Heading>
-                    <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={8} mb={6}>
+                    <Heading size={{ base: "sm", md: "md" }} mb={6} color="red.700" fontWeight="bold">Corruption Report Analysis</Heading>
+                    <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr", md: "repeat(4, 1fr)" }} gap={{ base: 4, md: 8 }} mb={6}>
                         <Stat>
                             <StatLabel>Total Reports</StatLabel>
                             <StatNumber>{analysisData.corruptionReportMetrics.reportCount}</StatNumber>

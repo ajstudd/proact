@@ -23,12 +23,17 @@ export const analysisApi = createApi({
       transformResponse: (response: {
         success: boolean;
         analysis: any;
+        projects?: any[];
         message: string;
       }) => {
         if (!response.success) {
           throw new Error(
             response.message || "Failed to fetch government dashboard data"
           );
+        }
+        // Attach projects array to analysis object for unified return
+        if (response.projects) {
+          response.analysis.projects = response.projects;
         }
         return response.analysis;
       },
@@ -107,6 +112,20 @@ export const {
 } = analysisApi;
 
 // Types based on the backend models
+export interface GovernmentDashboardProject {
+  _id: string;
+  title: string;
+  bannerUrl?: string;
+  budget: number;
+  expenditure: number;
+  contractor: {
+    _id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface GovernmentDashboardResponse {
   _id: string;
   governmentId: string;
@@ -157,12 +176,15 @@ export interface GovernmentDashboardResponse {
     topPositiveTags: Array<{
       tag: string;
       count: number;
+      _id?: string;
     }>;
     topNegativeTags: Array<{
       tag: string;
       count: number;
+      _id?: string;
     }>;
     topConcerns: string[];
+    topPraises: string[];
   };
   corruptionReports: {
     totalReports: number;
@@ -175,8 +197,11 @@ export interface GovernmentDashboardResponse {
         title: string;
       };
       reportCount: number;
+      _id?: string;
     }>;
   };
+  // Add the new projects property
+  projects?: GovernmentDashboardProject[];
 }
 
 export interface ProjectAnalysisResponse {

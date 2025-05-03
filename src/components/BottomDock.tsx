@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Icon, Flex, Text, Badge } from "@chakra-ui/react";
-import { FiHome, FiUser, FiMessageCircle, FiBell, FiSettings, FiClipboard, FiUsers, FiBriefcase } from "react-icons/fi";
+import { FiHome, FiUser, FiMessageCircle, FiBell, FiSettings, FiClipboard, FiUsers, FiBriefcase, FiBarChart2 } from "react-icons/fi";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { useGetUnreadCountQuery } from "../services/notificationsApi";
@@ -34,6 +34,7 @@ const BottomDock = ({ showLabels = false }: { showLabels?: boolean }) => {
             { label: "Home", icon: FiHome, path: "/home" },
             { label: "Profile", icon: FiUser, path: "/profile" },
             { label: "Projects", icon: FiClipboard, path: "/projects" },
+            { label: "Analytics", icon: FiBarChart2, path: "/analytics/dashboard" }, // Added analytics link
             // { label: "Contractors", icon: FiUsers, path: "/contractors" },
             { label: "Notifications", icon: FiBell, path: "/notifications", badge: unreadCount },
             { label: "Corruption Reports", icon: FiBriefcase, path: "/reports" },

@@ -200,40 +200,49 @@ const DashboardPage: NextPage = () => {
             <Box
                 maxW="7xl"
                 mx="auto"
-                px={{ base: 2, md: 6 }}
-                py={{ base: 4, md: 10 }}
+                px={{ base: 1, sm: 2, md: 6 }}
+                py={{ base: 2, sm: 4, md: 10 }}
                 minH="100vh"
                 bgGradient="linear(to-br, blue.50, white 60%, teal.50)"
             >
                 {/* Header with refresh button */}
-                <Flex justify="space-between" align="center" mb={10}>
+                <Flex
+                    direction={{ base: "column", sm: "row" }}
+                    justify="space-between"
+                    align={{ base: "stretch", sm: "center" }}
+                    mb={{ base: 6, md: 10 }}
+                    gap={{ base: 4, sm: 0 }}
+                >
                     <Heading
-                        size="lg"
+                        size={{ base: "md", md: "lg" }}
                         fontWeight="extrabold"
                         letterSpacing="tight"
                         color="blue.800"
                         bgGradient="linear(to-r, blue.700, teal.500)"
                         bgClip="text"
+                        mb={{ base: 2, sm: 0 }}
                     >
-                        Government Analytics Dashboard
+                        Analytics
                     </Heading>
-                    <Button
-                        leftIcon={<FiRefreshCw size={20} />}
-                        colorScheme="blue"
-                        variant="solid"
-                        size="md"
-                        borderRadius="xl"
-                        shadow="md"
-                        onClick={handleRefresh}
-                        isLoading={isRegenerating}
-                        _hover={{ bg: "blue.600", transform: "scale(1.04)" }}
-                        transition="all 0.2s"
-                    >
-                        Refresh Analysis
-                    </Button>
+                    <Flex gap={2} flexWrap="wrap">
+                        <Button
+                            leftIcon={<FiRefreshCw size={20} />}
+                            colorScheme="blue"
+                            variant="solid"
+                            size={{ base: "sm", md: "md" }}
+                            borderRadius="xl"
+                            shadow="md"
+                            onClick={handleRefresh}
+                            isLoading={isRegenerating}
+                            _hover={{ bg: "blue.600", transform: "scale(1.04)" }}
+                            transition="all 0.2s"
+                        >
+                            Refresh Analysis
+                        </Button>
+                    </Flex>
                 </Flex>
 
-                <Text fontSize="sm" color="gray.500" mb={6}>
+                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500" mb={{ base: 4, md: 6 }}>
                     Last updated: {formatDate(dashboardData.lastUpdated)}
                 </Text>
 
@@ -243,8 +252,9 @@ const DashboardPage: NextPage = () => {
                     overflowX="auto"
                     className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
                     gap={2}
+                    pb={2}
                 >
-                    {/* Tab Buttons - add more visual feedback */}
+                    {/* Tab Buttons */}
                     {[
                         {
                             key: "overview",
@@ -269,8 +279,10 @@ const DashboardPage: NextPage = () => {
                     ].map(tab => (
                         <Box
                             key={tab.key}
-                            px={6}
-                            py={2}
+                            px={{ base: 3, md: 6 }}
+                            py={{ base: 1.5, md: 2 }}
+                            minW="120px"
+                            fontSize={{ base: "sm", md: "md" }}
                             cursor="pointer"
                             borderBottom={activeTab === tab.key ? "3px solid" : "3px solid transparent"}
                             borderColor={activeTab === tab.key ? "teal.400" : "transparent"}
@@ -299,7 +311,7 @@ const DashboardPage: NextPage = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={8} mb={10}>
+                        <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr", lg: "repeat(4, 1fr)" }} gap={{ base: 4, md: 8 }} mb={{ base: 6, md: 10 }}>
                             {/* Project Count Stats */}
                             <Box
                                 bg="white"
@@ -401,7 +413,7 @@ const DashboardPage: NextPage = () => {
                         </Grid>
 
                         {/* Charts Row */}
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={8} mb={10}>
+                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={{ base: 4, md: 8 }} mb={{ base: 6, md: 10 }}>
                             {/* Project Status Chart */}
                             <Box
                                 bg="white"
@@ -445,13 +457,13 @@ const DashboardPage: NextPage = () => {
                         {/* Financial Status */}
                         <Box
                             bg="white"
-                            p={8}
+                            p={{ base: 4, md: 8 }}
                             shadow="lg"
                             borderRadius="2xl"
-                            mb={10}
+                            mb={{ base: 6, md: 10 }}
                         >
-                            <Heading size="md" mb={6} color="green.700" fontWeight="bold">Financial Status</Heading>
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={8} mb={6}>
+                            <Heading size={{ base: "sm", md: "md" }} mb={6} color="green.700" fontWeight="bold">Financial Status</Heading>
+                            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={{ base: 4, md: 8 }} mb={6}>
                                 <Stat>
                                     <StatLabel>Total Budget</StatLabel>
                                     <StatNumber>{formatCurrency(dashboardData.financialSummary.totalBudget)}</StatNumber>
@@ -481,6 +493,71 @@ const DashboardPage: NextPage = () => {
                                 />
                             </Box>
                         </Box>
+
+                        {/* Projects List Section */}
+                        <Box
+                            bg="white"
+                            p={{ base: 4, md: 6 }}
+                            shadow="lg"
+                            borderRadius="2xl"
+                            mb={{ base: 6, md: 10 }}
+                        >
+                            <Heading size={{ base: "sm", md: "md" }} mb={4} color="blue.700" fontWeight="bold">
+                                Projects
+                            </Heading>
+                            {/* List all projects with links to their analytics page */}
+                            {dashboardData.projects && dashboardData.projects.length > 0 ? (
+                                <Box>
+                                    {dashboardData.projects.map((project, idx) => (
+                                        <Flex
+                                            key={project._id}
+                                            align="center"
+                                            justify="space-between"
+                                            p={3}
+                                            mb={2}
+                                            borderRadius="md"
+                                            bg="gray.50"
+                                            _hover={{ bg: "blue.50", cursor: "pointer" }}
+                                            onClick={() => router.push(`/analytics/project/${project._id}`)}
+                                        >
+                                            <Flex align="center">
+                                                {project.bannerUrl && (
+                                                    <Box
+                                                        as="img"
+                                                        src={project.bannerUrl}
+                                                        alt={project.title}
+                                                        boxSize="48px"
+                                                        objectFit="cover"
+                                                        borderRadius="md"
+                                                        mr={3}
+                                                    />
+                                                )}
+                                                <Box>
+                                                    <Text fontWeight="medium">{project.title}</Text>
+                                                    <Text fontSize="sm" color="gray.500">
+                                                        Project ID: {project._id.substring(0, 8)}...
+                                                    </Text>
+                                                    <Text fontSize="sm" color="gray.500">
+                                                        Contractor: {project.contractor?.name || "N/A"}
+                                                    </Text>
+                                                    <Text fontSize="sm" color="gray.500">
+                                                        Budget: {formatCurrency(project.budget)} | Expenditure: {formatCurrency(project.expenditure)}
+                                                    </Text>
+                                                    <Text fontSize="xs" color="gray.400">
+                                                        Created: {formatDate(project.createdAt)}
+                                                    </Text>
+                                                </Box>
+                                            </Flex>
+                                            <Badge colorScheme="blue" px={2} py={1}>
+                                                View Analysis
+                                            </Badge>
+                                        </Flex>
+                                    ))}
+                                </Box>
+                            ) : (
+                                <Text color="gray.500">No project data available</Text>
+                            )}
+                        </Box>
                     </motion.div>
                 )}
 
@@ -491,7 +568,7 @@ const DashboardPage: NextPage = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mb={8}>
+                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={{ base: 4, md: 6 }} mb={8}>
                             {/* Most Active Contractors */}
                             <Box bg="white" p={6} shadow="sm" borderRadius="md">
                                 <Heading size="md" mb={4}>Most Active Contractors</Heading>
@@ -604,7 +681,7 @@ const DashboardPage: NextPage = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mb={8}>
+                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={{ base: 4, md: 6 }} mb={8}>
                             {/* Positive Sentiment */}
                             <Box bg="white" p={6} shadow="sm" borderRadius="md">
                                 <Heading size="md" mb={4} color="green.600">
@@ -625,10 +702,10 @@ const DashboardPage: NextPage = () => {
                                         ))}
 
                                         {/* Replace with proper data from government dashboard structure */}
-                                        {dashboardData.publicSentiment.topConcerns && dashboardData.publicSentiment.topConcerns.length > 0 && (
+                                        {dashboardData.publicSentiment.topPraises && dashboardData.publicSentiment.topPraises.length > 0 && (
                                             <Box mt={5}>
                                                 <Text fontWeight="medium" mb={3}>Top Positive Feedback:</Text>
-                                                {dashboardData.publicSentiment.topConcerns.filter((_, i) => i < 3).map((praise, index) => (
+                                                {dashboardData.publicSentiment.topPraises.filter((_, i) => i < 3).map((praise, index) => (
                                                     <Flex key={index} align="center" mb={2}>
                                                         <Box as={FiAward} color="green.500" mr={2} />
                                                         <Text>{praise}</Text>
@@ -680,9 +757,8 @@ const DashboardPage: NextPage = () => {
                         </Grid>
 
                         {/* Overall Sentiment Chart */}
-                        <Box bg="white" p={6} shadow="sm" borderRadius="md">
-                            <Heading size="md" mb={4}>Public Sentiment Overview</Heading>
-
+                        <Box bg="white" p={{ base: 4, md: 6 }} shadow="sm" borderRadius="md">
+                            <Heading size={{ base: "sm", md: "md" }} mb={4}>Public Sentiment Overview</Heading>
                             <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
                                 <Box>
                                     <Chart
@@ -758,7 +834,7 @@ const DashboardPage: NextPage = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6} mb={8}>
+                        <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={{ base: 4, md: 6 }} mb={8}>
                             <Stat bg="white" p={5} shadow="sm" borderRadius="md" borderLeft="4px" borderLeftColor="yellow.400">
                                 <StatLabel>Total Reports</StatLabel>
                                 <StatNumber>{dashboardData.corruptionReports.totalReports}</StatNumber>
@@ -774,7 +850,7 @@ const DashboardPage: NextPage = () => {
                         </Grid>
 
                         {/* Projects with Most Reports */}
-                        <Box bg="white" p={6} shadow="sm" borderRadius="md" mb={8}>
+                        <Box bg="white" p={{ base: 4, md: 6 }} shadow="sm" borderRadius="md" mb={8}>
                             <Heading size="md" mb={4}>
                                 <Box as={FiAlertTriangle} display="inline" mr={2} color="red.500" />
                                 Projects with Most Reports
@@ -819,7 +895,7 @@ const DashboardPage: NextPage = () => {
                         </Box>
 
                         {/* Average Severity */}
-                        <Box bg="white" p={6} shadow="sm" borderRadius="md">
+                        <Box bg="white" p={{ base: 4, md: 6 }} shadow="sm" borderRadius="md">
                             <Heading size="md" mb={4}>Average Severity of Reports</Heading>
 
                             <Box mb={4}>

@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { Box, Button, Flex, Icon, Text } from "@chakra-ui/react";
-import { FiMenu, FiChevronLeft, FiHome, FiClipboard, FiUsers, FiBell, FiBriefcase, FiSettings, FiUser, FiUpload } from "react-icons/fi";
+import { FiMenu, FiChevronLeft, FiHome, FiClipboard, FiUsers, FiBell, FiBriefcase, FiSettings, FiUser, FiUpload, FiBarChart2 } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -20,6 +20,7 @@ const roleSpecificItems = {
         // { label: "Contractors", icon: FiUsers, path: "/contractors" },
         { label: "Corruption Reports", icon: FiBriefcase, path: "/reports" },
         { label: "Projects", icon: FiClipboard, path: "/projects" },
+        { label: "Analytics", icon: FiBarChart2, path: "/analytics/dashboard" }, // Added analytics link
     ],
     CONTRACTOR: [
         { label: "Assigned Projects", icon: FiClipboard, path: "/projects" },
