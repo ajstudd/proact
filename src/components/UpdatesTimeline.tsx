@@ -16,6 +16,15 @@ interface Update {
             url: string;
         };
     };
+    purchasedItems?: {
+        name: string;
+        quantity: number;
+        price: number;
+    }[];
+    utilisedItems?: {
+        name: string;
+        quantity: number;
+    }[];
 }
 
 interface UpdatesTimelineProps {
@@ -78,7 +87,7 @@ const UpdatesTimeline: React.FC<UpdatesTimelineProps> = ({
                             onClick={() => setIsAddModalOpen(true)}
                             className="flex items-center text-sm text-blue-600 hover:text-blue-800"
                         >
-                            <FiPlus className="mr-1" /> Add Update
+                            <FiPlus className="mr-1" /> Add Project Update
                         </button>
                     )}
                 </div>
@@ -103,7 +112,7 @@ const UpdatesTimeline: React.FC<UpdatesTimelineProps> = ({
                         onClick={() => setIsAddModalOpen(true)}
                         className="flex items-center text-sm text-blue-600 hover:text-blue-800"
                     >
-                        <FiPlus className="mr-1" /> Add Update
+                        <FiPlus className="mr-1" /> Add Project Update
                     </button>
                 )}
             </div>
@@ -155,6 +164,32 @@ const UpdatesTimeline: React.FC<UpdatesTimelineProps> = ({
                                         className="w-32 h-24 object-cover rounded-md border border-gray-200"
                                     />
                                 ))}
+                            </div>
+                        )}
+
+                        {/* Display purchased and utilised items if available */}
+                        {update.purchasedItems && update.purchasedItems.length > 0 && (
+                            <div className="mt-2 text-xs text-green-700">
+                                <strong>Purchased Items:</strong>
+                                <ul>
+                                    {update.purchasedItems.map((item, idx) => (
+                                        <li key={idx}>
+                                            {item.name}: {item.quantity} @ ₹{item.price}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {update.utilisedItems && update.utilisedItems.length > 0 && (
+                            <div className="mt-2 text-xs text-blue-700">
+                                <strong>Utilised Items:</strong>
+                                <ul>
+                                    {update.utilisedItems.map((item, idx) => (
+                                        <li key={idx}>
+                                            {item.name}: {item.quantity} used
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         )}
                     </motion.div>

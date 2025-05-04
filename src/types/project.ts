@@ -27,10 +27,31 @@ export interface TrimmedProjectsResponse {
   projects: TrimmedProject[];
 }
 
+export interface InventoryItem {
+  name: string;
+  quantity: number;
+  price: number;
+  totalSpent: number;
+}
+
+export interface UsedItem {
+  name: string;
+  quantity: number;
+}
+
 export interface ProjectUpdate {
   content: string;
   media?: string[];
-  date: Date;
+  date?: Date;
+  purchasedItems?: {
+    name: string;
+    quantity: number;
+    price: number;
+  }[];
+  utilisedItems?: {
+    name: string;
+    quantity: number;
+  }[];
 }
 
 export interface Project {
@@ -55,6 +76,8 @@ export interface Project {
   government: string; // ObjectId as string
   createdAt: Date;
   updatedAt: Date;
+  inventory?: InventoryItem[];
+  usedItems?: UsedItem[];
 }
 
 export interface ProjectsResponse {

@@ -149,7 +149,6 @@ export const projectApi = api.injectEndpoints({
       },
     }),
 
-    // Project updates
     getProjectUpdates: builder.query({
       query: (projectId) => `/${projectId}/updates`,
       transformResponse: (response: any) => {
@@ -164,23 +163,24 @@ export const projectApi = api.injectEndpoints({
     }),
 
     addProjectUpdate: builder.mutation({
-      query: ({ projectId, content, media }) => {
-        // Create FormData for file upload
+      query: ({ projectId, content, media, purchasedItems, utilisedItems }) => {
         const formData = new FormData();
         formData.append("content", content);
-
-        // Append media files if they exist
         if (media && media.length > 0) {
           media.forEach((file: any) => {
             formData.append("media", file);
           });
         }
-
+        if (purchasedItems && purchasedItems.length > 0) {
+          formData.append("purchasedItems", JSON.stringify(purchasedItems));
+        }
+        if (utilisedItems && utilisedItems.length > 0) {
+          formData.append("utilisedItems", JSON.stringify(utilisedItems));
+        }
         return {
           url: `/${projectId}/updates`,
           method: "POST",
           body: formData,
-          // No need to set Content-Type as it's automatically set with FormData
         };
       },
       invalidatesTags: (result, error, { projectId }) => [

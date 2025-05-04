@@ -28,6 +28,29 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useRBAC } from "../../hooks/useRBAC"; // Added RBAC hook
 import { useBookmarks } from "../../hooks/useBookmarks"; // Import the new hook
 import { toast } from "react-toastify"; // Assuming you use react-hot-toast for notifications
+import { useForm, useFieldArray } from "react-hook-form"; // Add this import
+interface InventoryItem {
+    name: string;
+    quantity: number;
+    price: number;
+    totalSpent?: number;
+}
+
+// Add type for the Add Update form data
+interface AddUpdateFormData {
+    content: string;
+    items: {
+        name: string;
+        quantity: number;
+        price: number;
+        type: "purchased" | "used";
+    }[];
+}
+
+// Add type for comment handler functions
+type AddCommentHandler = (comment: string, parentCommentId?: string) => Promise<void>;
+type DeleteCommentHandler = (commentId: string) => Promise<void>;
+type LikeDislikeCommentHandler = (commentId: string) => Promise<void>;
 
 const ProjectPage = () => {
     const router = useRouter();
@@ -50,6 +73,9 @@ const ProjectPage = () => {
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [isPdfOpen, setIsPdfOpen] = useState(false);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false); // Add this state
+
+    // Add local state for purchased items form (for contractors)
+    const [showAddUpdate, setShowAddUpdate] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -145,7 +171,8 @@ const ProjectPage = () => {
         }
     };
 
-    const handleAddComment = useCallback(async (comment: string, parentCommentId?: string) => {
+    // Handler function types are now explicit:
+    const handleAddComment: AddCommentHandler = useCallback(async (comment, parentCommentId) => {
         if (!projectId) return;
 
         if (!isAuthenticated) {
@@ -192,7 +219,7 @@ const ProjectPage = () => {
         }
     }, [projectId, isAuthenticated, addComment]);
 
-    const handleDeleteComment = useCallback(async (commentId: string) => {
+    const handleDeleteComment: DeleteCommentHandler = useCallback(async (commentId) => {
         if (!projectId) return;
         try {
             // Make actual API call
@@ -223,7 +250,7 @@ const ProjectPage = () => {
         }
     }, [projectId, removeComment, project?.comments]);
 
-    const handleLikeComment = useCallback(async (commentId: string) => {
+    const handleLikeComment: LikeDislikeCommentHandler = useCallback(async (commentId) => {
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to like comments");
             return;
@@ -238,7 +265,7 @@ const ProjectPage = () => {
         }
     }, [projectId, isAuthenticated, likeComment]);
 
-    const handleDislikeComment = useCallback(async (commentId: string) => {
+    const handleDislikeComment: LikeDislikeCommentHandler = useCallback(async (commentId) => {
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to dislike comments");
             return;
@@ -258,8 +285,60 @@ const ProjectPage = () => {
         ((isGovernment && project?.government?._id === userId) ||
             (isContractor && project?.contractor?._id === userId));
 
-    // Project update handlers - Updated to handle file uploads
-    const handleAddUpdate = async (content: string, mediaFiles?: File[]) => {
+    // --- Inventory/Used Items Analysis ---
+
+    // --- Add Update Form for Contractors ---
+    const { register, control, handleSubmit, reset, watch } = useForm<AddUpdateFormData>({
+        defaultValues: {
+            content: "",
+            items: [{ name: "", quantity: 1, price: 0, type: "purchased" as const }]
+        }
+    });
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "items"
+    });
+    const watchedItems = watch("items");
+
+    // Add loading and error handling
+    if (isLoading || !project) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <span className="text-gray-500 text-lg">Loading project...</span>
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <span className="text-red-500 text-lg">Failed to load project.</span>
+            </div>
+        );
+    }
+
+    // --- Inventory/Used Items Analysis ---
+    // Move this AFTER the loading/error check so project is always defined
+    // useFieldArray must be called unconditionally at the top level
+
+    const totalSpentOnItems = project.inventory?.reduce((sum: number, item: InventoryItem) => sum + (item.totalSpent || 0), 0) || 0;
+
+    const onAddUpdateFormSubmit = async (data: AddUpdateFormData) => {
+        // Split items into purchased and utilised
+        const purchasedItems = data.items.filter(i => i.type === "purchased").map(({ type, ...rest }) => rest);
+        const utilisedItems = data.items.filter(i => i.type === "used").map(({ type, price, ...rest }) => rest);
+        // Only pass the correct number of arguments
+        await handleAddUpdate(data.content, undefined, purchasedItems, utilisedItems);
+        reset();
+        setShowAddUpdate(false);
+    };
+
+    // Update the type of handleAddUpdate to match its usage
+    const handleAddUpdate = async (
+        content: string,
+        mediaFiles?: File[],
+        purchasedItems?: any[],
+        utilisedItems?: any[],
+    ) => {
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to add updates");
             return;
@@ -269,7 +348,9 @@ const ProjectPage = () => {
             await addProjectUpdate({
                 projectId,
                 content,
-                media: mediaFiles
+                media: mediaFiles,
+                purchasedItems,
+                utilisedItems
             }).unwrap();
             toast.success("Project update added successfully");
         } catch (error) {
@@ -278,12 +359,18 @@ const ProjectPage = () => {
         }
     };
 
-    const handleEditUpdate = async (updateId: string, content: string, mediaFiles?: File[], keepExistingMedia: boolean = true) => {
+    // Add these handler stubs before the return statement
+    const handleEditUpdate = async (
+        updateId: string,
+        content: string,
+        mediaFiles?: File[],
+        keepExistingMedia?: boolean
+    ) => {
+        // Implement edit logic here, e.g.:
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to edit updates");
             return;
         }
-
         try {
             await editProjectUpdate({
                 projectId,
@@ -300,33 +387,27 @@ const ProjectPage = () => {
     };
 
     const handleDeleteUpdate = async (updateId: string) => {
+        // Implement delete logic here, e.g.:
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to delete updates");
             return;
         }
-
         try {
             await removeProjectUpdate({
                 projectId,
                 updateId
             }).unwrap();
-            toast.success("Project update removed successfully");
+            toast.success("Project update deleted successfully");
         } catch (error) {
             console.error("Failed to delete update:", error);
             toast.error("Failed to delete update");
         }
     };
 
-    if (isLoading) return <p className="text-center text-gray-500 mt-20">Loading...</p>;
-    if (error) return <p className="text-center text-gray-500 mt-20">Error loading project data.</p>;
-    if (!project) return <p className="text-center text-gray-500 mt-20">Project not found.</p>;
-
-    // Check if user has liked or disliked the project
-    const userHasLiked = isAuthenticated && project.likes?.includes(userId || '');
-    const userHasDisliked = isAuthenticated && project.dislikes?.includes(userId || '');
-
-    // Check if project is bookmarked
-    const projectIsBookmarked = isAuthenticated && projectId ? isProjectBookmarked(projectId) : false;
+    // Compute bookmark and like/dislike status
+    const projectIsBookmarked = projectId ? isProjectBookmarked(projectId) : false;
+    const userHasLiked = isAuthenticated && project.likes?.includes(userId);
+    const userHasDisliked = isAuthenticated && project.dislikes?.includes(userId);
 
     // Using RBAC approach for checking update management permissions
     const canManageUpdates = isAuthenticated &&
@@ -424,6 +505,163 @@ const ProjectPage = () => {
                 canManageProject={canManageProject} // Pass management permissions
             />
 
+            {/* Redesigned Inventory & Usage Analysis */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 className="text-lg font-semibold mb-4">Inventory & Usage Analysis</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Inventory Section */}
+                    <div>
+                        <h4 className="font-medium mb-2">Inventory</h4>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full text-sm border-separate border-spacing-y-2">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        <th className="px-2 py-1 text-left font-semibold">Name</th>
+                                        <th className="px-2 py-1 text-left font-semibold">Quantity</th>
+                                        <th className="px-2 py-1 text-left font-semibold">Unit Price</th>
+                                        <th className="px-2 py-1 text-left font-semibold">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {project.inventory && project.inventory.length > 0 ? (
+                                        project.inventory.map((item: any, idx: any) => (
+                                            <tr key={idx} className="bg-white even:bg-gray-50">
+                                                <td className="px-2 py-1">{item.name}</td>
+                                                <td className="px-2 py-1">{item.quantity}</td>
+                                                <td className="px-2 py-1">₹{item.price}</td>
+                                                <td className="px-2 py-1 font-semibold">₹{item.totalSpent}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={4} className="text-gray-500 px-2 py-2">No inventory items.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="mt-2 text-gray-600 text-xs">
+                            <span className="font-semibold">Total spent on items:</span> ₹{totalSpentOnItems}
+                        </div>
+                    </div>
+                    {/* Used Items Section */}
+                    <div>
+                        <h4 className="font-medium mb-2">Used Items</h4>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full text-sm border-separate border-spacing-y-2">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        <th className="px-2 py-1 text-left font-semibold">Name</th>
+                                        <th className="px-2 py-1 text-left font-semibold">Quantity Used</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {project.usedItems && project.usedItems.length > 0 ? (
+                                        project.usedItems.map((item: any, idx: any) => (
+                                            <tr key={idx} className="bg-white even:bg-gray-50">
+                                                <td className="px-2 py-1">{item.name}</td>
+                                                <td className="px-2 py-1">{item.quantity}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={2} className="text-gray-500 px-2 py-2">No items used yet.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Update Inventory Form for Contractors */}
+            {canManageUpdates && (
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <button
+                        onClick={() => setShowAddUpdate(!showAddUpdate)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md mb-4"
+                    >
+                        {showAddUpdate ? "Cancel" : "Update Inventory"}
+                    </button>
+                    {showAddUpdate && (
+                        <form onSubmit={handleSubmit(onAddUpdateFormSubmit)}>
+                            <div className="mb-3">
+                                <label className="block font-medium mb-1">Update Content</label>
+                                <textarea
+                                    {...register("content", { required: true })}
+                                    className="w-full border rounded px-3 py-2"
+                                    rows={3}
+                                    placeholder="Describe the update and any item utilisation..."
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="block font-medium mb-1">Items</label>
+                                <div className="space-y-2">
+                                    {fields.map((field, idx) => {
+                                        const item = watchedItems?.[idx] || {};
+                                        const total = (item.quantity || 0) * (item.price || 0);
+                                        return (
+                                            <div key={field.id} className="flex flex-col sm:flex-row gap-2 items-center">
+                                                <input
+                                                    {...register(`items.${idx}.name`, { required: true })}
+                                                    placeholder="Name"
+                                                    className="border rounded px-2 py-1 flex-1 min-w-[100px]"
+                                                />
+                                                <input
+                                                    {...register(`items.${idx}.quantity`, { valueAsNumber: true, required: true })}
+                                                    type="number"
+                                                    min={1}
+                                                    placeholder="Quantity"
+                                                    className="border rounded px-2 py-1 w-20"
+                                                />
+                                                <input
+                                                    {...register(`items.${idx}.price`, { valueAsNumber: true })}
+                                                    type="number"
+                                                    min={0}
+                                                    placeholder="Price"
+                                                    className="border rounded px-2 py-1 w-24"
+                                                    disabled={item.type === "used"}
+                                                />
+                                                <select
+                                                    {...register(`items.${idx}.type`)}
+                                                    className="border rounded px-2 py-1"
+                                                >
+                                                    <option value="purchased">Purchased</option>
+                                                    <option value="used">Used</option>
+                                                </select>
+                                                <span className="text-xs text-gray-700">
+                                                    {item.type === "purchased"
+                                                        ? <>Total: <span className="font-semibold">₹{total}</span></>
+                                                        : null}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => remove(idx)}
+                                                    className="text-red-500 text-xs ml-2"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                    <button
+                                        type="button"
+                                        onClick={() => append({ name: "", quantity: 1, price: 0, type: "purchased" })}
+                                        className="text-blue-600 mt-2 text-sm"
+                                    >
+                                        + Add Item
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-md w-full sm:w-auto">
+                                Submit Update
+                            </button>
+                        </form>
+                    )}
+                </div>
+            )}
+
             <UpdatesTimeline
                 updates={project.updates || []}
                 projectId={project._id}
@@ -431,7 +669,7 @@ const ProjectPage = () => {
                 onEditUpdate={handleEditUpdate}
                 onDeleteUpdate={handleDeleteUpdate}
                 canManageUpdates={canManageUpdates}
-                isAuthenticated={isAuthenticated} // Pass authentication status
+                isAuthenticated={isAuthenticated}
             />
 
             <Comments
