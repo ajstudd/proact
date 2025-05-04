@@ -22,7 +22,7 @@ const UnifiedLayout = ({ children }: { children: React.ReactNode }) => {
                 <Box
                     as="main"
                     className="transition-all duration-300 flex-1 bg-gray-100 overflow-y-auto h-full p-4"
-                    pb={isMobile ? "24" : "0"} // Add padding bottom in mobile view
+                    pb={isMobile ? "80px" : "0"}
                 >
                     <ChakraProvider>
                         {children}
