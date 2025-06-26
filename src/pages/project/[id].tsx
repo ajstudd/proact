@@ -9,8 +9,8 @@ import UpdatesTimeline from "components/UpdatesTimeline";
 import PdfToSlides from "components/PdfToSlides";
 import MapModal from "components/MapModal";
 import ProjectStakeholders from "components/ProjectStakeholders";
-import ReportModal from "components/ReportModal"; // Import the new component
-import RoleBasedGuard from "components/RoleBasedGuard"; // Import the guard component
+import ReportModal from "components/ReportModal";
+import RoleBasedGuard from "components/RoleBasedGuard";
 import {
     useGetProjectByIdQuery,
     useLikeProjectMutation,
@@ -25,10 +25,10 @@ import {
 } from "@services";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useAuth } from "../../contexts/AuthContext";
-import { useRBAC } from "../../hooks/useRBAC"; // Added RBAC hook
-import { useBookmarks } from "../../hooks/useBookmarks"; // Import the new hook
-import { toast } from "react-toastify"; // Assuming you use react-hot-toast for notifications
-import { useForm, useFieldArray } from "react-hook-form"; // Add this import
+import { useRBAC } from "../../hooks/useRBAC";
+import { useBookmarks } from "../../hooks/useBookmarks";
+import { toast } from "react-toastify";
+import { useForm, useFieldArray } from "react-hook-form";
 interface InventoryItem {
     name: string;
     quantity: number;
@@ -36,7 +36,6 @@ interface InventoryItem {
     totalSpent?: number;
 }
 
-// Add type for the Add Update form data
 interface AddUpdateFormData {
     content: string;
     items: {
@@ -47,34 +46,29 @@ interface AddUpdateFormData {
     }[];
 }
 
-// Add type for comment handler functions
 type AddCommentHandler = (comment: string, parentCommentId?: string) => Promise<void>;
 type DeleteCommentHandler = (commentId: string) => Promise<void>;
 type LikeDislikeCommentHandler = (commentId: string) => Promise<void>;
 
 const ProjectPage = () => {
     const router = useRouter();
-    const { id } = router.query; // Get project ID from URL
+    const { id } = router.query;
     const [projectId, setProjectId] = useState<string | null>(null);
 
-    // Get current user using our new hook
     const { user, isAuthenticated, userId } = useCurrentUser();
     const auth = useAuth();
-    const { isGovernment, isContractor } = useRBAC(); // Using RBAC hook
+    const { isGovernment, isContractor } = useRBAC();
 
-    // Use our new bookmark hook
     const {
         isProjectBookmarked,
         toggleBookmark,
         isBookmarking
     } = useBookmarks();
 
-    // State for modals
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [isPdfOpen, setIsPdfOpen] = useState(false);
-    const [isReportModalOpen, setIsReportModalOpen] = useState(false); // Add this state
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-    // Add local state for purchased items form (for contractors)
     const [showAddUpdate, setShowAddUpdate] = useState(false);
 
     useEffect(() => {
@@ -83,12 +77,10 @@ const ProjectPage = () => {
         }
     }, [id]);
 
-    // Load the project and comments
     const { data: project, error, isLoading } = useGetProjectByIdQuery(projectId!, {
         skip: !projectId,
     });
 
-    // Get mutations for interactions
     const [likeProject] = useLikeProjectMutation();
     const [dislikeProject] = useDislikeProjectMutation();
     const [addComment] = useAddCommentMutation();
@@ -96,22 +88,18 @@ const ProjectPage = () => {
     const [likeComment] = useLikeCommentMutation();
     const [dislikeComment] = useDislikeCommentMutation();
 
-    // Project update mutations
     const [addProjectUpdate] = useAddProjectUpdateMutation();
     const [editProjectUpdate] = useEditProjectUpdateMutation();
     const [removeProjectUpdate] = useRemoveProjectUpdateMutation();
 
-    // Add local state for comments to enable optimistic updates
     const [localComments, setLocalComments] = useState<any[]>([]);
 
-    // Sync local comments with API data when it changes
     useEffect(() => {
         if (project?.comments) {
             setLocalComments(project.comments);
         }
     }, [project?.comments]);
 
-    // Handle bookmark toggle
     const handleBookmarkToggle = async () => {
         if (!projectId) return;
 
@@ -136,7 +124,6 @@ const ProjectPage = () => {
         }
     };
 
-    // Handlers for user interactions
     const handleLike = async () => {
         if (!projectId) return;
 
@@ -171,7 +158,6 @@ const ProjectPage = () => {
         }
     };
 
-    // Handler function types are now explicit:
     const handleAddComment: AddCommentHandler = useCallback(async (comment, parentCommentId) => {
         if (!projectId) return;
 
@@ -181,7 +167,6 @@ const ProjectPage = () => {
         }
 
         try {
-            // API call first
             const response = await addComment({
                 projectId,
                 comment,
@@ -189,16 +174,12 @@ const ProjectPage = () => {
             }).unwrap();
             console.log('response in comment', response)
 
-            // On successful response, update the local comments state
             if (response && response.comment) {
                 setLocalComments(prevComments => {
-                    // For replies, find parent comment and add the new reply
                     if (parentCommentId) {
                         return prevComments.map(c => {
                             if (c._id === parentCommentId) {
-                                // Ensure replies array exists
                                 const replies = Array.isArray(c.replies) ? [...c.replies] : [];
-                                // Return updated comment with new reply added
                                 return {
                                     ...c,
                                     replies: [...replies, response.comment]
@@ -207,7 +188,6 @@ const ProjectPage = () => {
                             return c;
                         });
                     }
-                    // For top-level comments
                     return [response.comment, ...prevComments];
                 });
             }
@@ -222,17 +202,14 @@ const ProjectPage = () => {
     const handleDeleteComment: DeleteCommentHandler = useCallback(async (commentId) => {
         if (!projectId) return;
         try {
-            // Make actual API call
             await removeComment({ projectId, commentId }).unwrap();
             setLocalComments(prevComments => {
-                // First try to delete from top level comments
                 const topLevelFiltered = prevComments.filter(c => c._id !== commentId);
 
                 if (topLevelFiltered.length < prevComments.length) {
                     return topLevelFiltered;
                 }
 
-                // If not found at top level, search in replies
                 return prevComments.map(c => ({
                     ...c,
                     replies: (c.replies || []).filter((r: any) => r?._id !== commentId)
@@ -243,7 +220,6 @@ const ProjectPage = () => {
             console.error("Failed to delete comment:", error);
             toast.error("Failed to delete comment");
 
-            // Revert optimistic update if there's an error
             if (project?.comments) {
                 setLocalComments(project.comments);
             }
@@ -257,7 +233,6 @@ const ProjectPage = () => {
         }
 
         try {
-            // API call - local state is handled by the Comments component now
             await likeComment({ projectId, commentId }).unwrap();
         } catch (error) {
             console.error("Failed to like comment:", error);
@@ -272,7 +247,6 @@ const ProjectPage = () => {
         }
 
         try {
-            // API call - local state is handled by the Comments component now
             await dislikeComment({ projectId, commentId }).unwrap();
         } catch (error) {
             console.error("Failed to dislike comment:", error);
@@ -285,9 +259,6 @@ const ProjectPage = () => {
         ((isGovernment && project?.government?._id === userId) ||
             (isContractor && project?.contractor?._id === userId));
 
-    // --- Inventory/Used Items Analysis ---
-
-    // --- Add Update Form for Contractors ---
     const { register, control, handleSubmit, reset, watch } = useForm<AddUpdateFormData>({
         defaultValues: {
             content: "",
@@ -300,7 +271,6 @@ const ProjectPage = () => {
     });
     const watchedItems = watch("items");
 
-    // Add loading and error handling
     if (isLoading || !project) {
         return (
             <div className="flex justify-center items-center min-h-screen">
@@ -316,23 +286,16 @@ const ProjectPage = () => {
         );
     }
 
-    // --- Inventory/Used Items Analysis ---
-    // Move this AFTER the loading/error check so project is always defined
-    // useFieldArray must be called unconditionally at the top level
-
     const totalSpentOnItems = project.inventory?.reduce((sum: number, item: InventoryItem) => sum + (item.totalSpent || 0), 0) || 0;
 
     const onAddUpdateFormSubmit = async (data: AddUpdateFormData) => {
-        // Split items into purchased and utilised
         const purchasedItems = data.items.filter(i => i.type === "purchased").map(({ type, ...rest }) => rest);
         const utilisedItems = data.items.filter(i => i.type === "used").map(({ type, price, ...rest }) => rest);
-        // Only pass the correct number of arguments
         await handleAddUpdate(data.content, undefined, purchasedItems, utilisedItems);
         reset();
         setShowAddUpdate(false);
     };
 
-    // Update the type of handleAddUpdate to match its usage
     const handleAddUpdate = async (
         content: string,
         mediaFiles?: File[],
@@ -366,7 +329,6 @@ const ProjectPage = () => {
         mediaFiles?: File[],
         keepExistingMedia?: boolean
     ) => {
-        // Implement edit logic here, e.g.:
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to edit updates");
             return;
@@ -387,7 +349,6 @@ const ProjectPage = () => {
     };
 
     const handleDeleteUpdate = async (updateId: string) => {
-        // Implement delete logic here, e.g.:
         if (!projectId || !isAuthenticated) {
             toast.error("You must be logged in to delete updates");
             return;
@@ -404,12 +365,10 @@ const ProjectPage = () => {
         }
     };
 
-    // Compute bookmark and like/dislike status
     const projectIsBookmarked = projectId ? isProjectBookmarked(projectId) : false;
     const userHasLiked = isAuthenticated && project.likes?.includes(userId);
     const userHasDisliked = isAuthenticated && project.dislikes?.includes(userId);
 
-    // Using RBAC approach for checking update management permissions
     const canManageUpdates = isAuthenticated &&
         ((isGovernment && project.government?._id === userId) ||
             (isContractor && project.contractor?._id === userId));
@@ -509,7 +468,6 @@ const ProjectPage = () => {
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                 <h3 className="text-lg font-semibold mb-4">Inventory & Usage Analysis</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Inventory Section */}
                     <div>
                         <h4 className="font-medium mb-2">Inventory</h4>
                         <div className="overflow-x-auto">
@@ -544,7 +502,6 @@ const ProjectPage = () => {
                             <span className="font-semibold">Total spent on items:</span> ₹{totalSpentOnItems}
                         </div>
                     </div>
-                    {/* Used Items Section */}
                     <div>
                         <h4 className="font-medium mb-2">Used Items</h4>
                         <div className="overflow-x-auto">
@@ -575,7 +532,6 @@ const ProjectPage = () => {
                 </div>
             </div>
 
-            {/* Update Inventory Form for Contractors */}
             {canManageUpdates && (
                 <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                     <button

@@ -32,7 +32,7 @@ export const UserCommentCard: React.FC<UserCommentCardProps> = ({ comment }) => 
                     mr={3}
                 />
                 <VStack alignItems="flex-start" spacing={0.5}>
-                    <NextLink href={`/projects/${comment.project._id}`} passHref>
+                    <NextLink href={`/project/${comment.project._id}`} passHref>
                         <Link fontWeight="bold" fontSize="md" color="blue.600">
                             {comment.project.title}
                         </Link>

@@ -30,7 +30,6 @@ const commentsSlice = createSlice({
   name: "comments",
   initialState,
   reducers: {
-    // Set all comments for a project
     setComments: (
       state,
       action: PayloadAction<{ projectId: string; comments: Comment[] }>
@@ -39,7 +38,6 @@ const commentsSlice = createSlice({
       state.commentsByProject[projectId] = comments;
     },
 
-    // Add a new comment
     addComment: (
       state,
       action: PayloadAction<{ projectId: string; comment: Comment }>
@@ -51,7 +49,6 @@ const commentsSlice = createSlice({
       state.commentsByProject[projectId].unshift(comment);
     },
 
-    // Add a reply to a comment
     addReply: (
       state,
       action: PayloadAction<{
@@ -65,7 +62,6 @@ const commentsSlice = createSlice({
 
       if (!comments) return;
 
-      // Find parent comment and add reply
       const findAndAddReply = (commentsList: Comment[]): boolean => {
         for (let i = 0; i < commentsList.length; i++) {
           if (commentsList[i]._id === parentId) {
@@ -76,7 +72,6 @@ const commentsSlice = createSlice({
             return true;
           }
 
-          // Check in replies recursively
           if (commentsList[i].replies && commentsList[i].replies.length > 0) {
             const found = findAndAddReply(commentsList[i].replies);
             if (found) return true;
@@ -88,7 +83,6 @@ const commentsSlice = createSlice({
       findAndAddReply(comments);
     },
 
-    // Like/unlike a comment
     toggleLike: (
       state,
       action: PayloadAction<{
@@ -109,10 +103,8 @@ const commentsSlice = createSlice({
             const likedIndex = comment.likes.indexOf(userId);
 
             if (likedIndex >= 0) {
-              // Unlike
               comment.likes.splice(likedIndex, 1);
             } else {
-              // Like and remove from dislikes if present
               comment.likes.push(userId);
               const dislikedIndex = comment.dislikes.indexOf(userId);
               if (dislikedIndex >= 0) {
@@ -122,7 +114,6 @@ const commentsSlice = createSlice({
             return true;
           }
 
-          // Check in replies
           if (commentsList[i].replies && commentsList[i].replies.length > 0) {
             const found = updateLikes(commentsList[i].replies);
             if (found) return true;
@@ -134,7 +125,6 @@ const commentsSlice = createSlice({
       updateLikes(comments);
     },
 
-    // Dislike/undislike a comment
     toggleDislike: (
       state,
       action: PayloadAction<{
@@ -155,10 +145,8 @@ const commentsSlice = createSlice({
             const dislikedIndex = comment.dislikes.indexOf(userId);
 
             if (dislikedIndex >= 0) {
-              // Remove dislike
               comment.dislikes.splice(dislikedIndex, 1);
             } else {
-              // Dislike and remove from likes if present
               comment.dislikes.push(userId);
               const likedIndex = comment.likes.indexOf(userId);
               if (likedIndex >= 0) {
@@ -168,7 +156,6 @@ const commentsSlice = createSlice({
             return true;
           }
 
-          // Check in replies
           if (commentsList[i].replies && commentsList[i].replies.length > 0) {
             const found = updateDislikes(commentsList[i].replies);
             if (found) return true;
@@ -180,7 +167,6 @@ const commentsSlice = createSlice({
       updateDislikes(comments);
     },
 
-    // Delete a comment
     deleteComment: (
       state,
       action: PayloadAction<{ projectId: string; commentId: string }>
@@ -195,7 +181,6 @@ const commentsSlice = createSlice({
         (c) => c._id !== commentId
       );
 
-      // If not found at top level, search in replies
       if (state.commentsByProject[projectId].length === comments.length) {
         const removeFromReplies = (commentsList: Comment[]): boolean => {
           for (let i = 0; i < commentsList.length; i++) {
@@ -209,7 +194,6 @@ const commentsSlice = createSlice({
                 return true;
               }
 
-              // Search deeper
               const found = removeFromReplies(commentsList[i].replies);
               if (found) return true;
             }

@@ -29,7 +29,6 @@ export interface IUserData {
   contractorId?: string;
 }
 
-// New interface for project search results
 export interface ProjectSearchResult {
   _id: string;
   title: string;
@@ -75,7 +74,6 @@ export interface UpdateUserResponse {
   name: string;
   email?: string;
   phone?: string;
-  // Include other updated fields
   photo?: string;
   role: string;
   isVerified: boolean;

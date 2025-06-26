@@ -49,8 +49,15 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
     };
 
     return (
-        <Box as="header" className="bg-gray-800 text-white px-6 shadow-md fixed w-full top-0 z-20 h-16 flex items-center">
-            <Text fontSize="4xl" fontWeight="bold" className="w-[33%]">Proactive India</Text>
+        <Box as="header" className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white px-6 shadow-2xl fixed w-full top-0 z-20 h-16 flex items-center border-b border-blue-800/30 backdrop-blur-sm">
+            <Text
+                fontSize="4xl"
+                fontWeight="bold"
+                className="w-[33%] bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-teal-300 transition-all duration-300 cursor-pointer"
+                onClick={() => router.push('/')}
+            >
+                Proactive India
+            </Text>
             <Flex className="w-[67%] mx-auto px-1 lg:px-4 justify-between sm:justify-end items-center">
                 {/* Conditionally Render Search Bar & Button */}
                 {!hideSearch && (
@@ -63,7 +70,7 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                                 className="absolute left-6 text-gray-500 bg-transparent"
                             />
                             <Input
-                                className="pl-12 pr-12 py-[4px] text-black w-full rounded-md shadow-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="pl-12 pr-12 py-[4px] text-gray-900 w-full rounded-lg shadow-lg border border-blue-200/30 bg-white/95 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200"
                                 placeholder="Search projects..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -111,14 +118,14 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                                 <Image
                                     src={user?.photo || "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="}
                                     alt={user?.name || "User"}
-                                    className="rounded-full cursor-pointer border-solid border-[2px] border-gray-200"
+                                    className="rounded-full cursor-pointer border-2 border-blue-400/50 hover:border-teal-400/70 transition-all duration-300 shadow-lg hover:shadow-blue-500/20"
                                     width={32}
                                     height={32}
                                     objectFit="cover"
                                 />
                             </MenuButton>
                             <MenuList
-                                className="bg-white text-gray-800 rounded-md shadow-lg py-2 min-w-[180px] z-[50] mt-1 absolute right-0"
+                                className="bg-white/95 backdrop-blur-sm text-gray-800 rounded-xl shadow-2xl border border-blue-200/30 py-2 min-w-[180px] z-[50] mt-1 absolute right-0"
                                 sx={{
                                     zIndex: 50,
                                     position: "relative"
@@ -126,14 +133,14 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                             >
                                 <div
                                     onClick={navigateToProfile}
-                                    className="px-3 py-3 flex items-center text-sm text-gray-800 hover:bg-teal-50 cursor-pointer"
+                                    className="px-3 py-3 flex items-center text-sm text-gray-800 hover:bg-gradient-to-r hover:from-blue-50 hover:to-teal-50 hover:text-blue-700 cursor-pointer transition-all duration-200 rounded-lg mx-1"
                                 >
                                     <FiUser className="mr-2.5" /> Profile
                                 </div>
-                                <div className="border-t border-gray-100 my-1"></div>
+                                <div className="border-t border-gray-200/50 my-1 mx-2"></div>
                                 <div
                                     onClick={handleLogout}
-                                    className="px-3 py-3 flex items-center text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                                    className="px-3 py-3 flex items-center text-sm text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer transition-all duration-200 rounded-lg mx-1"
                                 >
                                     <FiLogOut className="mr-2.5" /> Logout
                                 </div>
@@ -142,11 +149,9 @@ const Header = ({ hideSearch = false }: HeaderProps) => {
                     ) : button ? (
                         <Button
                             variant="outline"
-                            colorScheme="teal"
                             size="sm"
                             fontWeight="medium"
-                            _hover={{ bg: "teal.500", color: "white" }}
-                            transition="all 0.2s"
+                            className="border-2 border-blue-400/50 text-blue-200 hover:bg-gradient-to-r hover:from-blue-600 hover:to-teal-600 hover:text-white hover:border-transparent transition-all duration-300 rounded-lg shadow-lg hover:shadow-blue-500/25"
                             onClick={() => router.push(button.link)}
                         >
                             {button.text}

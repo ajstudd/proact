@@ -91,7 +91,6 @@ export interface EmailVerificationResponse {
   user: UserProfileResponse;
 }
 
-// For user comments
 export interface Comment {
   _id: string;
   content: string;

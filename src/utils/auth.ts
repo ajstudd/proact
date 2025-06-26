@@ -1,5 +1,3 @@
-// utils/auth.ts
-
 export const setAuthData = (token: string, user: any) => {
   localStorage.setItem("authToken", token);
   localStorage.setItem("userData", JSON.stringify(user));
@@ -20,16 +18,12 @@ export const clearAuthData = () => {
 };
 
 export const logout = async (refreshToken?: string) => {
-  // If you have a logout API call, use it here
   try {
     if (refreshToken) {
-      // Call logout API if needed
-      // await logoutApi(refreshToken);
     }
   } catch (error) {
     console.error("Logout error:", error);
   } finally {
-    // Always clear local data
     clearAuthData();
   }
 };

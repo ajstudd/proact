@@ -67,13 +67,13 @@ export interface Project {
   };
   budget: number;
   expenditure: number;
-  likes: string[]; // ObjectIds as strings
-  dislikes: string[]; // ObjectIds as strings
-  comments: string[]; // ObjectIds as strings
+  likes: string[];
+  dislikes: string[];
+  comments: string[];
   updates: ProjectUpdate[];
-  associatedProfiles: string[]; // ObjectIds as strings
-  contractor: string; // ObjectId as string
-  government: string; // ObjectId as string
+  associatedProfiles: string[];
+  contractor: string;
+  government: string;
   createdAt: Date;
   updatedAt: Date;
   inventory?: InventoryItem[];

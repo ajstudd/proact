@@ -17,7 +17,6 @@ interface CommentsProps {
     isAuthenticated?: boolean;
 }
 
-// Separate component for the comment input to avoid unnecessary re-renders
 const CommentInput = memo(({
     onSubmit,
     placeholder,
@@ -65,7 +64,6 @@ const CommentInput = memo(({
 
 CommentInput.displayName = 'CommentInput';
 
-// Separate component for reply input to isolate state and prevent re-renders
 const ReplyInput = memo(({
     onSubmit,
     userName
@@ -86,7 +84,6 @@ const ReplyInput = memo(({
 
 ReplyInput.displayName = 'ReplyInput';
 
-// Individual comment component with its own state management
 const CommentItem = memo(({
     comment,
     projectId,
@@ -109,7 +106,6 @@ const CommentItem = memo(({
     const [showReplyInput, setShowReplyInput] = useState(false);
     const dispatch = useDispatch();
 
-    // Format date string
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString("en-US", {
@@ -125,7 +121,6 @@ const CommentItem = memo(({
     const userDisliked = comment.dislikes.includes(currentUserId || '');
     const isCommentAuthor = currentUserId === comment.user._id;
 
-    // Check if this comment is already a reply to prevent nested replies
     const isAlreadyAReply = Boolean(comment.parentComment);
 
     const handleReplyClick = () => {
@@ -178,7 +173,6 @@ const CommentItem = memo(({
                             {comment.dislikes.length}
                         </button>
 
-                        {/* Only show reply button for top-level comments */}
                         {!isAlreadyAReply && (
                             <button
                                 onClick={handleReplyClick}
@@ -188,7 +182,6 @@ const CommentItem = memo(({
                             </button>
                         )}
 
-                        {/* Show delete button if user is the author */}
                         {isCommentAuthor && onDelete && (
                             <button
                                 onClick={() => onDelete(comment._id)}
@@ -199,7 +192,6 @@ const CommentItem = memo(({
                         )}
                     </div>
 
-                    {/* Reply input - isolated in its own component */}
                     {showReplyInput && (
                         <ReplyInput
                             onSubmit={handleSubmitReply}
@@ -207,7 +199,6 @@ const CommentItem = memo(({
                         />
                     )}
 
-                    {/* Render replies */}
                     {comment.replies && comment.replies.length > 0 && (
                         <div className="mt-2">
                             {comment.replies.map((reply) => (
@@ -233,7 +224,6 @@ const CommentItem = memo(({
 
 CommentItem.displayName = 'CommentItem';
 
-// Main Comments component
 export const Comments: React.FC<CommentsProps> = memo(({
     projectId,
     comments,
@@ -243,43 +233,33 @@ export const Comments: React.FC<CommentsProps> = memo(({
     onDeleteComment,
     currentUserId
 }) => {
-    // Get authentication status from our hook
     const { isAuthenticated = false, userId } = useCurrentUser();
 
-    // Get comments state from our custom hook
     const commentsState = useCommentsState(projectId);
 
-    // Add API mutation hook for adding comments/replies
     const [addCommentMutation] = useAddCommentMutation();
 
-    // Keep a local reference to track when comments change
     const [commentVersion, setCommentVersion] = useState(0);
 
-    // Use the userId from the hook if not provided directly
     const effectiveUserId = currentUserId || userId;
 
-    // Initialize comments in the Redux store when they change from props
     useEffect(() => {
         if (comments && comments.length > 0) {
             commentsState.initializeComments(comments);
-            setCommentVersion(prev => prev + 1); // Increment version to force refresh
+            setCommentVersion(prev => prev + 1);
         }
     }, [comments.length, comments.map(c => c._id).join(',')]);
 
-    // Handle adding a new comment
     const handleNewComment = useCallback((text: string) => {
         if (isAuthenticated) {
             onAddComment(text);
-            // No need to update local state here as API call will refresh data
         } else {
             alert("You must be logged in to comment");
         }
     }, [isAuthenticated, onAddComment]);
 
-    // Handle adding a reply
     const handleReply = useCallback((parentId: string, text: string) => {
         if (isAuthenticated) {
-            // Call the API
             addCommentMutation({
                 projectId,
                 comment: text,
@@ -287,13 +267,10 @@ export const Comments: React.FC<CommentsProps> = memo(({
             })
                 .unwrap()
                 .then(response => {
-                    // Use the response data to update Redux store
                     if (response && response.comment) {
-                        // Update local state with the returned comment data
                         commentsState.addReply(parentId, response.comment);
                     }
 
-                    // Still call the parent component's handler for any additional logic
                     onAddComment(text, parentId);
                 })
                 .catch(error => {
@@ -302,41 +279,32 @@ export const Comments: React.FC<CommentsProps> = memo(({
         }
     }, [isAuthenticated, projectId, addCommentMutation, commentsState, onAddComment]);
 
-    // Handle like action with optimistic UI update
     const handleLike = useCallback((commentId: string) => {
         if (!isAuthenticated || !effectiveUserId) {
             alert("Please log in to like comments");
             return;
         }
 
-        // Optimistic UI update through Redux
         commentsState.likeComment(commentId, effectiveUserId);
 
-        // Call the API function
         onLikeComment(commentId);
     }, [isAuthenticated, effectiveUserId, onLikeComment, commentsState]);
 
-    // Handle dislike action with optimistic UI update
     const handleDislike = useCallback((commentId: string) => {
         if (!isAuthenticated || !effectiveUserId) {
             alert("Please log in to dislike comments");
             return;
         }
 
-        // Optimistic UI update through Redux
         commentsState.dislikeComment(commentId, effectiveUserId);
 
-        // Call the API function
         onDislikeComment(commentId);
     }, [isAuthenticated, effectiveUserId, onDislikeComment, commentsState]);
 
-    // Handle deleting a comment
     const handleDelete = useCallback((commentId: string) => {
         if (onDeleteComment) {
-            // Optimistic UI update
             commentsState.deleteComment(commentId);
 
-            // Call API
             onDeleteComment(commentId);
         }
     }, [onDeleteComment, commentsState]);
@@ -345,7 +313,6 @@ export const Comments: React.FC<CommentsProps> = memo(({
         <div className="bg-white rounded-lg shadow-md p-4">
             <h3 className="text-xl font-semibold mb-4">Comments</h3>
 
-            {/* Add comment form - isolated to prevent re-renders */}
             <div className="mb-6">
                 <CommentInput
                     onSubmit={handleNewComment}
@@ -358,7 +325,6 @@ export const Comments: React.FC<CommentsProps> = memo(({
                 )}
             </div>
 
-            {/* Comments list */}
             <div>
                 {commentsState.comments.length === 0 ? (
                     <p className="text-gray-500 text-center py-4">No comments yet. Be the first to comment!</p>
@@ -382,7 +348,6 @@ export const Comments: React.FC<CommentsProps> = memo(({
     );
 });
 
-// Add display name
 Comments.displayName = 'Comments';
 
 export default Comments;

@@ -88,7 +88,7 @@ export default function HeroCarousel() {
                     </Text>
                     <Button onClick={() => {
                         window.location.href = "/home";
-                    }} size="lg" colorScheme="teal">
+                    }} size="lg" colorScheme="teal" _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }} transition="all 0.2s">
                         Explore
                     </Button>
                 </Box>

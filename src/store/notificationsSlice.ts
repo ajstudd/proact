@@ -45,7 +45,6 @@ const notificationsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Handle notification count updates from API
     builder.addMatcher(
       notificationsApi.endpoints.getUnreadCount.matchFulfilled,
       (state, { payload }) => {
@@ -53,7 +52,6 @@ const notificationsSlice = createSlice({
       }
     );
 
-    // Handle marking as read
     builder.addMatcher(
       notificationsApi.endpoints.markAsRead.matchFulfilled,
       (state, { payload }) => {
@@ -64,7 +62,6 @@ const notificationsSlice = createSlice({
       }
     );
 
-    // Handle marking all as read
     builder.addMatcher(
       notificationsApi.endpoints.markAllAsRead.matchFulfilled,
       (state) => {
@@ -76,7 +73,6 @@ const notificationsSlice = createSlice({
       }
     );
 
-    // Get notification counts from user profile
     builder.addMatcher(
       userApi.endpoints.getUserProfile.matchFulfilled,
       (state, { payload }) => {

@@ -20,16 +20,28 @@ const Sidebar = ({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: ()
     return (
         <Box
             as="aside"
-            className={`h-screen bg-gray-900 text-white transition-all duration-300 shadow-lg ${isOpen ? "w-64" : "w-[64px]"}`}
+            className={`h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 text-white transition-all duration-300 shadow-2xl border-r border-blue-800/30 ${isOpen ? "w-64" : "w-[64px]"}`}
         >
-            <Flex align="center" className="p-4 border-b border-gray-700">
-                <Button onClick={toggleSidebar} className="text-white bg-transparent p-2">
+            <Flex align="center" className="p-4 border-b border-blue-700/30 bg-black/20 backdrop-blur-sm">
+                <Button
+                    onClick={toggleSidebar}
+                    className="text-white bg-transparent hover:bg-blue-800/30 p-2 rounded-lg transition-all duration-300"
+                >
                     <Icon as={isOpen ? FiChevronLeft : FiMenu} />
                 </Button>
-                {isOpen && <Text ml={4} fontSize="lg" fontWeight="bold">Dashboard</Text>}
+                {isOpen && (
+                    <Text
+                        ml={4}
+                        fontSize="lg"
+                        fontWeight="bold"
+                        className="bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent"
+                    >
+                        Dashboard
+                    </Text>
+                )}
             </Flex>
 
-            <Box p={4} className="overflow-hidden hover:overflow-y-auto h-[calc(100vh-64px)] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+            <Box p={4} className="overflow-hidden hover:overflow-y-auto h-[calc(100vh-64px)] scrollbar-thin scrollbar-thumb-blue-600/50 scrollbar-track-transparent">
                 <div className="w-full flex justify-center items-center flex-col gap-2">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.path;
@@ -37,18 +49,24 @@ const Sidebar = ({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: ()
                             <button
                                 key={item.path}
                                 onClick={() => router.push(item.path)}
-                                className={`flex items-center rounded-lg w-full transition-all duration-200
-                                    ${isOpen ? "pl-[20px] h-[40px]" : "justify-center h-[40px]"} 
-                                    ${isActive ? "bg-gray-700 text-blue-400" : "bg-transparent text-white hover:bg-gray-700"}
+                                className={`flex items-center rounded-xl w-full transition-all duration-300 shadow-sm hover:shadow-lg
+                                    ${isOpen ? "pl-[20px] h-[44px]" : "justify-center h-[44px]"} 
+                                    ${isActive
+                                        ? "bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-blue-500/25"
+                                        : "bg-transparent text-blue-100 hover:bg-blue-800/30 hover:text-white border border-transparent hover:border-blue-600/30"
+                                    }
                                 `}
                             >
-                                <Icon as={item.icon} className={`${isOpen ? "mr-2" : ""}`} />
+                                <Icon
+                                    as={item.icon}
+                                    className={`${isOpen ? "mr-3" : ""} ${isActive ? "text-white" : "text-blue-300"} transition-colors duration-300`}
+                                />
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: isOpen ? 1 : 0 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    {isOpen && <Text>{item.label}</Text>}
+                                    {isOpen && <Text className={isActive ? "text-white font-medium" : "text-blue-100"}>{item.label}</Text>}
                                 </motion.div>
                             </button>
                         );
