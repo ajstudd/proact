@@ -86,8 +86,10 @@ export default function HeroCarousel() {
                     >
                         Discover, monitor, and contribute to a transparent future in governance.
                     </Text>
-                    <Button size="lg" colorScheme="teal">
-                        Learn More
+                    <Button onClick={() => {
+                        window.location.href = "/home";
+                    }} size="lg" colorScheme="teal">
+                        Explore
                     </Button>
                 </Box>
             </Flex>
