@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useState, useEffect, useCallback } from "react";
 import { FiArrowLeft, FiMapPin, FiThumbsUp, FiThumbsDown, FiAlertCircle, FiBookmark } from "react-icons/fi";
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
 import ProjectStats from "components/ProjectStats";
 import Comments from "components/Comments";
 import UpdatesTimeline from "components/UpdatesTimeline";
@@ -10,7 +9,6 @@ import PdfToSlides from "components/PdfToSlides";
 import MapModal from "components/MapModal";
 import ProjectStakeholders from "components/ProjectStakeholders";
 import ReportModal from "components/ReportModal";
-import RoleBasedGuard from "components/RoleBasedGuard";
 import {
     useGetProjectByIdQuery,
     useLikeProjectMutation,

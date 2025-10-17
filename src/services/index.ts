@@ -10,14 +10,3 @@ export * from "./projectApi";
 export * from "./analysisApi";
 export * from "./reportApi";
 export * from "./notificationsApi";
-
-// // Export all API services
-// export { authApi } from "./authApi";
-// export { userApi } from "./userApi";
-// export { otpApi } from "./otpApi";
-// // Include other API exports
-// export { mediaApi } from "./mediaApi";
-// export { imageApi } from "./imageApi";
-// export { postApi } from "./postApi";
-// export { projectApi } from "./projectApi";
-// export { api } from "./api";
