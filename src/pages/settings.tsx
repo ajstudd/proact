@@ -33,12 +33,10 @@ export default function Settings() {
   const { logout } = useAuth();
   const [logoutApi] = useLogoutMutation();
 
-  // For feedback modal
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [feedbackText, setFeedbackText] = useState("");
   const [submitFeedback, { isLoading: isSubmittingFeedback }] = useSubmitFeedbackMutation();
 
-  // For change password modal
   const {
     isOpen: isChangePasswordOpen,
     onOpen: onChangePasswordOpen,
@@ -47,7 +45,6 @@ export default function Settings() {
 
   const handleLogout = async () => {
     try {
-      // Call the logout function from AuthContext
       logout();
 
       toast({
@@ -57,7 +54,6 @@ export default function Settings() {
         isClosable: true,
       });
 
-      // Redirect to login page
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);

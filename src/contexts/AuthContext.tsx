@@ -10,7 +10,7 @@ import { IUserData } from "../types";
 interface DecodedToken {
     userId: string;
     role: string;
-    exp: number; // Expiration timestamp
+    exp: number;
 }
 
 interface AuthContextType {
@@ -27,7 +27,6 @@ interface AuthContextType {
     token: string | null;
     userId: string | null;
     userRole?: string;
-    // Added from useAuth hook
     logout: () => void;
     hasRole: (role: "ADMIN" | "USER" | "CONTRACTOR" | "GOVERNMENT") => boolean;
     getUserData: () => Partial<IUserData> | null;
@@ -70,15 +69,10 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
     useEffect(() => {
         const initializeAuth = async () => {
             if (!token) {
-                // No token found, user is not authenticated
                 dispatch(setUserAuthentication(false));
 
-                // Check if current path matches any public page pattern
                 const isPublicPage = publicPages.some(publicPath => {
-                    // Handle exact matches
                     if (publicPath === pathname) return true;
-
-                    // Handle dynamic routes like /project/[id] or /otp/[email]
                     if (publicPath.includes('[')) {
                         const baseRoute = publicPath.split('/[')[0];
                         return pathname?.startsWith(baseRoute);
@@ -86,7 +80,6 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
                     return false;
                 });
 
-                // If not on a public page, redirect to login
                 if (!isPublicPage) {
                     console.log("Redirecting to login");
                     router.replace("/login");
@@ -97,19 +90,15 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
             }
 
             try {
-                // Decode and verify token
                 const decoded: DecodedToken = jwtDecode(token);
 
                 if (decoded.exp * 1000 < Date.now()) {
-                    // Token is expired
                     localStorage.removeItem("authData");
                     dispatch(setUserAuthentication(false));
                     router.replace("/login");
                 } else {
-                    // Valid token
                     setAuthState({ isAuthenticated: true, user: decoded });
 
-                    // If we have user data from API
                     if (isSuccess && userData) {
                         dispatch(
                             saveUser({
@@ -118,7 +107,7 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
                                 email: userData.email,
                                 phone: userData.phone,
                                 photo: userData.photo,
-                                role: userData.role || decoded.role, // Use role from token as fallback
+                                role: userData.role || decoded.role,
                                 isAuthenticated: true,
                                 isVerified: userData.isVerified,
                                 designation: userData.designation,
@@ -142,14 +131,12 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
         initializeAuth();
     }, [token, userId, isSuccess, userData, dispatch, pathname, router, publicPages]);
 
-    // Function to refresh user data
     const refreshUserData = async () => {
         if (token) {
             await refetch();
         }
     };
 
-    // Function to check if the user is authenticated
     const getAuthStatus = () => {
         return {
             token: getAuthToken(),
@@ -159,7 +146,6 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
         };
     };
 
-    // Added from useAuth hook
     const logout = () => {
         clearAuthData();
         dispatch(clearUser());
@@ -192,7 +178,6 @@ export const AuthProvider: React.FC<{ children: ReactNode, publicPages?: string[
         token,
         userId,
         userRole,
-        // Added from useAuth hook
         logout,
         hasRole,
         getUserData,

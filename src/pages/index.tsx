@@ -13,8 +13,7 @@ const roboto = Roboto({
   fallback: ["sans-serif"],
 });
 
-// 🎨 Background SVG Pattern
-const BackgroundPattern = () => (
+const BackgroundPattern: React.FC = () => (
   <svg className="absolute top-0 left-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
@@ -89,7 +88,6 @@ function Testimonials() {
   );
 }
 
-// 💬 Testimonial Card
 function Testimonial({ name, text, image }: { name: string; text: string; image: string }) {
   return (
     <motion.div
@@ -185,7 +183,9 @@ const CallToAction = () => {
   );
 };
 
-// 🏡 Home Page Component
+/**
+ * Main landing page component.
+ */
 export default function Home() {
   const router = useRouter();
 

@@ -20,9 +20,6 @@ import { clearAuthData } from "../utils/authUtils";
 
 const API_URL: string | undefined = process.env.NEXT_PUBLIC_API_URL;
 
-//add env.local file in root folder and add NEXT_PUBLIC_API_URL=your api url
-
-// Helper function to save auth data to localStorage
 const saveAuthDataToLocalStorage = (data: any) => {
   if (typeof window !== "undefined") {
     localStorage.setItem("authData", JSON.stringify(data.resp));
@@ -39,7 +36,6 @@ export const authApi = createApi({
     { status: number; data: ErrorResponse }
   >,
   endpoints: (builder) => ({
-    /** 🔐 User Login */
     login: builder.mutation<
       LoginSuccessResponsePayload,
       LoginAuthRequestPayload
@@ -49,7 +45,6 @@ export const authApi = createApi({
         method: "POST",
         body,
       }),
-      // Store auth data in localStorage on successful login
       onQueryStarted: async (arg, { queryFulfilled, dispatch }) => {
         try {
           const result = await queryFulfilled;
@@ -60,7 +55,6 @@ export const authApi = createApi({
       },
     }),
 
-    /** 📝 Register User */
     register: builder.mutation<void, RegisterUserRequestPayload>({
       query: (body) => ({
         url: "/register",
@@ -69,7 +63,6 @@ export const authApi = createApi({
       }),
     }),
 
-    /** 🔑 Forgot Password */
     forgotPassword: builder.mutation<void, string>({
       query: (email) => ({
         url: "/forgot-password",
@@ -78,7 +71,6 @@ export const authApi = createApi({
       }),
     }),
 
-    /** 👤 Get User Info */
     me: builder.query<
       {
         user: IUserData;
@@ -94,13 +86,11 @@ export const authApi = createApi({
       }),
     }),
 
-    /** 🚪 Logout */
     logout: builder.mutation<void, void>({
       query: () => ({
         url: "/logout",
         method: "POST",
       }),
-      // Clear auth data from localStorage on logout
       onQueryStarted: async (arg, { queryFulfilled, dispatch }) => {
         try {
           await queryFulfilled;

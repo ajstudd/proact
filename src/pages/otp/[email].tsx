@@ -105,7 +105,7 @@ const VerifyAccount = ({ decryptedEmail }: { decryptedEmail: string }) => {
                         {method === "phone" && (
                             <>
                                 <div className="bg-yellow-800 text-yellow-200 p-3 mb-4 rounded-lg text-sm">
-                                    ⚠️ Our SMS services are currently down. Please consider using email OTP instead.
+                                    Our SMS services are currently down. Please consider using email OTP instead.
                                 </div>
                                 <input
                                     type="text"
@@ -161,7 +161,6 @@ const VerifyAccount = ({ decryptedEmail }: { decryptedEmail: string }) => {
     );
 };
 
-// **Server-side function to get email from URL**
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const { email } = context.query;
 

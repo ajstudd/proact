@@ -10,10 +10,9 @@ import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import "../../global.css";
 import { useRouter } from "next/router";
 
-// Layouts
-import HomeLayout from "components/HomeLayout"; // Public Layout
-import UnifiedLayout from "components/UnifiedLayout"; // Unified authenticated layout
-import AuthLayout from "components/LoggedOutLayout"; // Login/Register Layout
+import HomeLayout from "components/HomeLayout";
+import UnifiedLayout from "components/UnifiedLayout";
+import AuthLayout from "components/LoggedOutLayout";
 
 const roboto = Roboto({
   display: "swap",
@@ -24,33 +23,50 @@ const roboto = Roboto({
   fallback: ["sans-serif"],
 });
 
-// Pages that don't require authentication
-const publicPages = ["/home", "/project/[id], /otp/[email]"];
+const publicPages = ["/home", "/project/[id]", "/about", "/privacy-policy"];
 const noAuthPages = ["/login", "/signup", "/onboarding", "/", "/otp/[email]"];
 
+/**
+ * Main application content wrapper handling authentication and layout selection.
+ */
 function AppContent({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const auth = useAuth();
 
-  // ✅ Prevent rendering protected pages before checking auth
   if (auth.isLoading) {
     return <p className="text-center text-gray-500 mt-20">Loading...</p>;
   }
 
-  if (!auth.isAuthenticated &&
-    !publicPages.includes(router.pathname) &&
-    !noAuthPages.includes(router.pathname)) {
-    return <p className="text-center text-gray-500 mt-20">Redirecting...</p>;
+  const isPublicRoute = publicPages.some(path => {
+    if (path.includes('[')) {
+      const baseRoute = path.split('/[')[0];
+      return router.pathname.startsWith(baseRoute);
+    }
+    return router.pathname === path;
+  });
+
+  const isNoAuthRoute = noAuthPages.some(path => {
+    if (path.includes('[')) {
+      const baseRoute = path.split('/[')[0];
+      return router.pathname.startsWith(baseRoute);
+    }
+    return router.pathname === path;
+  });
+
+  if (!auth.isAuthenticated && !isPublicRoute && !isNoAuthRoute) {
+    router.replace("/login");
+    return <p className="text-center text-gray-500 mt-20">Redirecting to login...</p>;
   }
 
-  // 🛠️ **Simplified Layout Selection**
   let Layout;
-  if (noAuthPages.includes(router.pathname)) {
-    Layout = AuthLayout; // Login/Register pages
+  if (isNoAuthRoute) {
+    Layout = AuthLayout;
   } else if (auth.isAuthenticated) {
-    Layout = UnifiedLayout; // One layout for all authenticated users
+    Layout = UnifiedLayout;
+  } else if (isPublicRoute) {
+    Layout = HomeLayout;
   } else {
-    Layout = HomeLayout; // Default public layout
+    Layout = HomeLayout;
   }
 
   return (

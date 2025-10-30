@@ -48,6 +48,9 @@ type AddCommentHandler = (comment: string, parentCommentId?: string) => Promise<
 type DeleteCommentHandler = (commentId: string) => Promise<void>;
 type LikeDislikeCommentHandler = (commentId: string) => Promise<void>;
 
+/**
+ * Project detail page component displaying project information, stats, updates, and comments.
+ */
 const ProjectPage = () => {
     const router = useRouter();
     const { id } = router.query;
@@ -252,7 +255,6 @@ const ProjectPage = () => {
         }
     }, [projectId, isAuthenticated, dislikeComment]);
 
-    // Determine if the current user can manage this project
     const canManageProject = isAuthenticated &&
         ((isGovernment && project?.government?._id === userId) ||
             (isContractor && project?.contractor?._id === userId));
@@ -320,7 +322,6 @@ const ProjectPage = () => {
         }
     };
 
-    // Add these handler stubs before the return statement
     const handleEditUpdate = async (
         updateId: string,
         content: string,
