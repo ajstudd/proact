@@ -8,7 +8,6 @@ export const analysisApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${API_URL}/analysis`,
     prepareHeaders: (headers) => {
-      // Add auth token to every request
       const token = getAuthToken();
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
@@ -17,7 +16,6 @@ export const analysisApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // Get aggregate analysis for government dashboard
     getGovernmentDashboard: builder.query<GovernmentDashboardResponse, void>({
       query: () => `/dashboard`,
       transformResponse: (response: {
@@ -31,7 +29,6 @@ export const analysisApi = createApi({
             response.message || "Failed to fetch government dashboard data"
           );
         }
-        // Attach projects array to analysis object for unified return
         if (response.projects) {
           response.analysis.projects = response.projects;
         }
@@ -39,7 +36,6 @@ export const analysisApi = createApi({
       },
     }),
 
-    // Get detailed analysis for a specific project
     getProjectAnalysis: builder.query<ProjectAnalysisResponse, string>({
       query: (projectId) => `/project/${projectId}`,
       transformResponse: (response: {
@@ -56,7 +52,6 @@ export const analysisApi = createApi({
       },
     }),
 
-    // Manually trigger regeneration of project analysis
     regenerateProjectAnalysis: builder.mutation<
       ProjectAnalysisResponse,
       string
@@ -79,7 +74,6 @@ export const analysisApi = createApi({
       },
     }),
 
-    // Manually trigger regeneration of government's aggregate analysis
     regenerateGovernmentAnalysis: builder.mutation<
       GovernmentDashboardResponse,
       void
@@ -200,7 +194,6 @@ export interface GovernmentDashboardResponse {
       _id?: string;
     }>;
   };
-  // Add the new projects property
   projects?: GovernmentDashboardProject[];
 }
 

@@ -9,7 +9,9 @@ import { useCurrentUser } from "hooks/useCurrentUser";
 import { TrimmedProject } from "types/project";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Dialog } from "../components/Dialog"; // Updated import to use our custom Dialog
+import CreateProject from "../components/CreateProject";
+import BookmarkedProjectCard from "../components/BookmarkedProjectCard";
+import { Dialog } from "../components/Dialog";
 import { Heading } from "@chakra-ui/react";
 
 const ProjectsPage = () => {
@@ -18,7 +20,6 @@ const ProjectsPage = () => {
     const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
     const { user } = useCurrentUser();
 
-    // Get user's projects using the userId parameter
     const {
         data: projects,
         isLoading,
@@ -35,7 +36,6 @@ const ProjectsPage = () => {
         refetch();
     }, [refetch]);
 
-    // Hide client-side only UI until after hydration
     if (!mounted) {
         return null;
     }

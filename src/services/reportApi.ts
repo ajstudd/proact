@@ -47,7 +47,6 @@ export const reportApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${API_URL}/corruption-reports`,
     prepareHeaders: (headers) => {
-      // Get a fresh token every time
       const token = getAuthToken();
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
@@ -57,7 +56,6 @@ export const reportApi = createApi({
   }),
   tagTypes,
   endpoints: (builder) => ({
-    // Create corruption report (for both anonymous and authenticated users)
     createReport: builder.mutation<any, FormData>({
       query: (formData) => ({
         url: "/create",
@@ -69,7 +67,6 @@ export const reportApi = createApi({
         report: Report;
         message?: string;
       }) => {
-        //send error message to be used in the UI can I define the type of the error message
         if (!response.success) {
           const errorMessage = response.message || "Failed to create report";
           throw new Error(errorMessage);
@@ -78,7 +75,6 @@ export const reportApi = createApi({
       },
     }),
 
-    // Get reports for a specific project (only for project owner - contractor or government)
     getProjectReports: builder.query<Report[], string>({
       query: (projectId) => `/project/${projectId}`,
       transformResponse: (response: {
@@ -102,7 +98,6 @@ export const reportApi = createApi({
           : [{ type: "Reports", id: projectId }],
     }),
 
-    // Get all reports for the logged-in user's projects
     getUserProjectReports: builder.query<Report[], void>({
       query: () => `/user-projects`,
       transformResponse: (response: {
@@ -117,7 +112,6 @@ export const reportApi = createApi({
       providesTags: ["Reports"],
     }),
 
-    // Update report status (only for project owner)
     updateReportStatus: builder.mutation<
       any,
       {
@@ -136,7 +130,6 @@ export const reportApi = createApi({
       ],
     }),
 
-    // Get a single report by ID
     getReportById: builder.query<Report, string>({
       query: (reportId) => `/info/${reportId}`,
       transformResponse: (response: {
@@ -165,7 +158,6 @@ export const {
   useGetReportByIdQuery,
 } = reportApi;
 
-// Helper function to get auth header for custom calls if needed
 export const getReportAuthHeader = () => {
   const token = getAuthToken();
   return token ? { Authorization: `Bearer ${token}` } : {};

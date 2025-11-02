@@ -176,7 +176,6 @@ const commentsSlice = createSlice({
 
       if (!comments) return;
 
-      // First try to delete from top level
       state.commentsByProject[projectId] = comments.filter(
         (c) => c._id !== commentId
       );

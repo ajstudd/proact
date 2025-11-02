@@ -1,6 +1,5 @@
 import { LocalStorageKeys } from "../configs/localStorageKeys";
 import { ErrorResponse, UserAuthResponsePayload } from "../types";
-// import { reAuthBaseQuery } from '@/utils/reAuth';
 import {
   BaseQueryFn,
   FetchArgs,
@@ -23,15 +22,6 @@ export const mediaApi = createApi({
         url: "/upload",
         method: "POST",
         body,
-        // headers: {
-        //   Authorization: `Bearer ${
-        //     (
-        //       JSON.parse(
-        //         localStorage.getItem(LocalStorageKeys.AUTH_DATA)!
-        //       ) as UserAuthResponsePayload
-        //     ).tokens.access.token
-        //   }`,
-        // },
       }),
     }),
   }),

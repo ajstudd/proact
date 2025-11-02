@@ -29,15 +29,11 @@ export const useUserState = () => {
       clearAuthData();
     } catch (error) {
       console.error("Logout failed:", error);
-      // Still clear local state even if API call fails
       dispatch(clearUser());
       clearAuthData();
     }
   };
 
-  /**
-   * Sets authentication status
-   */
   const setAuthenticated = (status: boolean) => {
     dispatch(setUserAuthentication(status));
   };

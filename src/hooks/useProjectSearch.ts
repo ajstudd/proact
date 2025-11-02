@@ -20,7 +20,6 @@ export default function useProjectSearch({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Only fetch when we have a search term
   const shouldFetch = debouncedSearchTerm.trim().length > 0;
 
   const { data, isFetching, isError } = useFastSearchProjectsQuery(

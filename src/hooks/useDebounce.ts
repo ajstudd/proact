@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-// Custom hook for debouncing with generic type
 const useDebounce = <T>(value: T, delay = 500) => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 

@@ -31,10 +31,8 @@ export const useCommentsState = (projectId: string) => {
     (state: RootState) => state.commentsSlice.commentsByProject[projectId] || []
   );
 
-  // Get root comments (those without a parent comment)
   const rootComments = allComments.filter((comment) => !comment.parentComment);
 
-  // Sort comments by creation date (newest first)
   const sortedComments = [...rootComments].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );

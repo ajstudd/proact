@@ -43,11 +43,6 @@ export interface UserAuthRequestPayload {
   password: string;
 }
 
-// export type LoginAuthRequestPayload = Pick<
-//   UserAuthRequestPayload,
-//   "email" | "password"
-// >;
-
 export interface LoginAuthRequestPayload {
   email?: string;
   phone?: string;
@@ -72,20 +67,6 @@ export interface LoginSuccessResponsePayload {
     };
   };
 }
-
-// {
-//   "message": "Login successful!",
-//   "resp": {
-//       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjYyZjQwZDljMGM4ZTIxNTkwYjY0NyIsInJvbGUiOiJVU0VSIiwiaXNWZXJpZmllZCI6dHJ1ZSwiaWF0IjoxNzQwMjUyMjc4LCJleHAiOjE3NDI4NDQyNzh9.3GCBf4isD0PuEu0KX3Etmj-lIvIJEVbFilHkl2efnTU",
-//       "user": {
-//           "id": "67b62f40d9c0c8e21590b647",
-//           "name": "junaid",
-//           "email": "j7654894110@gmail.com",
-//           "role": "USER",
-//           "isVerified": true
-//       }
-//   }
-// }
 
 export interface VerifyOtpRequestPayload {
   otp: string;
