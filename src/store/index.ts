@@ -4,7 +4,6 @@ import {
   mediaApi,
   userApi,
   imageApi,
-  postApi,
   otpApi,
   api,
   projectApi,
@@ -15,7 +14,6 @@ import {
 import userSlice from "./userSlice";
 import uiSlice from "./uiSlice";
 import notificationsSlice from "./notificationsSlice";
-import postsSlice from "./postsSlice";
 import commentsSlice from "./commentsSlice";
 
 export const store = configureStore({
@@ -25,14 +23,12 @@ export const store = configureStore({
     [api.reducerPath]: api.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [imageApi.reducerPath]: imageApi.reducer,
-    [postApi.reducerPath]: postApi.reducer,
     [otpApi.reducerPath]: otpApi.reducer,
     [analysisApi.reducerPath]: analysisApi.reducer,
     [reportApi.reducerPath]: reportApi.reducer,
     [notificationsApi.reducerPath]: notificationsApi.reducer,
     userSlice,
     notificationsSlice,
-    postsSlice,
     uiSlice,
     commentsSlice,
   },
@@ -44,7 +40,6 @@ export const store = configureStore({
       mediaApi.middleware,
       api.middleware,
       userApi.middleware,
-      postApi.middleware,
       imageApi.middleware,
       notificationsApi.middleware,
       projectApi.middleware,

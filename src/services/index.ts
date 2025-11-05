@@ -2,7 +2,6 @@ export * from "./authApi";
 export * from "./mediaApi";
 export * from "./userApi";
 export * from "./imageApi";
-export * from "./postApi";
 export * from "./otpApi";
 export * from "./api";
 export * from "./uploadApi";
