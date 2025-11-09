@@ -458,9 +458,9 @@ const ProjectPage = () => {
                 onDislike={handleDislike}
                 userHasLiked={userHasLiked}
                 userHasDisliked={userHasDisliked}
-                isAuthenticated={isAuthenticated} // Pass authentication status
-                projectId={project._id} // Pass projectId
-                canManageProject={canManageProject} // Pass management permissions
+                isAuthenticated={isAuthenticated}
+                projectId={project._id}
+                canManageProject={canManageProject}
             />
 
             {/* Redesigned Inventory & Usage Analysis */}
@@ -635,7 +635,7 @@ const ProjectPage = () => {
                 onDislikeComment={handleDislikeComment}
                 onDeleteComment={handleDeleteComment}
                 currentUserId={userId || undefined}
-                isAuthenticated={isAuthenticated} // Pass authentication status explicitly
+                isAuthenticated={isAuthenticated}
             />
 
             <PdfToSlides pdfUrl={project.pdfUrl} isOpen={isPdfOpen} onClose={() => setIsPdfOpen(false)} />

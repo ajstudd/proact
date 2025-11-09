@@ -39,7 +39,6 @@ export const useUser = () => {
   ] = useVerifyEmailChangeMutation();
 
   return {
-    // Original methods
     updateUser,
     isUserUpdateLoading,
     isUserUpdateError,
@@ -47,7 +46,6 @@ export const useUser = () => {
     userUpdateData,
     userUpdateError,
 
-    // New profile methods
     editProfile,
     isEditProfileLoading,
     isEditProfileError,
@@ -55,7 +53,6 @@ export const useUser = () => {
     editProfileData,
     editProfileError,
 
-    // Email verification
     verifyEmail,
     isVerifyEmailLoading,
     isVerifyEmailError,

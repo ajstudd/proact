@@ -17,14 +17,12 @@ const ReportsPage = () => {
     const [showStats, setShowStats] = useState(true);
     const [showExportMenu, setShowExportMenu] = useState(false);
 
-    // Redirect non-government users
     useEffect(() => {
         if (!authLoading && !isGovernment) {
             router.replace("/dashboard");
         }
     }, [authLoading, isGovernment, router]);
 
-    // Fetch reports for government user's projects
     const {
         data: reports = [],
         error,
@@ -35,7 +33,6 @@ const ReportsPage = () => {
         refetchOnMountOrArgChange: true
     });
 
-    // Filter and search reports
     const filteredReports = reports.filter((report) => {
         const matchesStatus = filter === "all" || report.status === filter;
         const matchesSearch =
@@ -45,7 +42,6 @@ const ReportsPage = () => {
         return matchesStatus && matchesSearch;
     });
 
-    // Sort reports by status priority and date
     const sortedReports = [...filteredReports].sort((a, b) => {
         const statusPriority = {
             pending: 0,
@@ -60,7 +56,6 @@ const ReportsPage = () => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-    // Calculate report statistics
     const reportStats = {
         total: reports.length,
         pending: reports.filter(r => r.status === "pending").length,
@@ -112,13 +107,10 @@ const ReportsPage = () => {
         });
     };
 
-    // Improved export function
     const exportReports = (format: string) => {
         try {
-            // Close the dropdown after selection
             setShowExportMenu(false);
 
-            // In a real implementation, this would create the proper file format
             const exportData = sortedReports.map(report => ({
                 project: report.project.title,
                 description: report.description,
@@ -135,14 +127,12 @@ const ReportsPage = () => {
         }
     };
 
-    // Function to handle refresh with loading state
     const handleRefresh = () => {
         refetch()
             .then(() => console.log("Reports refreshed successfully"))
             .catch(err => console.error("Error refreshing reports:", err));
     };
 
-    // Close export menu when clicking outside
     useEffect(() => {
         const handleClickOutside = () => setShowExportMenu(false);
         document.addEventListener('mousedown', handleClickOutside);

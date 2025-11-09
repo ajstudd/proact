@@ -41,7 +41,6 @@ const ProjectAnalysisPage: NextPage = () => {
     const { isGovernment, isLoading: authLoading } = useAuth();
     const toast = useToast();
 
-    // Fetch project analysis data
     const {
         data: analysisData,
         isLoading,
@@ -51,10 +50,8 @@ const ProjectAnalysisPage: NextPage = () => {
         skip: !id || authLoading || !isGovernment,
     });
 
-    // Mutation to regenerate analysis
     const [regenerateAnalysis, { isLoading: isRegenerating }] = useRegenerateProjectAnalysisMutation();
 
-    // Redirect if not a government user
     React.useEffect(() => {
         if (!authLoading && !isGovernment) {
             router.replace("/dashboard");
@@ -84,7 +81,6 @@ const ProjectAnalysisPage: NextPage = () => {
         }
     };
 
-    // Display loading state
     if (isLoading || authLoading) {
         return (
             <Flex height="100vh" align="center" justify="center">
@@ -93,7 +89,6 @@ const ProjectAnalysisPage: NextPage = () => {
         );
     }
 
-    // Display error state
     if (error || !analysisData) {
         return (
             <Flex direction="column" align="center" justify="center" height="90vh" p={4}>
@@ -116,7 +111,6 @@ const ProjectAnalysisPage: NextPage = () => {
         );
     }
 
-    // Format for currency numbers
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -125,7 +119,6 @@ const ProjectAnalysisPage: NextPage = () => {
         }).format(amount);
     };
 
-    // Format date strings
     const formatDate = (dateString: string | null) => {
         if (!dateString) return "Not available";
         return new Date(dateString).toLocaleDateString("en-US", {
@@ -135,7 +128,6 @@ const ProjectAnalysisPage: NextPage = () => {
         });
     };
 
-    // Calculate sentiment totals for the pie chart
     const sentimentTotal =
         analysisData.supportMetrics.commentSentiment.positive +
         analysisData.supportMetrics.commentSentiment.neutral +

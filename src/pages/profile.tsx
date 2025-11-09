@@ -17,12 +17,11 @@ export default function Profile() {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("comments");
 
-  // Extract user details
   const profileInfo = {
     name: user?.user.name || "Unknown User",
     email: user?.user.email || "No Email Provided",
     isVerified: user?.user.isVerified || false,
-    profile: user?.user.photo || "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=", // Default avatar
+    profile: user?.user.photo || "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=",
     role: user?.user.role || "USER",
     contractorId: user?.user.contractorLicense,
     governmentId: user?.user.governmentId,

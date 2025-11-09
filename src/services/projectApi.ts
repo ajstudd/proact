@@ -4,7 +4,6 @@ import { ProjectSearchResponse } from "../types";
 
 export const projectApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    // Project CRUD operations
     createProject: builder.mutation({
       query: (formData) => {
         const token = getAuthToken();
@@ -46,12 +45,10 @@ export const projectApi = api.injectEndpoints({
       query: (params = {}) => {
         const queryParams = new URLSearchParams();
 
-        // Add userId parameter if provided
         if (params.userId) {
           queryParams.append("userId", params.userId);
         }
 
-        // Add any other parameters that might be needed
         Object.entries(params).forEach(([key, value]) => {
           if (key !== "userId" && value !== undefined && value !== null) {
             queryParams.append(key, value.toString());
@@ -87,7 +84,6 @@ export const projectApi = api.injectEndpoints({
       invalidatesTags: ["Projects"],
     }),
 
-    // Project search and filter
     searchProjects: builder.query({
       query: (params) => {
         const { query, limit, page, sortBy, sortOrder, ...filters } = params;
@@ -99,7 +95,6 @@ export const projectApi = api.injectEndpoints({
         if (sortBy) queryParams.append("sortBy", sortBy);
         if (sortOrder) queryParams.append("sortOrder", sortOrder);
 
-        // Add any filters
         Object.entries(filters).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
             queryParams.append(key, value.toString());
@@ -116,7 +111,6 @@ export const projectApi = api.injectEndpoints({
       },
     }),
 
-    // Add fast search endpoint
     fastSearchProjects: builder.query<
       ProjectSearchResponse,
       {
@@ -190,16 +184,13 @@ export const projectApi = api.injectEndpoints({
 
     editProjectUpdate: builder.mutation({
       query: ({ projectId, updateId, content, media, keepExistingMedia }) => {
-        // Create FormData for file upload
         const formData = new FormData();
         formData.append("content", content);
 
-        // Flag to indicate whether to keep existing media
         if (keepExistingMedia !== undefined) {
           formData.append("keepExistingMedia", String(keepExistingMedia));
         }
 
-        // Append media files if they exist
         if (media && media.length > 0) {
           media.forEach((file: any) => {
             formData.append("media", file);
@@ -227,7 +218,6 @@ export const projectApi = api.injectEndpoints({
       ],
     }),
 
-    // New endpoint for updating project expenditure
     updateProjectExpenditure: builder.mutation({
       query: ({ projectId, expenditure }) => ({
         url: `/${projectId}/expenditure`,
@@ -239,11 +229,9 @@ export const projectApi = api.injectEndpoints({
       ],
     }),
 
-    // Project interactions (likes/dislikes)
     likeProject: builder.mutation({
       query: (projectId) => {
         const userId = getCurrentUserId();
-        // No need to manually add auth header as it's handled in the base query
         return {
           url: `/interaction/${projectId}/like`,
           method: "POST",
@@ -269,7 +257,6 @@ export const projectApi = api.injectEndpoints({
       ],
     }),
 
-    // Comments
     addComment: builder.mutation({
       query: ({ projectId, comment, parentCommentId }) => {
         const userId = getCurrentUserId();
@@ -288,7 +275,6 @@ export const projectApi = api.injectEndpoints({
         if (response.status === "error") {
           throw new Error(response.message);
         }
-        // Return the comment data for immediate UI update
         return response;
       },
       invalidatesTags: (result, error, { projectId }) => [
@@ -308,7 +294,6 @@ export const projectApi = api.injectEndpoints({
       ],
     }),
 
-    // Updated to match the API routes exactly
     likeComment: builder.mutation({
       query: ({ projectId, commentId }) => {
         const userId = getCurrentUserId();
@@ -323,7 +308,6 @@ export const projectApi = api.injectEndpoints({
       ],
     }),
 
-    // Updated to match the API routes exactly
     dislikeComment: builder.mutation({
       query: ({ projectId, commentId }) => {
         const userId = getCurrentUserId();
@@ -349,12 +333,12 @@ export const {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
   useSearchProjectsQuery,
-  useFastSearchProjectsQuery, // Export the new hook
+  useFastSearchProjectsQuery,
   useGetProjectUpdatesQuery,
   useAddProjectUpdateMutation,
   useEditProjectUpdateMutation,
   useRemoveProjectUpdateMutation,
-  useUpdateProjectExpenditureMutation, // Export the new mutation hook
+  useUpdateProjectExpenditureMutation,
   useLikeProjectMutation,
   useDislikeProjectMutation,
   useAddCommentMutation,

@@ -19,13 +19,11 @@ const HomePage = () => {
 
     useEffect(() => {
         setMounted(true);
-        // Refetch projects when component mounts to ensure we have the latest data
         refetch();
     }, [refetch]);
 
-    // Hide client-side only UI until after hydration
     if (!mounted) {
-        return null; // Return null on server-side to prevent hydration mismatch
+        return null;
     }
 
     return (

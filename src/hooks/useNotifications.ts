@@ -38,7 +38,6 @@ export const useNotifications = () => {
   const { data: unreadCountData, refetch: refetchUnreadCount } =
     useGetUnreadCountQuery();
 
-  // Synchronize unread count from API response with Redux state
   useEffect(() => {
     if (unreadCountData?.unreadCount !== undefined) {
       dispatch(setUnreadCount(unreadCountData.unreadCount));
@@ -48,7 +47,6 @@ export const useNotifications = () => {
   const [markAsRead] = useMarkAsReadMutation();
   const [markAllAsRead] = useMarkAllAsReadMutation();
 
-  // Auto-mark all notifications as read when the component loads
   useEffect(() => {
     if (
       !isLoadingNotifications &&
@@ -82,7 +80,6 @@ export const useNotifications = () => {
     }
   };
 
-  // Use the unread count from user state if available, otherwise fall back to notifications state
   const effectiveUnreadCount =
     unreadNotificationsCount !== undefined
       ? unreadNotificationsCount

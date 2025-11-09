@@ -15,7 +15,6 @@ export const useProfile = () => {
   const { updateUser } = useUserState();
   const { userId } = useCurrentUser();
 
-  // Get user profile
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -23,7 +22,6 @@ export const useProfile = () => {
     refetch: refetchProfile,
   } = useGetUserProfileQuery();
 
-  // Edit profile
   const [
     editProfile,
     {
@@ -34,7 +32,6 @@ export const useProfile = () => {
     },
   ] = useEditProfileMutation();
 
-  // Verify email change
   const [
     verifyEmailChange,
     {
@@ -44,7 +41,6 @@ export const useProfile = () => {
     },
   ] = useVerifyEmailChangeMutation();
 
-  // Get user comments
   const {
     data: userComments,
     isLoading: isCommentsLoading,
@@ -54,7 +50,6 @@ export const useProfile = () => {
     skip: !userId,
   });
 
-  // Get bookmarked projects
   const {
     data: bookmarkedProjects,
     isLoading: isBookmarksLoading,
@@ -62,7 +57,6 @@ export const useProfile = () => {
     refetch: refetchBookmarks,
   } = useGetBookmarkedProjectsQuery();
 
-  // Get user projects
   const {
     data: userProjects,
     isLoading: isProjectsLoading,

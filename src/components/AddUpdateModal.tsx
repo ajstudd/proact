@@ -26,19 +26,19 @@ const AddUpdateModal: React.FC<AddUpdateModalProps> = ({
     const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Track previous props values to avoid unnecessary updates
     const prevPropsRef = useRef({
         isOpen,
         initialContent,
         initialMedia: [...initialMedia]
     });
 
-    // Fix the infinite loop by properly comparing arrays and avoiding unnecessary updates
+    /**
+     * Update state when modal opens or initial values change.
+     * Prevents infinite loops by comparing array contents properly.
+     */
     useEffect(() => {
-        // Only update state if the modal is opening or if the initial values changed significantly
         const prevProps = prevPropsRef.current;
 
-        // Check if initialMedia arrays are different by comparing content
         const mediaChanged =
             initialMedia.length !== prevProps.initialMedia.length ||
             initialMedia.some((url, i) => prevProps.initialMedia[i] !== url);
@@ -51,18 +51,17 @@ const AddUpdateModal: React.FC<AddUpdateModalProps> = ({
             ))
         ) {
             setContent(initialContent);
-            setExistingMedia([...initialMedia]); // Use spread to ensure new array reference
+            setExistingMedia([...initialMedia]);
             setNewMediaFiles([]);
             setKeepExistingMedia(true);
         }
 
-        // Update ref with current props, creating new array reference for initialMedia
         prevPropsRef.current = {
             isOpen,
             initialContent,
             initialMedia: [...initialMedia]
         };
-    }, [isOpen, initialContent, initialMedia]); // Added initialMedia to dependencies since we have proper comparison
+    }, [isOpen, initialContent, initialMedia]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -88,7 +87,6 @@ const AddUpdateModal: React.FC<AddUpdateModalProps> = ({
             const filesArray = Array.from(e.target.files);
             setNewMediaFiles(prev => [...prev, ...filesArray]);
         }
-        // Clear the input value so the same file can be selected again if needed
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }

@@ -10,7 +10,6 @@ export const useBookmarks = () => {
   const { isAuthenticated } = useCurrentUser();
   const [bookmarkedProjects, setBookmarkedProjects] = useState<string[]>([]);
 
-  // Get mutations and queries for bookmark operations
   const [
     bookmarkProject,
     {
@@ -33,7 +32,6 @@ export const useBookmarks = () => {
     skip: !isAuthenticated,
   });
 
-  // Update local state when bookmarks data changes
   useEffect(() => {
     if (bookmarksData?.bookmarks) {
       const projectIds = bookmarksData.bookmarks.map(
@@ -43,12 +41,10 @@ export const useBookmarks = () => {
     }
   }, [bookmarksData]);
 
-  // Helper function to check if a project is bookmarked
   const isProjectBookmarked = (projectId: string) => {
     return bookmarkedProjects.includes(projectId);
   };
 
-  // Toggle bookmark status
   const toggleBookmark = async (projectId: string) => {
     if (!isAuthenticated) {
       return {

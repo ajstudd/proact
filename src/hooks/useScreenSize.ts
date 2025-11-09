@@ -23,13 +23,10 @@ const useScreenSize = () => {
       }
     };
 
-    // Initial size update
     updateSize();
 
-    // Update the size on window resize
     window.addEventListener("resize", updateSize);
 
-    // Cleanup event listener on component unmount
     return () => {
       window.removeEventListener("resize", updateSize);
     };

@@ -1,11 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-// import authReducer from './authSlice';
 import {
   authApi,
   mediaApi,
   userApi,
   imageApi,
-  postApi,
   otpApi,
   api,
   projectApi,
@@ -16,7 +14,6 @@ import {
 import userSlice from "./userSlice";
 import uiSlice from "./uiSlice";
 import notificationsSlice from "./notificationsSlice";
-import postsSlice from "./postsSlice";
 import commentsSlice from "./commentsSlice";
 
 export const store = configureStore({
@@ -26,14 +23,12 @@ export const store = configureStore({
     [api.reducerPath]: api.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [imageApi.reducerPath]: imageApi.reducer,
-    [postApi.reducerPath]: postApi.reducer,
     [otpApi.reducerPath]: otpApi.reducer,
     [analysisApi.reducerPath]: analysisApi.reducer,
     [reportApi.reducerPath]: reportApi.reducer,
     [notificationsApi.reducerPath]: notificationsApi.reducer,
     userSlice,
     notificationsSlice,
-    postsSlice,
     uiSlice,
     commentsSlice,
   },
@@ -45,7 +40,6 @@ export const store = configureStore({
       mediaApi.middleware,
       api.middleware,
       userApi.middleware,
-      postApi.middleware,
       imageApi.middleware,
       notificationsApi.middleware,
       projectApi.middleware,
@@ -55,7 +49,5 @@ export const store = configureStore({
     ),
 });
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;

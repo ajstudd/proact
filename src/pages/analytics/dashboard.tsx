@@ -42,7 +42,6 @@ const DashboardPage: NextPage = () => {
     const [activeTab, setActiveTab] = useState<string>("overview");
     const toast = useToast();
 
-    // Fetch government dashboard data
     const {
         data: dashboardData,
         isLoading,
@@ -52,10 +51,8 @@ const DashboardPage: NextPage = () => {
         skip: !isGovernment || authLoading,
     });
 
-    // Mutation to regenerate analysis
     const [regenerateAnalysis, { isLoading: isRegenerating }] = useRegenerateGovernmentAnalysisMutation();
 
-    // Redirect if not a government user
     React.useEffect(() => {
         if (!authLoading && !isGovernment) {
             router.replace("/dashboard");
@@ -83,7 +80,6 @@ const DashboardPage: NextPage = () => {
         }
     };
 
-    // Display loading state
     if (isLoading || authLoading) {
         return (
             <Flex height="100vh" align="center" justify="center">
@@ -92,7 +88,6 @@ const DashboardPage: NextPage = () => {
         );
     }
 
-    // Display error state
     if (error || !dashboardData) {
         return (
             <Flex direction="column" align="center" justify="center" height="90vh" p={4}>
@@ -115,16 +110,14 @@ const DashboardPage: NextPage = () => {
         );
     }
 
-    // Format for currency numbers
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
-            maximumFractionDigits: 0,
+            maximumFractionDigits: 0
         }).format(amount);
     };
 
-    // Format date strings
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("en-US", {
             year: "numeric",
@@ -133,7 +126,6 @@ const DashboardPage: NextPage = () => {
         });
     };
 
-    // Calculate sentiment totals for the pie chart
     const sentimentTotal =
         dashboardData.overallSatisfaction.commentSentimentDistribution.positive +
         dashboardData.overallSatisfaction.commentSentimentDistribution.neutral +
@@ -164,7 +156,6 @@ const DashboardPage: NextPage = () => {
         dashboardData.overallSatisfaction.commentSentimentDistribution.negative
     ];
 
-    // Prepare data for project status chart
     const projectStatusChartOptions = {
         labels: ['Active', 'Stalled', 'Completed'],
         colors: ['#4299E1', '#F6AD55', '#68D391'],
@@ -190,7 +181,6 @@ const DashboardPage: NextPage = () => {
         dashboardData.projectCount.completed
     ];
 
-    // Add a modern gradient background and more padding
     return (
         <>
             <Head>
