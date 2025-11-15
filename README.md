@@ -2,6 +2,8 @@
 
 **ProactiveIndia** is an AI-powered civic-tech platform that empowers citizens by providing real-time updates on government projects. It enables the public to track project progress, give feedback, and report corruption anonymously with AI-assisted analysis. Contractors update project developments, ensuring accountability, while the government oversees execution with intelligent insights. This initiative fosters civic engagement, combats corruption, and promotes proactive participation in national development.
 
+**🔗 Deployed Link**: [ProactiveIndia](https://www.proactiveindia.site/)
+
 ## Table of Contents
 
 - [Project Overview](#project-overview)
@@ -167,7 +169,6 @@ Using **Google Gemini 1.5 Flash** (`@google/generative-ai` SDK), the platform le
 
 ## 🔗 Links
 
-**Live Platform**: [ProactiveIndia](https://www.proactiveindia.site/)  
 **Backend Repository**: [proact_backend](https://github.com/ajstudd/proact_backend)  
 **Owner**: ajstudd
 
